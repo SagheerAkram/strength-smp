@@ -1,0 +1,69 @@
+name: StrengthSMP
+version: 1.0.0
+description: "Professional Strength PvP system for Floki SMP"
+main: com.floki.strengthsmp.StrengthSMP
+api-version: "1.21"
+authors:
+  - FlokiDev
+
+commands:
+  strength:
+    description: View your current strength
+    usage: "/strength"
+    aliases: [str, power]
+  
+  withdraw:
+    description: Withdraw strength into Nautilus Shells
+    usage: "/withdraw <amount>"
+  
+  bounty:
+    description: Place a bounty on a player
+    usage: "/bounty <player> <amount>"
+  
+  bountyrefund:
+    description: Refund a bounty (Admin)
+    usage: "/bountyrefund <player>"
+    permission: strengthsmp.admin
+  
+  ability:
+    description: Activate your weapon's ultimate ability
+    usage: "/ability"
+  
+  announce:
+    description: Send announcements to Discord channels
+    usage: "/announce [info|monarch]"
+    permission: strengthsmp.admin
+  
+  strengthsmp:
+    description: Admin panel for Strength SMP
+    usage: "/strengthsmp [toggle|info|reload|setupboard|setupleaderboard|resetplayer|reroll|setstrength|setweapon]"
+    permission: strengthsmp.admin
+
+  punish:
+    description: Punish a player (2x STR loss on death for 24 hours)
+    usage: "/punish <player>"
+    permission: strengthsmp.admin
+
+  notimer:
+    description: Remove a player's 4-hour death protection
+    usage: "/notimer <player>"
+    permission: strengthsmp.admin
+
+  killreset:
+    description: Reset kill counts for all players
+    usage: "/killreset"
+    permission: strengthsmp.admin
+
+  nonewbie:
+    description: Remove a player's newbie protection early
+    usage: "/nonewbie <player>"
+    permission: strengthsmp.admin
+
+  removeprotection:
+    description: Remove your own death or newbie protection
+    usage: "/removeprotection"
+
+permissions:
+  strengthsmp.admin:
+    description: Admin access to all strength commands
+    default: op

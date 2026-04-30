@@ -1,0 +1,28 @@
+# StrengthSMP World Events & Seasons
+# Scheduled events and seasonal modifiers.
+
+seasons:
+  enabled: false
+  current-season: 1
+  duration-days: 30
+  modifiers:
+    strength-gain-multiplier: 1.0
+    bounty-reward-multiplier: 1.0
+
+events:
+  daily-contracts:
+    enabled: false
+    refresh-time: "00:00"
+    pool:
+      - "Kill 5 players"
+      - "Claim a bounty"
+      - "Reach 5 strength"
+      - "Win a duel"
+
+  monarch:
+    enabled: false
+    death-tax: 0.1 # 10% tax on all strength lost goes to Monarch? 
+    glow-color: "GOLD"
+    effects:
+      - "INCREASE_DAMAGE:1"
+      - "SPEED:1"

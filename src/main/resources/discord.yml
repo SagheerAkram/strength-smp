@@ -1,0 +1,25 @@
+# StrengthSMP Discord Integration Configuration
+
+# Bot Settings
+enabled: true
+bot-token: "YOUR_TOKEN_HERE"
+bot-name: "FlokiBot"
+update-interval: 30 # Seconds for general updates
+
+# Channel IDs
+channels:
+  dashboard: ""
+  leaderboard: ""
+  welcome: ""
+  audit: ""
+  monarch: "" # Optional separate channel for monarch board
+
+# Leaderboard Display Settings
+leaderboard:
+  enabled: true
+  update-minutes: 5
+  color: "gold"
+  show-kills: true
+  show-bounties: true
+  show-monarch: true
+  show-status: true

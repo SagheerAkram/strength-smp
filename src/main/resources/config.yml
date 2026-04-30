@@ -1,0 +1,138 @@
+# ═══════════════════════════════════════════════════════════════════════
+# FLOKI STRENGTH SMP — CONFIGURATION FILE
+# All values are hot-reloadable with /strengthsmp reload
+# ═══════════════════════════════════════════════════════════════════════
+
+# ─── Core Strength Settings ─────────────────────────────────────────────
+strength:
+  min: 0           # Minimum strength a player can reach
+  max: 5           # Maximum strength a player can reach
+  default: 0       # Starting strength for new players
+
+  # On PvP kill: victim loses this many, attacker gets an item worth this many
+  death-penalty: 1
+  death-gain: 1
+
+  # Underdog rule: negative-strength player killing a high-strength player gains more
+  underdog-multiplier: 2  # multiplied strength gain
+  underdog-threshold: 3   # attacker must have at least this much more strength
+
+# ─── Items ──────────────────────────────────────────────────────────────
+items:
+  strength-item: NAUTILUS_SHELL
+  reroll-item: BOOK
+
+# ─── Damage Scaling ─────────────────────────────────────────────────────
+# Controls how strength stat affects raw melee damage.
+# IMPORTANT: Set only-on-weapon-match: true to prevent bare-hand overpowering.
+damage-scaling:
+  enabled: true
+  # If true, bonus ONLY applies when the attacker holds their class weapon.
+  # Prevents bare-fist hits from being overpowered.
+  only-on-weapon-match: true
+  # Extra raw damage per strength point (0.5 = +0.25 hearts per strength)
+  per-strength: 0.5
+  # Damage reduction per victim strength point
+  victim-reduction-per-strength: 0.3
+
+# ─── Weapon Abilities ───────────────────────────────────────────────────
+weapons:
+
+  # ── SWORD ──
+  # Passive: every N hits charges a single next-hit damage burst.
+  sword:
+    passive-combo-hits: 3        # How many hits to charge the burst
+    passive-damage-mult: 1.15    # Damage multiplier on the charged next hit (1.15 = +15%)
+    # Shockwave AoE (set to 0 to disable — disabled by default for balance)
+    shockwave-damage: 0.0        # Extra damage dealt to nearby enemies on combo trigger
+    shockwave-radius: 0.0        # Radius of the shockwave (0 = disabled)
+
+  # ── AXE ──
+  # Passive: every N crits triggers a short stun + delayed bleed.
+  axe:
+    passive-crit-hits: 5         # Number of critical hits before passive fires
+    stun-duration-ticks: 10      # How long the stun lasts (10 ticks = 0.5 seconds)
+    bleed-damage: 1.5            # Delayed bleed damage dealt after bleed-delay-ticks
+    bleed-delay-ticks: 40        # Ticks before bleed triggers (40 = 2 seconds)
+
+  # ── TRIDENT ──
+  # Passive: every N hits calls a lightning strike and grants a speed boost.
+  trident:
+    hits-for-lightning: 4        # Hits before lightning passive fires
+    lightning-extra-damage: 0.5  # Bonus damage added when lightning triggers
+    speed-level: 0               # Speed potion level (0 = Speed I, 1 = Speed II)
+    speed-duration-ticks: 60     # How long the speed lasts (60 ticks = 3 seconds)
+
+  # ── SHIELD ──
+  # Passive: blocking grants speed and counter-damages the attacker (with cooldown).
+  shield:
+    speed-level: 1               # Speed level on block (1 = Speed II)
+    speed-duration-ticks: 100    # Duration of speed boost (100 ticks = 5 seconds)
+    counter-damage: 2.0          # Damage reflected to the attacker on counter
+    counter-radius: 3.0          # Max distance to the attacker for counter to fire
+    counter-cooldown-seconds: 3  # Cooldown between counter activations (prevents spam)
+
+  # ── BOW ──
+  # Passive: every arrow explodes on impact — moderate damage + full TNT-style knockback.
+  # No block damage is applied.
+  bow:
+    explosion-radius: 4.0        # Radius of the explosion (blocks)
+    explosion-damage: 3.0        # Damage dealt to entities in radius (1.5 hearts)
+    explosion-knockback-h: 2.5   # Horizontal knockback multiplier (TNT-like)
+    explosion-knockback-v: 0.6   # Vertical knockback (launch height)
+
+  # ── CROSSBOW ──
+  # Passive: arrow hit pulls the victim toward the shooter + chains nearby players.
+  crossbow:
+    pull-strength: 1.5           # How strongly the victim is pulled (velocity multiplier)
+    chain-radius: 3.0            # Radius for chain-leashing nearby players
+    chain-pull-strength: 1.2     # Pull strength for chain victims
+
+# ─── Weapon Cooldowns (seconds) ─────────────────────────────────────────
+cooldowns:
+  sword: 60
+  axe: 60
+  trident: 60
+  shield: 60
+  bow: 60
+  crossbow: 60
+
+# ─── Weapon Duration (seconds) ──────────────────────────────────────────
+durations:
+  sword: 15
+  axe: 5
+  trident: 5
+  shield: 15
+  crossbow: 15
+  bow: 3
+
+# ─── Combat System ──────────────────────────────────────────────────────
+combat:
+  grace-period: 5           # Join grace period in seconds (immune to damage)
+  combat-tag-duration: 15   # Combat tag duration in seconds
+  ping-logout-threshold: 500 # ms ping before logout is flagged
+
+# ─── Anti-Farm ──────────────────────────────────────────────────────────
+anti-farm:
+  max-kills-same-player: 2  # Max rewarded kills per player within the window
+  window-minutes: 10        # Rolling time window in minutes
+
+# ─── Potion Settings ────────────────────────────────────────────────────
+potions:
+  ban-strength-potions: true  # Block vanilla Strength II potions
+
+# ─── System ─────────────────────────────────────────────────────────────
+system:
+  active-on-startup: false
+  maintenance-keep-inventory: true
+  contracts:
+    count-per-day: 3
+    reward-strength: 1
+
+# ─── Totem Limit ────────────────────────────────────────────────────────
+totem-limit:
+  enabled: true
+  max: 2                   # Maximum total totems a player can carry
+  drop-excess: true        # If true, excess totems drop at player location. If false, they are deleted.
+  message-cooldown-seconds: 2 # Cooldown for the "Limit Exceeded" warning message
+

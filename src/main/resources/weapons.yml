@@ -1,0 +1,57 @@
+# StrengthSMP Weapon Balancing
+# All values can be tuned here without code changes.
+
+sword:
+  cosmetic-name: "&b&lDuelist Sword"
+  rename-on-bind: true
+  passive-combo-hits: 3
+  passive-damage-mult: 1.25
+  shockwave:
+    enabled: true
+    damage: 2.0
+    radius: 3.5
+    cooldown: 15
+
+axe:
+  cosmetic-name: "&c&lHeirloom Axe"
+  rename-on-bind: true
+  passive-crit-hits: 5
+  stun-duration-ticks: 20
+  bleed:
+    damage: 1.5
+    ticks: 40
+
+bow:
+  cosmetic-name: "&e&lRecurve Bow"
+  rename-on-bind: true
+  explosion:
+    radius: 4.0
+    damage: 3.0
+    knockback-h: 2.5
+    knockback-v: 0.6
+
+crossbow:
+  cosmetic-name: "&6&lHeavy Crossbow"
+  rename-on-bind: true
+  pull-strength: 1.5
+  chain:
+    radius: 5.0
+    pull-strength: 1.2
+
+trident:
+  cosmetic-name: "&3&lRoyal Trident"
+  rename-on-bind: true
+  lightning-hits: 4
+  lightning-damage: 2.0
+  speed-level: 1
+  speed-ticks: 100
+
+shield:
+  cosmetic-name: "&f&lBulwark Shield"
+  rename-on-bind: true
+  speed-level: 1
+  speed-ticks: 100
+  counter:
+    damage: 2.5
+    radius: 3.0
+    cooldown: 5
