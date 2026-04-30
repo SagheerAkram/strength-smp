@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/thumbnail.jpg" alt="StrengthSMP Thumbnail">
+</p>
+
 # ⚔️ **StrengthSMP | Professional Strength PvP System**
 
 **StrengthSMP** is not your typical PvP plugin. It is a complete competitive combat overhaul for Spigot/Paper 1.21+ servers.
