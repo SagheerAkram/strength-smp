@@ -132,14 +132,11 @@ public class Config {
 
     // Discord
     // Discord (read only from discord.yml)
+    // Discord (read only from discord.yml)
     public boolean isDiscordEnabled()       { return getD().getBoolean("enabled",          true); }
-    public String  getBotToken()            { return getD().getString ("bot-token",           ""); }
-    public String  getBotName()             { return getD().getString ("bot-name",    "FlokiBot"); }
-    public String  getDashboardChannelId()  { return getD().getString ("channels.dashboard",  ""); }
-    public String  getLeaderboardChannelId(){ return getD().getString ("channels.leaderboard",""); }
-    public String  getWelcomeChannelId()    { return getD().getString ("channels.welcome",    ""); }
-    public String  getAuditChannelId()      { return getD().getString ("channels.audit",      ""); }
-    public String  getMonarchChannelId()    { return getD().getString ("channels.monarch",    ""); }
+    public String  getAuditWebhook()        { return getD().getString ("webhooks.audit",      ""); }
+    public String  getAnnouncementWebhook() { return getD().getString ("webhooks.announcements", ""); }
+    public String  getLeaderboardWebhook()  { return getD().getString ("webhooks.leaderboard",   ""); }
     public int     getDiscordUpdateInterval(){ return getD().getInt   ("update-interval",     30); }
 
     // Discord Leaderboard (discord.yml)
@@ -168,4 +165,19 @@ public class Config {
     public int     getTotemMax()                { return getC().getInt("totem-limit.max", 2); }
     public boolean isTotemDropExcess()          { return getC().getBoolean("totem-limit.drop-excess", true); }
     public int     getTotemMessageCooldown()    { return getC().getInt("totem-limit.message-cooldown-seconds", 2); }
+
+    // ════════════════════════════════════════════════════════════════
+    //  MONARCH
+    // ════════════════════════════════════════════════════════════════
+    public boolean isMonarchEnabled()           { return getC().getBoolean("monarch.enabled", true); }
+    public boolean isMonarchGlowing()           { return getC().getBoolean("monarch.glowing", true); }
+    public boolean isMonarchAnnouncements()     { return getC().getBoolean("monarch.announcements", true); }
+
+    // ════════════════════════════════════════════════════════════════
+    //  PROTECTION
+    // ════════════════════════════════════════════════════════════════
+    public boolean isDeathProtectionEnabled()   { return getC().getBoolean("protection.death.enabled", true); }
+    public int     getDeathProtectionHours()     { return getC().getInt("protection.death.duration-hours", 4); }
+    public boolean isNewbieProtectionEnabled()  { return getC().getBoolean("protection.newbie.enabled", true); }
+    public int     getNewbieProtectionHours()    { return getC().getInt("protection.newbie.duration-hours", 8); }
 }

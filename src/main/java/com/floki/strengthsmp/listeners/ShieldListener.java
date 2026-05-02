@@ -85,7 +85,7 @@ public class ShieldListener implements Listener {
         reflecting.add(player.getUniqueId());
         player.sendMessage("§6§lREFLECT §r§7— You are reflecting all damage for 7s!");
         player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0f, 1.5f);
-        player.getWorld().spawnParticle(Particle.ENCHANT, player.getLocation(), 100, 0.5, 1.0, 0.5, 0.1);
+        player.getWorld().spawnParticle(org.bukkit.Particle.ENCHANTMENT_TABLE, player.getLocation(), 100, 0.5, 1.0, 0.5, 0.1);
 
         org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
             reflecting.remove(player.getUniqueId());

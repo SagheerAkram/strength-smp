@@ -64,8 +64,8 @@ public class AxeListener implements Listener {
 
     private void triggerGroundPound(Player player) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.8f);
-        player.getWorld().spawnParticle(Particle.EXPLOSION_EMITTER, player.getLocation(), 1);
-        player.getWorld().spawnParticle(Particle.BLOCK, player.getLocation(), 100, 3.0, 0.1, 3.0, Material.DIRT.createBlockData());
+        player.getWorld().spawnParticle(org.bukkit.Particle.EXPLOSION_HUGE, player.getLocation(), 1);
+        player.getWorld().spawnParticle(org.bukkit.Particle.BLOCK_CRACK, player.getLocation(), 100, 3.0, 0.1, 3.0, org.bukkit.Material.DIRT.createBlockData());
 
         for (Entity entity : player.getNearbyEntities(6.0, 4.0, 6.0)) {
             if (entity instanceof LivingEntity && !entity.equals(player)) {

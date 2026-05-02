@@ -38,7 +38,7 @@ public class AbilityCommand extends BaseCommand {
 
         switch (type) {
             case SHIELD:
-                player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 100, 1));
+                player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 1));
                 sendMessage(player, "<#3498db><b>SHIELD</b></#3498db> <gray>Active: Resistance II (5s)</gray>");
                 success = true;
                 break;

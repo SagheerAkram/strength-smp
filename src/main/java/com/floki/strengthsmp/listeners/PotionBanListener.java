@@ -12,16 +12,15 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionData;
 
 /**
  * Blocks vanilla Strength potions from being used.
- * Uses the modern PotionMeta API compatible with Paper 1.21.
+ * Refactored for 1.16.5 Spigot API compatibility.
  */
 public class PotionBanListener implements Listener {
 
@@ -31,7 +30,6 @@ public class PotionBanListener implements Listener {
         this.plugin = plugin;
     }
 
-    /** Block drinking strength potions */
     @EventHandler
     public void onPotionConsume(PlayerItemConsumeEvent event) {
         if (!plugin.getConfigManager().isBanStrengthPotions()) return;
@@ -43,64 +41,60 @@ public class PotionBanListener implements Listener {
         }
     }
 
-    /** Block splash potions containing strength */
     @EventHandler
     public void onPotionSplash(PotionSplashEvent event) {
         if (!plugin.getConfigManager().isBanStrengthPotions()) return;
         
         if (isStrengthSource(event.getPotion().getItem())) {
             event.setCancelled(true);
-            if (event.getPotion().getShooter() instanceof Player shooter) {
-                shooter.sendMessage("§c⚠ Strength potions are disabled.");
+            if (event.getPotion().getShooter() instanceof Player) {
+                ((Player) event.getPotion().getShooter()).sendMessage("§c⚠ Strength potions are disabled.");
             }
         }
     }
 
-    /** Block lingering potion clouds from applying strength */
     @EventHandler
     public void onCloudApply(AreaEffectCloudApplyEvent event) {
         if (!plugin.getConfigManager().isBanStrengthPotions()) return;
         
         AreaEffectCloud cloud = event.getEntity();
-        if (cloud.getBasePotionType() != null && cloud.getBasePotionType() == PotionType.STRENGTH) {
+        PotionData data = cloud.getBasePotionData();
+        if (data != null && data.getType() == PotionType.STRENGTH) {
             event.setCancelled(true);
             return;
         }
         
-        // Check custom effects in cloud
         for (PotionEffect effect : cloud.getCustomEffects()) {
-            if (effect.getType().equals(PotionEffectType.STRENGTH)) {
+            if (effect.getType().equals(PotionEffectType.INCREASE_DAMAGE)) {
                 event.setCancelled(true);
                 return;
             }
         }
     }
 
-    /** Block tipped arrows with strength */
     @EventHandler
     public void onArrowHit(ProjectileHitEvent event) {
         if (!plugin.getConfigManager().isBanStrengthPotions()) return;
-        if (!(event.getEntity() instanceof Arrow arrow)) return;
+        if (!(event.getEntity() instanceof Arrow)) return;
+        Arrow arrow = (Arrow) event.getEntity();
         
-        if (arrow.getBasePotionType() != null && arrow.getBasePotionType() == PotionType.STRENGTH) {
-            arrow.setBasePotionType(null); // Strip effect
+        PotionData data = arrow.getBasePotionData();
+        if (data != null && data.getType() == PotionType.STRENGTH) {
+            arrow.setBasePotionData(new PotionData(PotionType.WATER)); // Strip effect
         }
         
-        // Remove custom strength effects
         if (!arrow.getCustomEffects().isEmpty()) {
-            arrow.removeCustomEffect(PotionEffectType.STRENGTH);
+            arrow.removeCustomEffect(PotionEffectType.INCREASE_DAMAGE);
         }
     }
 
-    /** Global backstop for any strength effect application */
     @EventHandler
     public void onStrengthEffectApplied(EntityPotionEffectEvent event) {
         if (!plugin.getConfigManager().isBanStrengthPotions()) return;
         if (!(event.getEntity() instanceof Player)) return;
         if (event.getNewEffect() == null) return;
 
-        // If it's strength and comes from a potion source, cancel it
-        if (event.getNewEffect().getType().equals(PotionEffectType.STRENGTH)) {
+        if (event.getNewEffect().getType().equals(PotionEffectType.INCREASE_DAMAGE)) {
             EntityPotionEffectEvent.Cause cause = event.getCause();
             if (cause.name().contains("POTION") || 
                 cause == EntityPotionEffectEvent.Cause.AREA_EFFECT_CLOUD ||
@@ -110,19 +104,18 @@ public class PotionBanListener implements Listener {
         }
     }
 
-    /** Helper to check if an item provides strength */
     private boolean isStrengthSource(ItemStack item) {
         if (item == null || !item.hasItemMeta()) return false;
-        if (!(item.getItemMeta() instanceof PotionMeta meta)) return false;
+        if (!(item.getItemMeta() instanceof PotionMeta)) return false;
+        PotionMeta meta = (PotionMeta) item.getItemMeta();
 
-        // Check base potion type
-        if (meta.getBasePotionType() != null && meta.getBasePotionType() == PotionType.STRENGTH) {
+        PotionData data = meta.getBasePotionData();
+        if (data != null && data.getType() == PotionType.STRENGTH) {
             return true;
         }
 
-        // Check custom effects
         for (PotionEffect effect : meta.getCustomEffects()) {
-            if (effect.getType().equals(PotionEffectType.STRENGTH)) {
+            if (effect.getType().equals(PotionEffectType.INCREASE_DAMAGE)) {
                 return true;
             }
         }

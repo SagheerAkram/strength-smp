@@ -33,7 +33,7 @@ public class StrengthSMP extends JavaPlugin {
         
         long startTime = System.currentTimeMillis();
         getLogger().info("╔════════════════════════════════════════════════════════════╗");
-        getLogger().info("║       🗡️  FLOKI STRENGTH SMP - v1.0.0 INITIALIZING  🗡️      ║");
+        getLogger().info("║       🗡️  FLOKI STRENGTH SMP - v1.0.1 INITIALIZING  🗡️      ║");
         getLogger().info("╚════════════════════════════════════════════════════════════╝");
         
         // 1. Initialize Core Configuration
@@ -71,7 +71,7 @@ public class StrengthSMP extends JavaPlugin {
         
         // 7. Initialize Discord bot
         if (config.isDiscordEnabled()) {
-            this.discordManager = new DiscordManager(this, config.getBotToken());
+            this.discordManager = new DiscordManager(this, "");
             getLogger().info("✓ Discord bot connecting asynchronously...");
             Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
                 discordManager.connect();

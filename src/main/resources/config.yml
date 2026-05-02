@@ -136,3 +136,18 @@ totem-limit:
   drop-excess: true        # If true, excess totems drop at player location. If false, they are deleted.
   message-cooldown-seconds: 2 # Cooldown for the "Limit Exceeded" warning message
 
+# ─── Monarch Settings ───────────────────────────────────────────────────
+monarch:
+  enabled: true
+  glowing: true
+  announcements: true
+
+# ─── Protection Settings ────────────────────────────────────────────────
+protection:
+  death:
+    enabled: true
+    duration-hours: 4
+  newbie:
+    enabled: true
+    duration-hours: 8
+

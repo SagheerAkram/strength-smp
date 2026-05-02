@@ -40,7 +40,7 @@ public class ExperimentalManager {
                 if (monarchId != null) {
                     Player monarch = Bukkit.getPlayer(monarchId);
                     if (monarch != null && monarch.isOnline()) {
-                        monarch.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, monarch.getLocation().add(0, 1, 0), 3, 0.5, 0.5, 0.5, 0.05);
+                        monarch.getWorld().spawnParticle(Particle.TOTEM, monarch.getLocation().add(0, 1, 0), 3, 0.5, 0.5, 0.5, 0.05);
                         if (!monarch.getPlayerListName().contains("Monarch")) {
                             monarch.setPlayerListName("§e[👑 Monarch] §r" + monarch.getName());
                         }
@@ -52,8 +52,8 @@ public class ExperimentalManager {
                     int bounty = dataManager.getBounty(player.getUniqueId());
                     if (bounty >= 2) {
                         if (Math.random() < 0.3) { // 30% chance every 2 seconds to hear heartbeat
-                            player.playSound(player.getLocation(), Sound.ENTITY_WARDEN_HEARTBEAT, 1.0f, 1.0f);
-                            player.getWorld().spawnParticle(Particle.SMOKE, player.getLocation().add(0, 1, 0), 5, 0.3, 0.3, 0.3, 0.02);
+                            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 1.0f, 0.5f);
+                            player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0, 1, 0), 5, 0.3, 0.3, 0.3, 0.02);
                         }
                     }
                 }

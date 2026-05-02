@@ -76,7 +76,7 @@ public class ItemInteractionListener implements Listener {
         String hexName = getWeaponHex(nextType);
         player.sendTitle(MessageUtil.color("&#f1c40f&l⚔ NEW POWER"), MessageUtil.color(hexName + "<b>" + nextType.getDisplayName().toUpperCase()), 10, 40, 10);
         player.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1.0f, 1.5f);
-        player.getWorld().spawnParticle(org.bukkit.Particle.WITCH, player.getLocation().add(0, 1, 0), 50, 0.5, 0.5, 0.5, 0.1);
+        player.getWorld().spawnParticle(org.bukkit.Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 50, 0.5, 0.5, 0.5, 0.1);
         
         MessageUtil.send(player, "strength.reroll-success", "type", nextType.getDisplayName());
         plugin.updateDisplay(player);

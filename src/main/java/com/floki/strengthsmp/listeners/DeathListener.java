@@ -143,12 +143,13 @@ public class DeathListener implements Listener {
                 // Victim loses strength (1 normally, 2 if punished)
                 plugin.getStrengthService().removeStrength(victim, lossAmount);
 
-                // ── Grant 4-hour death protection to victim ──────────────────
-                if (!isPunished) {
-                    long protectionExpiry = System.currentTimeMillis() + (4 * 60 * 60 * 1000L); // 4 hours
+                // ── Grant death protection to victim ──────────────────
+                if (!isPunished && plugin.getConfigManager().isDeathProtectionEnabled()) {
+                    long durationHours = plugin.getConfigManager().getDeathProtectionHours();
+                    long protectionExpiry = System.currentTimeMillis() + (durationHours * 60 * 60 * 1000L);
                     plugin.getDataManager().setDeathProtection(vUid, protectionExpiry);
                     MessageUtil.send(victim, "strength.protection-granted");
-                } else {
+                } else if (isPunished) {
                     MessageUtil.send(victim, "strength.punished-no-protection");
                 }
 

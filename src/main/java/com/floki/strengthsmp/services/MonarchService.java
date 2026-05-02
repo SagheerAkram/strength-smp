@@ -56,7 +56,7 @@ public class MonarchService {
 
     public void calculateNewMonarch() {
         // ⏳ GATING: No monarch selection until 1 hour after plugin start
-        if (System.currentTimeMillis() < dataManager.getMonarchStartTime()) {
+        if (!plugin.getConfigManager().isMonarchEnabled() || System.currentTimeMillis() < dataManager.getMonarchStartTime()) {
             return;
         }
 
@@ -84,8 +84,10 @@ public class MonarchService {
     }
 
     private void announceNewMonarch(UUID uuid) {
-        String name = Bukkit.getOfflinePlayer(uuid).getName();
-        Bukkit.broadcastMessage(MessageUtil.parse("<#f1c40f><b>[MONARCH]</b></#f1c40f> <white>" + (name != null ? name : "Unknown") + "</white> <gray>has claimed the Crown!</gray>"));
+        if (plugin.getConfigManager().isMonarchAnnouncements()) {
+            String name = Bukkit.getOfflinePlayer(uuid).getName();
+            Bukkit.broadcastMessage(MessageUtil.parse("<#f1c40f><b>[MONARCH]</b></#f1c40f> <white>" + (name != null ? name : "Unknown") + "</white> <gray>has claimed the Crown!</gray>"));
+        }
         
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
@@ -111,7 +113,9 @@ public class MonarchService {
         if (player == null) return;
 
         // Apply Red Glow via Team
-        setMonarchGlow(player, true);
+        if (plugin.getConfigManager().isMonarchGlowing()) {
+            setMonarchGlow(player, true);
+        }
         
         // Strictly Fire Resistance and Red Glow as per new rules
         player.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 0, false, false, true));

@@ -80,7 +80,7 @@ public class BowListener implements Listener {
                     Vector currentVel = arrow.getVelocity();
                     double speed = currentVel.length();
                     arrow.setVelocity(currentVel.add(direction.multiply(0.2)).normalize().multiply(speed));
-                    arrow.getWorld().spawnParticle(Particle.INSTANT_EFFECT, arrow.getLocation(), 1, 0, 0, 0, 0);
+                    arrow.getWorld().spawnParticle(org.bukkit.Particle.SPELL_INSTANT, arrow.getLocation(), 1, 0, 0, 0, 0);
                 }
             }
         }.runTaskTimer(plugin, 1L, 1L);
@@ -92,7 +92,7 @@ public class BowListener implements Listener {
         if (!arrow.hasMetadata("explosive")) return;
 
         org.bukkit.Location loc = arrow.getLocation();
-        arrow.getWorld().spawnParticle(Particle.EXPLOSION_EMITTER, loc, 1);
+        arrow.getWorld().spawnParticle(org.bukkit.Particle.EXPLOSION_HUGE, loc, 1);
         arrow.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 1.0f);
 
         // Manual damage loop to prevent self-damage

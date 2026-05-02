@@ -1,24 +1,20 @@
-# StrengthSMP Discord Integration Configuration
+# StrengthSMP Discord Integration — WEBHOOK VERSION
+# This version is ultra-lightweight and uses Discord Webhooks.
 
-# Bot Settings
 enabled: true
-bot-token: "YOUR_TOKEN_HERE"
-bot-name: "FlokiBot"
-update-interval: 30 # Seconds for general updates
 
-# Channel IDs
-channels:
-  dashboard: ""
-  leaderboard: ""
-  welcome: ""
-  audit: ""
-  monarch: "" # Optional separate channel for monarch board
+# Webhook URLs
+# You can get these in Discord: Channel Settings -> Integrations -> Webhooks
+webhooks:
+  audit: "YOUR_WEBHOOK_URL_HERE"       # For kill logs and combat logs
+  announcements: "YOUR_WEBHOOK_URL_HERE" # For milestone/monarch announcements
+  leaderboard: "YOUR_WEBHOOK_URL_HERE"   # For the periodic leaderboard update
 
-# Leaderboard Display Settings
+# Leaderboard Settings
 leaderboard:
   enabled: true
-  update-minutes: 5
-  color: "gold"
+  update-minutes: 10 # Periodic updates
+  color: "#f1c40f"
   show-kills: true
   show-bounties: true
   show-monarch: true
