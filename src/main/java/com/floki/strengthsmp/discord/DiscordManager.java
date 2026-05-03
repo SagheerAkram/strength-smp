@@ -69,9 +69,12 @@ public class DiscordManager {
             embed.addProperty("description", "**" + killer.getName() + "** killed **" + victim.getName() + "**");
             embed.addProperty("color", 0xe67e22);
             if (bounty > 0) {
-                embed.addProperty("footer", "Bounty Claimed: " + bounty + " Strength");
+                JsonObject footer = new JsonObject();
+                footer.addProperty("text", "Bounty Claimed: " + bounty + " Strength");
+                embed.add("footer", footer);
             }
         }
+        embed.addProperty("timestamp", Instant.now().toString());
         
         sendWebhook(webhook, embed);
     }
@@ -105,6 +108,17 @@ public class DiscordManager {
             }
         }
         fields.add(createField("⚡ Top Strength", strBuilder.toString(), false));
+
+        // 1.5 MONARCH
+        if (config.lbShowMonarch()) {
+            UUID monarchUUID = plugin.getDataManager().getMonarch();
+            String monarchName = "None";
+            if (monarchUUID != null) {
+                monarchName = Bukkit.getOfflinePlayer(monarchUUID).getName();
+                if (monarchName == null) monarchName = "Unknown";
+            }
+            fields.add(createField("👑 Current Monarch", "**" + monarchName + "**", true));
+        }
 
         // 2. TOP KILLERS
         if (config.lbShowKills()) {

@@ -553,8 +553,6 @@ public class DataManager {
     }
 
     public UUID getMonarch() { 
-        // Monarch system is only active after the start time
-        if (System.currentTimeMillis() < monarchStartTime) return null;
         return monarchUUID; 
     }
     

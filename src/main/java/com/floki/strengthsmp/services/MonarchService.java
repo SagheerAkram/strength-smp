@@ -55,8 +55,7 @@ public class MonarchService {
     }
 
     public void calculateNewMonarch() {
-        // ⏳ GATING: No monarch selection until 1 hour after plugin start
-        if (!plugin.getConfigManager().isMonarchEnabled() || System.currentTimeMillis() < dataManager.getMonarchStartTime()) {
+        if (!plugin.getConfigManager().isMonarchEnabled()) {
             return;
         }
 

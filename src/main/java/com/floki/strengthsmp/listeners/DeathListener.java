@@ -70,6 +70,9 @@ public class DeathListener implements Listener {
     private void handleDeathRewards(org.bukkit.OfflinePlayer attacker, Player victim, boolean isCombatLog) {
         UUID aUid = attacker.getUniqueId();
         UUID vUid = victim.getUniqueId();
+        
+        // Log to Discord
+        plugin.getDiscordManager().logKill(attacker.isOnline() ? (Player) attacker : null, victim, plugin.getDataManager().getBounty(vUid));
 
         // ── 1. Bounty Payout (MANDATORY - No Anti-Farm) ──────────────────────
         int bounty = plugin.getDataManager().getBounty(vUid);
