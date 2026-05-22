@@ -19,3 +19,8 @@ logs/
 # Other
 scratch/
 dependency-reduced-pom.xml
+
+# Zips and binaries
+*.zip
+src/main/resources/strengthsmp.zip
+

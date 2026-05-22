@@ -15,6 +15,21 @@ public class AdminCommand extends BaseCommand {
         plugin.getCommand("strengthsmp").setExecutor(this);
     }
 
+    private boolean handlePack(CommandSender sender) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Only players can use this command.");
+            return true;
+        }
+        
+        Player player = (Player) sender;
+        plugin.getLogger().info("🛠️ Manual pack request from " + player.getName());
+        
+        // Directly trigger the join logic but immediately
+        plugin.getServer().getPluginManager().callEvent(new org.bukkit.event.player.PlayerJoinEvent(player, null));
+        sender.sendMessage(MessageUtil.parse("<#2ecc71>Attempting to send resource pack... Check console for debug info.</#2ecc71>"));
+        return true;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, org.bukkit.command.Command cmd, String label, String[] args) {
         if (!sender.hasPermission("strengthsmp.admin")) {
@@ -33,6 +48,8 @@ public class AdminCommand extends BaseCommand {
             sendMessage(sender, " <#f39c12>•</#f39c12> <white>/strengthsmp setstrength <player> <amount></white>");
             sendMessage(sender, " <#f39c12>•</#f39c12> <white>/strengthsmp setweapon <player> <weapon></white>");
             sendMessage(sender, " <#f39c12>•</#f39c12> <white>/strengthsmp giveitem <player> <strength|reroll></white>");
+            sendMessage(sender, " <#f39c12>•</#f39c12> <white>/strengthsmp resetmonarch</white> <gray>— Recalculate monarch</gray>");
+            sendMessage(sender, " <#f39c12>•</#f39c12> <white>/strengthsmp pack</white> <gray>— Force resource pack</gray>");
             return true;
         }
 
@@ -52,6 +69,10 @@ public class AdminCommand extends BaseCommand {
                 plugin.getConfigManager().reload();
                 sendSuccess(sender, "Configuration reloaded successfully.");
                 break;
+            }
+
+            case "pack": {
+                return handlePack(sender);
             }
 
             case "info": {
@@ -127,7 +148,7 @@ public class AdminCommand extends BaseCommand {
 
             case "giveitem": {
                 if (args.length < 3) {
-                    sendError(sender, "Usage: /strengthsmp giveitem <player> <strength|reroll>");
+                    sendError(sender, "Usage: /strengthsmp giveitem <player> <strength|reroll|death>");
                     return true;
                 }
                 Player target = Bukkit.getPlayer(args[1]);
@@ -139,10 +160,31 @@ public class AdminCommand extends BaseCommand {
                 } else if (typeStr.equals("reroll")) {
                     target.getInventory().addItem(ItemFactory.createRerollItem(plugin, 1));
                     sendSuccess(sender, "Gave a Reroll item to <#f1c40f>" + target.getName() + "</#f1c40f>");
+                } else if (typeStr.equals("death") || typeStr.equals("death_certificate") || typeStr.equals("deathcertificate")) {
+                    target.getInventory().addItem(ItemFactory.createDeathCertificate(plugin, "Victim", "Killer"));
+                    sendSuccess(sender, "Gave a Death Certificate to <#f1c40f>" + target.getName() + "</#f1c40f>");
                 } else {
-                    sendError(sender, "Unknown item type. Use: strength or reroll");
+                    sendError(sender, "Unknown item type. Use: strength, reroll, or death");
                 }
                 break;
+            }
+
+            case "checkitem": {
+                if (!(sender instanceof Player player)) {
+                    sender.sendMessage("Only players can use this command.");
+                    return true;
+                }
+                org.bukkit.inventory.ItemStack item = player.getInventory().getItemInMainHand();
+                if (item.getType() == org.bukkit.Material.AIR) {
+                    sendError(sender, "Hold an item in your hand!");
+                    return true;
+                }
+                org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
+                int cmdValue = (meta != null && meta.hasCustomModelData()) ? meta.getCustomModelData() : 0;
+                sendMessage(player, "<#2ecc71><b>[Item Check]</b></#2ecc71>");
+                sendMessage(player, " <#95a5a6>Material:</#95a5a6> <white>" + item.getType().name() + "</white>");
+                sendMessage(player, " <#95a5a6>CustomModelData:</#95a5a6> <#f1c40f>" + cmdValue + "</#f1c40f>");
+                return true;
             }
 
             case "setupboard":
@@ -153,6 +195,12 @@ public class AdminCommand extends BaseCommand {
                 }
                 plugin.getDiscordManager().updateDashboard();
                 sendSuccess(sender, "Discord board updated.");
+                break;
+            }
+
+            case "resetmonarch": {
+                plugin.getMonarchService().calculateNewMonarch();
+                sendSuccess(sender, "Monarch status has been recalculated.");
                 break;
             }
 

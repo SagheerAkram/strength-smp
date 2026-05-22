@@ -74,7 +74,18 @@ public class WithdrawCommand extends BaseCommand {
         int newBalance = plugin.getDataManager().getStrength(player.getUniqueId());
         
         sendMessage(player, "<#2ecc71><b>WITHDRAW</b></#2ecc71> <gray>You withdrew</gray> <#f1c40f>" + amount + " STR</#f1c40f><gray>. Remaining:</gray> <white>" + newBalance + "</white>");
-        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0f, 1.0f);
+        
+        // ── MANIFESTATION EFFECT ─────────────────────────────────────────────
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
+        com.floki.strengthsmp.util.CompatUtil.playSound(player, player.getLocation(), "BLOCK_AMETHYST_BLOCK_CHIME", 1.0f, 1.0f);
+        
+        for (int i = 0; i < 360; i += 30) {
+            double angle = Math.toRadians(i);
+            double x = Math.cos(angle) * 0.8;
+            double z = Math.sin(angle) * 0.8;
+            player.getWorld().spawnParticle(org.bukkit.Particle.ENCHANTMENT_TABLE, player.getLocation().add(x, 1, z), 5, 0.1, 0.1, 0.1, 0.05);
+            player.getWorld().spawnParticle(org.bukkit.Particle.FIREWORKS_SPARK, player.getLocation().add(x, 0.5, z), 2, 0.05, 0.05, 0.05, 0.02);
+        }
         
         return true;
     }

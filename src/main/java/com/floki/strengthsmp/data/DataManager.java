@@ -43,6 +43,7 @@ public class DataManager {
     private final Map<UUID, Long>             punishmentExpiryCache    = new ConcurrentHashMap<>();
     private final Map<UUID, Long>             deathProtectionExpiryCache = new ConcurrentHashMap<>();
     private final Map<UUID, Long>             newbieProtectionExpiryCache  = new ConcurrentHashMap<>();
+    private final Map<UUID, Set<String>>      playerSkillsCache = new ConcurrentHashMap<>();
     
     private long lastContractRefresh = 0;
     private long lastSeasonReset = 0;
@@ -152,6 +153,11 @@ public class DataManager {
                     // Reroll Reward
                     receivedFreeRerollCache.put(uuid, data.getBoolean(path + ".received_free_reroll", false));
 
+                    // Skills
+                    if (data.contains(path + ".skills")) {
+                        playerSkillsCache.put(uuid, new HashSet<>(data.getStringList(path + ".skills")));
+                    }
+
                     // Punishment & Death Protection
                     long punishExp = data.getLong(path + ".punishment_expiry", 0L);
                     if (punishExp > 0) punishmentExpiryCache.put(uuid, punishExp);
@@ -239,7 +245,13 @@ public class DataManager {
 
     private void savePlayerToConfig(UUID uuid) {
         String path = "players." + uuid;
-        if (strengthCache.containsKey(uuid)) data.set(path + ".strength", strengthCache.get(uuid));
+        if (strengthCache.containsKey(uuid)) {
+            int currentStr = strengthCache.get(uuid);
+            data.set(path + ".strength", currentStr);
+            // Write the backup rank name
+            String rankName = plugin.getConfigManager().getRankNameForStrength(currentStr);
+            data.set(path + ".rank_name", rankName);
+        }
         if (killsCache.containsKey(uuid))    data.set(path + ".kills",    killsCache.get(uuid));
         if (deathsCache.containsKey(uuid))   data.set(path + ".deaths",   deathsCache.get(uuid));
         if (weaponCache.containsKey(uuid))   data.set(path + ".weapon",   weaponCache.get(uuid).name());
@@ -281,6 +293,11 @@ public class DataManager {
                 data.set(path + ".ability_cooldowns." + e.getKey(), e.getValue());
             }
         }
+
+        // Skills
+        if (playerSkillsCache.containsKey(uuid)) {
+            data.set(path + ".skills", new ArrayList<>(playerSkillsCache.get(uuid)));
+        }
     }
 
     private void saveConfigToDisk() {
@@ -308,6 +325,7 @@ public class DataManager {
         int min = plugin.getConfigManager().getMinStrength();
         int max = plugin.getConfigManager().getMaxStrength();
         strengthCache.compute(uuid, (k, v) -> Math.max(min, Math.min(max, strength)));
+        savePlayer(uuid);
     }
 
     public void addStrength(UUID uuid, int amount) {
@@ -328,6 +346,7 @@ public class DataManager {
             return current + actualAdded[0];
         });
         
+        savePlayer(uuid);
         return actualAdded[0];
     }
 
@@ -341,6 +360,7 @@ public class DataManager {
             if (current == null) current = plugin.getConfigManager().getDefaultStrength();
             return Math.max(min, current - amount);
         });
+        savePlayer(uuid);
     }
 
     public String getRank(UUID uuid) {
@@ -357,9 +377,9 @@ public class DataManager {
     // ════════════════════════════════════════════════════════════════════════
 
     public int  getKills(UUID uuid)  { return killsCache.getOrDefault(uuid, 0); }
-    public void addKill(UUID uuid)   { killsCache.put(uuid, getKills(uuid) + 1); }
+    public void addKill(UUID uuid)   { killsCache.put(uuid, getKills(uuid) + 1); savePlayer(uuid); }
     public int  getDeaths(UUID uuid) { return deathsCache.getOrDefault(uuid, 0); }
-    public void addDeath(UUID uuid)  { deathsCache.put(uuid, getDeaths(uuid) + 1); }
+    public void addDeath(UUID uuid)  { deathsCache.put(uuid, getDeaths(uuid) + 1); savePlayer(uuid); }
 
     /**
      * Resets kill counts for ALL players (online + offline) then saves to disk.
@@ -387,22 +407,13 @@ public class DataManager {
     }
 
     public WeaponType getWeaponType(UUID uuid) {
-        // If they have 0 strength, they are Neutral and have no class abilities
-        if (getStrength(uuid) <= 0) return null;
-        
         // Use cache-first approach. If not in cache, roll ONCE and save.
-        WeaponType type = weaponCache.get(uuid);
-        if (type == null) {
-            type = WeaponType.getRandomWeapon();
-            weaponCache.put(uuid, type);
-            savePlayer(uuid); // Ensure it's persisted immediately
-            plugin.getLogger().info("🎲 Assigned persistent weapon " + type.name() + " to " + uuid);
-        }
-        return type;
+        return weaponCache.get(uuid); // Will be null if they haven't rolled yet
     }
 
     public void setWeaponType(UUID uuid, WeaponType weapon) {
         weaponCache.put(uuid, weapon);
+        savePlayer(uuid);
     }
 
     // Aliases for compatibility with command classes
@@ -420,16 +431,19 @@ public class DataManager {
 
     public void setBounty(UUID targetUUID, UUID setterUUID, int amount) {
         bountyCache.computeIfAbsent(targetUUID, k -> new ConcurrentHashMap<>()).put(setterUUID, amount);
+        savePlayer(targetUUID);
     }
 
     public void addBounty(UUID targetUUID, UUID setterUUID, int amount) {
         Map<UUID, Integer> targetBounties = bountyCache.computeIfAbsent(targetUUID, k -> new ConcurrentHashMap<>());
         int current = targetBounties.getOrDefault(setterUUID, 0);
         targetBounties.put(setterUUID, current + amount);
+        savePlayer(targetUUID);
     }
 
     public void removeBounty(UUID uuid) {
         bountyCache.remove(uuid);
+        savePlayer(uuid);
     }
 
     public long getBountyGlowExpiration(UUID uuid) {
@@ -438,10 +452,12 @@ public class DataManager {
 
     public void setBountyGlowExpiration(UUID uuid, long timestamp) {
         bountyGlowExpirationCache.put(uuid, timestamp);
+        savePlayer(uuid);
     }
 
     public void clearBountyGlowExpiration(UUID uuid) {
         bountyGlowExpirationCache.remove(uuid);
+        savePlayer(uuid);
     }
 
     public long getAbilityCooldown(UUID uuid) {
@@ -458,6 +474,14 @@ public class DataManager {
 
     public void setAbilityCooldown(UUID uuid, String key, long timestamp) {
         getAbilityCooldownMap(uuid).put(key, timestamp);
+
+        // Auto-increment bound weapon ability uses statistic if a class ability is triggered
+        if (key != null && (key.endsWith("_reflect") || key.endsWith("_blink") || key.endsWith("_explosive") || 
+            key.endsWith("_riptide") || key.endsWith("_burst") || key.endsWith("_pound"))) {
+            if (getBoundWeaponId(uuid) != null) {
+                incrementBoundStat(uuid, "ability_uses");
+            }
+        }
     }
 
     private Map<String, Long> getAbilityCooldownMap(UUID uuid) {
@@ -474,6 +498,7 @@ public class DataManager {
 
     public void setPlayerContractDate(UUID uuid, String date) {
         playerContractDateCache.put(uuid, date);
+        savePlayer(uuid);
     }
 
     public List<String> getPlayerContracts(UUID uuid) {
@@ -482,6 +507,7 @@ public class DataManager {
 
     public void setPlayerContracts(UUID uuid, List<String> contracts) {
         playerContractsCache.put(uuid, contracts);
+        savePlayer(uuid);
     }
 
     public Map<String, Integer> getContractProgress(UUID uuid) {
@@ -490,10 +516,12 @@ public class DataManager {
 
     public void updateContractProgress(UUID uuid, String contract, int value) {
         contractProgressCache.computeIfAbsent(uuid, k -> new ConcurrentHashMap<>()).put(contract, value);
+        savePlayer(uuid);
     }
 
     public void resetContractProgress(UUID uuid) {
         contractProgressCache.put(uuid, new HashMap<>());
+        savePlayer(uuid);
     }
 
     public long getLastContractRefresh() {
@@ -512,6 +540,7 @@ public class DataManager {
 
     public void recordKill(UUID attacker, UUID victim) {
         killHistoryCache.computeIfAbsent(attacker, k -> new ConcurrentHashMap<>()).put(victim, System.currentTimeMillis());
+        savePlayer(attacker);
     }
 
     public void clearKillHistory(UUID uuid) {
@@ -564,11 +593,13 @@ public class DataManager {
         UUID topPlayer = null;
         int  topStrength = -1;
         int  topKills = -1;
+        int  topDeaths = Integer.MAX_VALUE;
 
         for (Map.Entry<UUID, Integer> entry : strengthCache.entrySet()) {
             UUID uuid = entry.getKey();
             int strength = entry.getValue();
             int kills = getKills(uuid);
+            int deaths = getDeaths(uuid);
 
             // Monarch must have at least 1 strength to be eligible
             if (strength <= 0) continue;
@@ -576,16 +607,25 @@ public class DataManager {
             if (strength > topStrength) {
                 topStrength = strength;
                 topKills = kills;
+                topDeaths = deaths;
                 topPlayer = uuid;
             } else if (strength == topStrength) {
-                // Tie-breaker: total kills
+                // Tie-breaker 1: total kills (descending)
                 if (kills > topKills) {
                     topKills = kills;
+                    topDeaths = deaths;
                     topPlayer = uuid;
+                } else if (kills == topKills) {
+                    // Tie-breaker 2: total deaths (ascending)
+                    if (deaths < topDeaths) {
+                        topDeaths = deaths;
+                        topPlayer = uuid;
+                    }
                 }
             }
         }
         monarchUUID = topPlayer;
+        saveAll();
     }
 
     public String getTopPlayerName() {
@@ -610,6 +650,7 @@ public class DataManager {
 
     public void setReceivedFreeReroll(UUID uuid, boolean val) {
         receivedFreeRerollCache.put(uuid, val);
+        savePlayer(uuid);
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -629,10 +670,12 @@ public class DataManager {
 
     public void setPunishment(UUID uuid, long expiryTimestamp) {
         punishmentExpiryCache.put(uuid, expiryTimestamp);
+        savePlayer(uuid);
     }
 
     public void clearPunishment(UUID uuid) {
         punishmentExpiryCache.remove(uuid);
+        savePlayer(uuid);
     }
 
     public long getPunishmentExpiry(UUID uuid) {
@@ -656,10 +699,12 @@ public class DataManager {
 
     public void setDeathProtection(UUID uuid, long expiryTimestamp) {
         deathProtectionExpiryCache.put(uuid, expiryTimestamp);
+        savePlayer(uuid);
     }
 
     public void clearDeathProtection(UUID uuid) {
         deathProtectionExpiryCache.remove(uuid);
+        savePlayer(uuid);
     }
 
     public long getDeathProtectionExpiry(UUID uuid) {
@@ -683,17 +728,19 @@ public class DataManager {
 
     public void setNewbieProtection(UUID uuid, long expiryTimestamp) {
         newbieProtectionExpiryCache.put(uuid, expiryTimestamp);
+        savePlayer(uuid);
     }
 
     public void clearNewbieProtection(UUID uuid) {
         newbieProtectionExpiryCache.remove(uuid);
+        savePlayer(uuid);
     }
 
     public long getNewbieProtectionExpiry(UUID uuid) {
         return newbieProtectionExpiryCache.getOrDefault(uuid, 0L);
     }
 
-        public void initializePlayer(UUID uuid) {
+    public void initializePlayer(UUID uuid) {
         // ONLY assign if NO saved data exists in cache
         if (!weaponCache.containsKey(uuid)) {
             weaponCache.put(uuid, WeaponType.getRandomWeapon());
@@ -710,6 +757,20 @@ public class DataManager {
         if (!receivedFreeRerollCache.containsKey(uuid)) {
             receivedFreeRerollCache.put(uuid, false);
         }
+        savePlayer(uuid);
+    }
+
+    public boolean hasSkill(UUID uuid, String skillId) {
+        return playerSkillsCache.getOrDefault(uuid, Collections.emptySet()).contains(skillId);
+    }
+
+    public void addSkill(UUID uuid, String skillId) {
+        playerSkillsCache.computeIfAbsent(uuid, k -> new HashSet<>()).add(skillId);
+        savePlayer(uuid);
+    }
+
+    public Set<String> getSkills(UUID uuid) {
+        return playerSkillsCache.getOrDefault(uuid, Collections.emptySet());
     }
 
     public Map<UUID, Integer>    getStrengthCache() { return new HashMap<>(strengthCache); }
@@ -720,11 +781,90 @@ public class DataManager {
 
     // System state getters/setters
     public String  getDashboardMessageId()    { return dashboardMessageId; }
-    public void    setDashboardMessageId(String id)   { this.dashboardMessageId = id; }
+    public void    setDashboardMessageId(String id)   { this.dashboardMessageId = id; saveAll(); }
     public String  getLeaderboardMessageId()  { return leaderboardMessageId; }
-    public void    setLeaderboardMessageId(String id) { this.leaderboardMessageId = id; }
+    public void    setLeaderboardMessageId(String id) { this.leaderboardMessageId = id; saveAll(); }
     public String  getMonarchMessageId()      { return monarchMessageId; }
-    public void    setMonarchMessageId(String id)     { this.monarchMessageId = id; }
+    public void    setMonarchMessageId(String id)     { this.monarchMessageId = id; saveAll(); }
     public boolean isSystemEnabled()          { return systemEnabled; }
     public void    setSystemEnabled(boolean e){ this.systemEnabled = e; }
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  WEAPON BINDING SYSTEM CACHE/PERSISTENCE
+    // ════════════════════════════════════════════════════════════════════════
+    public String getBoundWeaponId(UUID uuid) {
+        return data.getString("players." + uuid + ".bound_weapon_id", null);
+    }
+
+    public void setBoundWeaponId(UUID uuid, String itemId) {
+        data.set("players." + uuid + ".bound_weapon_id", itemId);
+        savePlayer(uuid);
+    }
+
+    public boolean hasBoundWeapon(UUID uuid) {
+        return data.getBoolean("players." + uuid + ".has_bound_weapon", false);
+    }
+
+    public void setHasBoundWeapon(UUID uuid, boolean val) {
+        data.set("players." + uuid + ".has_bound_weapon", val);
+        savePlayer(uuid);
+    }
+
+    public boolean isFreeBindAvailable(UUID uuid) {
+        return data.getBoolean("players." + uuid + ".free_bind_available", false);
+    }
+
+    public void setFreeBindAvailable(UUID uuid, boolean val) {
+        data.set("players." + uuid + ".free_bind_available", val);
+        savePlayer(uuid);
+    }
+
+    public void incrementBoundStat(UUID uuid, String stat) {
+        String path = "players." + uuid + ".bound_stats." + stat;
+        int current = data.getInt(path, 0);
+        data.set(path, current + 1);
+        savePlayer(uuid);
+    }
+
+    public void addBoundStatDouble(UUID uuid, String stat, double amount) {
+        String path = "players." + uuid + ".bound_stats." + stat;
+        double current = data.getDouble(path, 0.0);
+        data.set(path, current + amount);
+        savePlayer(uuid);
+    }
+
+    public int getBoundStat(UUID uuid, String stat) {
+        return data.getInt("players." + uuid + ".bound_stats." + stat, 0);
+    }
+
+    public double getBoundStatDouble(UUID uuid, String stat) {
+        return data.getDouble("players." + uuid + ".bound_stats." + stat, 0.0);
+    }
+
+    public void setBoundTimestamp(UUID uuid, long timestamp) {
+        data.set("players." + uuid + ".bound_stats.bound_timestamp", timestamp);
+        savePlayer(uuid);
+    }
+
+    public long getBoundTimestamp(UUID uuid) {
+        return data.getLong("players." + uuid + ".bound_stats.bound_timestamp", 0L);
+    }
+
+    public Map<String, Integer> getBoundKillsBreakdown(UUID uuid) {
+        Map<String, Integer> breakdown = new HashMap<>();
+        org.bukkit.configuration.ConfigurationSection sec = data.getConfigurationSection("players." + uuid + ".bound_stats.kills_breakdown");
+        if (sec != null) {
+            for (String key : sec.getKeys(false)) {
+                breakdown.put(key, sec.getInt(key, 0));
+            }
+        }
+        return breakdown;
+    }
+
+    public void recordBoundKill(UUID uuid, String victimName) {
+        String path = "players." + uuid + ".bound_stats.kills_breakdown." + victimName;
+        int count = data.getInt(path, 0);
+        data.set(path, count + 1);
+        incrementBoundStat(uuid, "kills");
+    }
 }

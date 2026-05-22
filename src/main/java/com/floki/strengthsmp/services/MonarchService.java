@@ -68,6 +68,7 @@ public class MonarchService {
             return;
         }
 
+        // Always update Discord if either the monarch changed OR it's the first run
         if (oldMonarch == null || !oldMonarch.equals(newMonarch)) {
             clearMonarch();
             
@@ -78,6 +79,11 @@ public class MonarchService {
             if (newPlayer != null) {
                 applyMonarchEffects(newPlayer);
                 plugin.updateDisplay(newPlayer);
+            }
+
+            // Push to Discord immediately
+            if (plugin.getDiscordManager() != null) {
+                plugin.getDiscordManager().updateDashboard();
             }
         }
     }
@@ -123,13 +129,21 @@ public class MonarchService {
     public void clearMonarch() {
         if (currentMonarchUUID == null) return;
         
-        Player player = Bukkit.getPlayer(currentMonarchUUID);
-        if (player != null) {
-            setMonarchGlow(player, false);
-            player.removePotionEffect(PotionEffectType.FIRE_RESISTANCE);
+        org.bukkit.scoreboard.Scoreboard sb = Bukkit.getScoreboardManager().getMainScoreboard();
+        org.bukkit.scoreboard.Team team = sb.getTeam("MonarchGlow");
+        if (team != null) {
+            for (String entry : new java.util.ArrayList<>(team.getEntries())) {
+                team.removeEntry(entry);
+            }
         }
         
+        Player player = Bukkit.getPlayer(currentMonarchUUID);
         currentMonarchUUID = null;
+        if (player != null) {
+            player.setGlowing(false);
+            player.removePotionEffect(PotionEffectType.FIRE_RESISTANCE);
+            plugin.updateDisplay(player);
+        }
     }
 
     private void setMonarchGlow(Player player, boolean enabled) {
@@ -144,6 +158,11 @@ public class MonarchService {
         }
 
         if (enabled) {
+            for (String entry : new java.util.ArrayList<>(team.getEntries())) {
+                if (!entry.equals(player.getName())) {
+                    team.removeEntry(entry);
+                }
+            }
             team.addEntry(player.getName());
             player.setGlowing(true);
         } else {

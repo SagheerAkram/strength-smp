@@ -49,6 +49,7 @@ public class StrengthService {
         }
 
         int added = dataManager.addStrengthCapped(player.getUniqueId(), amount);
+        plugin.getMonarchService().calculateNewMonarch();
         // Monarch logic removed from here
         
         // Handle leftovers if capped offline
@@ -77,6 +78,7 @@ public class StrengthService {
 
         // Update UI
         plugin.updateDisplay(player);
+        plugin.getMonarchService().calculateNewMonarch();
         
         // Progress Contracts
         plugin.getContractService().progressContract(player, "STRENGTH", added);
@@ -87,27 +89,28 @@ public class StrengthService {
         }
     }
 
-    public void removeStrength(org.bukkit.OfflinePlayer player, int amount) {
+    public boolean removeStrength(org.bukkit.OfflinePlayer player, int amount) {
         if (player.isOnline()) {
-            removeStrength((Player) player, amount);
-            return;
+            return removeStrength((Player) player, amount);
         }
 
         // Offline logic: just update data
         int current = dataManager.getStrength(player.getUniqueId());
         int min = plugin.getConfigManager().getMinStrength();
-        if (current <= min) return;
+        if (current <= min) return false;
 
         dataManager.subtractStrength(player.getUniqueId(), amount);
+        plugin.getMonarchService().calculateNewMonarch();
+        return true;
     }
 
-    public void removeStrength(Player player, int amount) {
+    public boolean removeStrength(Player player, int amount) {
         int current = dataManager.getStrength(player.getUniqueId());
         int min = plugin.getConfigManager().getMinStrength();
         
         if (current <= min) {
             MessageUtil.send(player, "strength.at-minimum");
-            return;
+            return false;
         }
 
         dataManager.subtractStrength(player.getUniqueId(), amount);
@@ -118,6 +121,70 @@ public class StrengthService {
         
         // Update UI
         plugin.updateDisplay(player);
+        plugin.getMonarchService().calculateNewMonarch();
+        return true;
+    }
+
+    public void handleKill(Player attacker, Player victim) {
+        java.util.UUID attackerUUID = attacker.getUniqueId();
+        java.util.UUID victimUUID = victim.getUniqueId();
+
+        boolean victimProtected = false;
+
+        // 1. Check Newbie Protection on Victim
+        if (dataManager.isNewbieProtected(victimUUID)) {
+            MessageUtil.send(victim, "strength.newbie-you-protected");
+            MessageUtil.send(attacker, "strength.newbie-protected");
+            victimProtected = true;
+        }
+        // 2. Check Death Protection on Victim
+        else if (dataManager.hasDeathProtection(victimUUID)) {
+            MessageUtil.send(victim, "strength.protected");
+            MessageUtil.send(attacker, "strength.protection-blocked");
+            victimProtected = true;
+        }
+
+        // 3. Check Anti-Farm
+        boolean isFarm = false;
+        if (!victimProtected) {
+            long lastKill = dataManager.getLastKillTime(attackerUUID, victimUUID);
+            long windowMs = plugin.getConfigManager().getAntiFarmWindowMinutes() * 60 * 1000L;
+            if (lastKill > 0 && (System.currentTimeMillis() - lastKill) < windowMs) {
+                MessageUtil.send(attacker, "strength.anti-farm");
+                isFarm = true;
+            }
+        }
+
+        // 4. Check Victim Minimum Strength
+        boolean victimAtMin = false;
+        int victimStr = dataManager.getStrength(victimUUID);
+        int minStrength = plugin.getConfigManager().getMinStrength();
+        if (!victimProtected && !isFarm && victimStr <= minStrength) {
+            MessageUtil.send(victim, "strength.at-minimum");
+            MessageUtil.send(attacker, "strength.victim-at-minimum", "victim", victim.getName());
+            victimAtMin = true;
+        }
+
+        // ── Do strength adjustments ──
+        if (!victimProtected && !isFarm && !victimAtMin) {
+            // Victim loses strength
+            removeStrength(victim, 1);
+
+            // Attacker gains strength unless attacker is protected
+            if (dataManager.isNewbieProtected(attackerUUID)) {
+                MessageUtil.send(attacker, "strength.newbie-no-gain");
+            } else if (dataManager.hasDeathProtection(attackerUUID)) {
+                MessageUtil.send(attacker, "strength.protected-no-gain");
+            } else {
+                addStrength(attacker, 1);
+            }
+        }
+
+        // Anti-farm: record the kill
+        dataManager.recordKill(attackerUUID, victimUUID);
+        
+        // Progress killer's kills stat
+        dataManager.addKill(attackerUUID);
     }
 
     /**
@@ -131,7 +198,7 @@ public class StrengthService {
             player.getWorld().dropItem(player.getLocation(), leftover.values().iterator().next());
         }
 
-        MessageUtil.send(player, "strength.max-reached");
+        MessageUtil.send(player, "strength.max-reached", "amount", String.valueOf(plugin.getConfigManager().getMaxStrength()));
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0f, 0.5f);
     }
 }

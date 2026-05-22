@@ -50,6 +50,8 @@ public class PlaceholderExpansionImpl extends PlaceholderExpansion {
         switch (params.toLowerCase()) {
             case "strength":
                 return String.valueOf(dataManager.getStrength(uuid));
+            case "strength_rank":
+                return plugin.getConfigManager().getRankNameForStrength(dataManager.getStrength(uuid));
             case "max_strength":
                 return String.valueOf(plugin.getConfigManager().getMaxStrength());
             case "bounty":
@@ -72,6 +74,10 @@ public class PlaceholderExpansionImpl extends PlaceholderExpansion {
                 return plugin.getCombatListener().isInCombat(uuid) ? "&cIn Combat" : "&aSafe";
             case "weapon_class":
                 return dataManager.getWeaponType(uuid).getDisplayName();
+            case "has_bound_weapon":
+                return dataManager.hasBoundWeapon(uuid) ? "Yes" : "No";
+            case "bound_weapon_class":
+                return dataManager.hasBoundWeapon(uuid) ? dataManager.getWeaponType(uuid).getDisplayName() : "None";
             case "kill_history_count":
                 return String.valueOf(dataManager.getKillHistoryCount(uuid));
             default:

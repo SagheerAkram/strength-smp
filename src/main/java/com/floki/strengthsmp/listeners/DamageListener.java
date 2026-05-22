@@ -49,12 +49,20 @@ public class DamageListener implements Listener {
             attacker = p;
             ItemStack weapon = attacker.getInventory().getItemInMainHand();
             itemType = WeaponType.fromMaterial(weapon.getType());
+            
+            // Ranged/defensive classes (Bow, Crossbow, Shield) cannot deal custom melee damage!
+            if (itemType == WeaponType.BOW || itemType == WeaponType.CROSSBOW || itemType == WeaponType.SHIELD) {
+                return;
+            }
         } else if (event.getDamager() instanceof Projectile projectile) {
             if (projectile.getShooter() instanceof Player p) {
                 attacker = p;
                 if (projectile instanceof Arrow) {
-                    // Crossbows are handled specially if they have metadata, but default to regular Arrow check
-                    itemType = projectile.hasMetadata("tripleshot") ? WeaponType.CROSSBOW : WeaponType.BOW;
+                    if (projectile.hasMetadata("crossbow_shot") || projectile.hasMetadata("crossbow_burst") || projectile.hasMetadata("tripleshot")) {
+                        itemType = WeaponType.CROSSBOW;
+                    } else {
+                        itemType = WeaponType.BOW;
+                    }
                 } else if (projectile instanceof Trident) {
                     itemType = WeaponType.TRIDENT;
                 }
@@ -86,7 +94,7 @@ public class DamageListener implements Listener {
             case BOW -> event.getDamage(); // Use vanilla pull-time base for bow
             case CROSSBOW -> {
                 if (event.getDamager().hasMetadata("crossbow_burst")) yield 8.0; // High damage for burst arrows
-                yield 8.0; // Increased from 6.0
+                yield event.getDamage(); // Scale actual vanilla damage for normal crossbow shots
             }
         };
 

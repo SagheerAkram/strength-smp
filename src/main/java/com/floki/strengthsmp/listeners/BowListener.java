@@ -38,6 +38,7 @@ public class BowListener implements Listener {
         if (!(event.getEntity() instanceof Player player)) return;
         if (!(event.getProjectile() instanceof Arrow arrow)) return;
         if (plugin.getDataManager().getWeaponType(player.getUniqueId()) != WeaponType.BOW) return;
+        if (event.getBow() == null || event.getBow().getType() != Material.BOW) return;
 
         // Passive: Homing (25% chance)
         if (Math.random() < 0.25) {

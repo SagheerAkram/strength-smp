@@ -7,11 +7,13 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
@@ -24,7 +26,20 @@ public class TridentListener implements Listener {
         this.plugin = plugin;
     }
 
+    /**
+     * BLOCK trident throwing for ALL players — tridents are melee-only in StrengthSMP.
+     * Even trident-class players cannot throw them; they use the custom riptide ability instead.
+     */
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onTridentThrow(ProjectileLaunchEvent event) {
+        if (!(event.getEntity() instanceof Trident trident)) return;
+        if (!(trident.getShooter() instanceof Player player)) return;
 
+        // Cancel the throw entirely — tridents are melee weapons in this SMP
+        event.setCancelled(true);
+        player.sendMessage("§c§lYou cannot throw tridents! §7Use it as a melee weapon.");
+        player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.8f, 1.0f);
+    }
 
     @EventHandler
     public void onTridentInteract(PlayerInteractEvent event) {

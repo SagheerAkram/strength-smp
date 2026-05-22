@@ -78,6 +78,7 @@ public class BountyCommand extends BaseCommand {
         // Update display to trigger glowing effect immediately
         plugin.updateDisplay(target);
         plugin.updateDisplay(player);
+        plugin.getMonarchService().calculateNewMonarch();
 
         sendMessage(player, "<#2ecc71><b>[!]</b></#2ecc71> <gray>You placed a bounty of</gray> <#f1c40f>" + amount + " STR</#f1c40f> <gray>on " + target.getName() + "!</gray>");
         Bukkit.broadcastMessage(com.floki.strengthsmp.util.MessageUtil.parse("<#e74c3c><b>[BOUNTY]</b></#e74c3c> <white>" + player.getName() + "</white> <gray>placed</gray> <#f1c40f>" + amount + " Strength</#f1c40f> <gray>bounty on</gray> <white>" + target.getName() + "</white><gray>!</gray>"));

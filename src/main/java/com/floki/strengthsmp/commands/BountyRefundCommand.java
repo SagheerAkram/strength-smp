@@ -51,12 +51,15 @@ public class BountyRefundCommand extends BaseCommand {
                 
                 Player setter = Bukkit.getPlayer(setterUuid);
                 if (setter != null && setter.isOnline()) {
+                    plugin.updateDisplay(setter);
                     sendMessage(setter, "<#2ecc71><b>[!]</b></#2ecc71> <gray>Your bounty of</gray> <#f1c40f>" + amount + " STR</#f1c40f> <gray>on " + target.getName() + " was refunded by an admin.</gray>");
                 }
             }
+            plugin.getMonarchService().calculateNewMonarch();
         }
 
         plugin.getDataManager().removeBounty(target.getUniqueId());
+        plugin.updateDisplay(target);
         sendSuccess(sender, "Successfully refunded bounty for <#f1c40f>" + target.getName() + "</#f1c40f> <gray>(Total: " + totalBounty + " STR)</gray>");
         
         return true;

@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 public class MessageUtil {
 
     private static final Pattern HEX_PATTERN = Pattern.compile("<#([A-Fa-f0-9]{6})>");
+    private static final Pattern HEX_CLOSE_PATTERN = Pattern.compile("</#[A-Fa-f0-9]{6}>");
     private static StrengthSMP plugin;
     private static boolean supportsHex;
 
@@ -38,6 +39,7 @@ public class MessageUtil {
 
         // 1. Handle Hex <#HEX> (Only if supported)
         if (supportsHex) {
+            // Opening tags
             Matcher matcher = HEX_PATTERN.matcher(msg);
             StringBuffer sb = new StringBuffer();
             while (matcher.find()) {
@@ -45,6 +47,10 @@ public class MessageUtil {
             }
             matcher.appendTail(sb);
             msg = sb.toString();
+
+            // Closing tags (treated as reset)
+            Matcher closeMatcher = HEX_CLOSE_PATTERN.matcher(msg);
+            msg = closeMatcher.replaceAll("§r");
         }
 
         // 2. Handle standard color tags
@@ -98,5 +104,19 @@ public class MessageUtil {
         }
 
         plugin.getServer().broadcastMessage(color(message));
+    }
+
+    /**
+     * Converts a hex string to a byte array.
+     */
+    public static byte[] hexToBytes(String hex) {
+        if (hex == null || hex.isEmpty()) return null;
+        int len = hex.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
+                                 + Character.digit(hex.charAt(i+1), 16));
+        }
+        return data;
     }
 }

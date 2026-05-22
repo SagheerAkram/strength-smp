@@ -41,20 +41,23 @@ public class ItemInteractionListener implements Listener {
         if (item == null || item.getType() == Material.AIR) return;
         if (!item.hasItemMeta()) return;
 
-        ItemMeta meta = item.getItemMeta();
-        if (!meta.getPersistentDataContainer().has(rerollKey, PersistentDataType.STRING)) return;
+        // Identify using PersistentDataContainer (supports both custom heads and vanilla items)
+        if (!com.floki.strengthsmp.util.ItemFactory.isRerollItem(item)) return;
+
 
         event.setCancelled(true);
 
         int strength = plugin.getDataManager().getStrength(player.getUniqueId());
-        if (strength < 1) {
+        WeaponType current = plugin.getDataManager().getWeapon(player.getUniqueId());
+        
+        // Only require strength if they already have a class (this is a reroll, not first roll)
+        if (current != null && strength < 1) {
             MessageUtil.send(player, "strength.insufficient", "required", "1");
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             return;
         }
 
         // 1. Selection: List-based unique choice
-        WeaponType current = plugin.getDataManager().getWeapon(player.getUniqueId());
         List<WeaponType> available = new ArrayList<>(Arrays.asList(WeaponType.values()));
         available.remove(current);
 
@@ -63,23 +66,20 @@ public class ItemInteractionListener implements Listener {
             return;
         }
 
-        WeaponType nextType = available.get(random.nextInt(available.size()));
-
-        // 2. Transaction: Deduct only after selection success
-        plugin.getDataManager().subtractStrength(player.getUniqueId(), 1);
-        plugin.getDataManager().setWeaponType(player.getUniqueId(), nextType);
+        // 2. Transaction: Deduct only if they are REROLLING (already have a class)
+        if (current != null) {
+            plugin.getDataManager().subtractStrength(player.getUniqueId(), 1);
+            plugin.updateDisplay(player);
+            plugin.getMonarchService().calculateNewMonarch();
+        }
         
         // 3. Consume
         item.setAmount(item.getAmount() - 1);
         
-        // 4. Premium UX
-        String hexName = getWeaponHex(nextType);
-        player.sendTitle(MessageUtil.color("&#f1c40f&l⚔ NEW POWER"), MessageUtil.color(hexName + "<b>" + nextType.getDisplayName().toUpperCase()), 10, 40, 10);
-        player.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1.0f, 1.5f);
-        player.getWorld().spawnParticle(org.bukkit.Particle.SPELL_WITCH, player.getLocation().add(0, 1, 0), 50, 0.5, 0.5, 0.5, 0.1);
+        // 4. Open Shuffle GUI
+        new com.floki.strengthsmp.gui.WeaponShuffleGUI(plugin, player).open();
         
-        MessageUtil.send(player, "strength.reroll-success", "type", nextType.getDisplayName());
-        plugin.updateDisplay(player);
+        player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0f, 1.0f);
     }
 
     private String getWeaponHex(WeaponType type) {

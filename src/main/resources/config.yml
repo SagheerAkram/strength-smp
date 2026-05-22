@@ -18,9 +18,29 @@ strength:
   underdog-threshold: 3   # attacker must have at least this much more strength
 
 # ─── Items ──────────────────────────────────────────────────────────────
+# Custom Head Textures — Makes items render as unique 3D blocks
+# No resource pack needed! Textures load instantly from Mojang's servers.
+# Set use-custom-heads to false to revert to vanilla materials.
 items:
-  strength-item: NAUTILUS_SHELL
-  reroll-item: BOOK
+  use-custom-heads: false
+
+  strength-item:
+    material: NAUTILUS_SHELL
+    custom-model-data: 12345
+    # Orange Energy Orb — from minecraft-heads.com
+    head-texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHBzOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkN2VkNDQ5Yjg1ZGUxMjU1MWUwMWZlZmIxODE5ODQwOTE1ZTIxNWFkMTM0ZTE1ZWNkMjcwZjBmZDgwYmQzMjQifX19"
+
+  reroll-item:
+    material: BOOK
+    custom-model-data: 12346
+    # Enchanted Grimoire — from minecraft-heads.com
+    head-texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHBzOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzdkYzk4NWE3YTY4YzU3NGY2ODNjMGI4NTk1MjFmZWIzZmMzZDJmZmEwOWRiMGJhZTQ0YjhhYzI5YjM4NSJ9fX0="
+
+  death-certificate:
+    material: PAPER
+    custom-model-data: 12347
+    # Tombstone — from minecraft-heads.com
+    head-texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHBzOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzdmM2JlNjQwMTY3MzZiZTQ0YjFkNWE1ZjNhZGFiNmQ0YzA0Mzc4MmMxN2RkMjljM2I4YzRjYjZlNzNmOTg5OCJ9fX0="
 
 # ─── Damage Scaling ─────────────────────────────────────────────────────
 # Controls how strength stat affects raw melee damage.
@@ -143,11 +163,77 @@ monarch:
   announcements: true
 
 # ─── Protection Settings ────────────────────────────────────────────────
+# Controls temporary immunity periods for players.
 protection:
   death:
     enabled: true
-    duration-hours: 4
+    duration-hours: 1  # Decreased from 4h to 1h
   newbie:
     enabled: true
-    duration-hours: 8
+    duration-hours: 1  # Decreased from 8h to 1h
+
+
+# ─── Resource Pack Settings ─────────────────────────────────────────────
+# If enabled, players will be prompted to download the custom textures
+# when they join the server.
+resource-pack:
+  enabled: true
+  
+  # --- Hosting Options ---
+  hosting:
+    mode: "INTERNAL"
+    internal-port: 8080
+    public-ip: "127.0.0.1"
+  
+  # --- External Link ---
+  url: "http://127.0.0.1:8080/strengthsmp.zip"
+  hash: "d6e2726423b2646242f401c8f35c85056face837"
+  
+  force: true
+  prompt-message: "&6&lStrengthSMP &7requires a custom resource pack for the best experience. &fWould you like to install it?"
+
+# ─── Strength Ranks ──────────────────────────────────────────────────────
+# Rank names associated with strength values. If a strength value is not listed here,
+# the plugin automatically falls back to "Rank <strength>" or "Strength <strength>".
+strength-ranks:
+  "-10": "&8[Hopeless]"
+  "-9": "&8[Wretched]"
+  "-8": "&7[Frail]"
+  "-7": "&7[Weakling]"
+  "-6": "&7[Peasant]"
+  "-5": "&f[Vassal]"
+  "-4": "&f[Citizen]"
+  "-3": "&a[Squire]"
+  "-2": "&a[Apprentice]"
+  "-1": "&e[Novice]"
+  "0": "&e[Neutral]"
+  "1": "&d[Initiate]"
+  "2": "&b[Soldier]"
+  "3": "&5&l[Knight]"
+  "4": "&6&l[Veteran]"
+  "5": "&c&l[Champion]"
+  "6": "&4&l[Warlord]"
+  "7": "&4&l[Conqueror]"
+  "8": "&5&l[Grandmaster]"
+  "9": "&d&l[Overlord]"
+  "10": "&x&f&f&a&a&0&0&l[Demigod]"
+
+# ─── Weapon Binding System ──────────────────────────────────────────────
+bind-system:
+  enabled: true
+  cost-strength: 3
+  formatted-lore-prefix: "&d&l⚡ BOUND WEAPON ⚡"
+  animation-ticks: 40           # Duration of loyalty-like flying weapon effect
+  knockback-radius: 2.0         # Radius to push away blocking players/mobs
+  knockback-strength: 1.5       # Horizontal knockback velocity
+  
+  # Active F/Q Bound Abilities
+  abilities:
+    cooldown-seconds: 25        # Default cooldown for all bound weapon F/Q abilities
+    excalibur-beam-damage: 8.0  # Damage dealt by sword Excalibur Beam (4 hearts)
+    dimensional-cleave-damage: 8.0 # Damage dealt by axe Dimensional Cleave (4 hearts)
+    void-singularity-duration-ticks: 70 # Duration of gravity black hole (3.5 seconds)
+    scorpion-hook-range: 14.0   # Maximum range for the crossbow hook
+    poseidons-wrath-damage: 7.0 # Damage dealt by trident lightning strikes (3.5 hearts)
+    force-field-radius: 6.0     # Radius of the shield kinetic blast
 

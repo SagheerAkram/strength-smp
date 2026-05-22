@@ -19,6 +19,15 @@ events:
       - "Reach 5 strength"
       - "Win a duel"
 
+  titans-rift:
+    enabled: true
+    interval-minutes: 60
+    spawn-chance: 1.0
+    mob-count: 5
+    rewards:
+      fragment-chance: 20
+      heart-chance: 5
+
   monarch:
     enabled: false
     death-tax: 0.1 # 10% tax on all strength lost goes to Monarch? 

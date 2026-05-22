@@ -62,8 +62,8 @@ public class PlayerListener implements Listener {
         dataManager.setReceivedFreeReroll(uuid, true);
         dataManager.savePlayer(uuid);
         
-        ItemStack rerollBook = com.floki.strengthsmp.util.ItemFactory.createRerollItem(plugin, 1);
-        java.util.Map<Integer, ItemStack> leftover = player.getInventory().addItem(rerollBook);
+        ItemStack sealedDestiny = com.floki.strengthsmp.util.ItemFactory.createSealedDestiny(plugin);
+        java.util.Map<Integer, ItemStack> leftover = player.getInventory().addItem(sealedDestiny);
         
         if (!leftover.isEmpty()) {
             for (ItemStack item : leftover.values()) {
@@ -87,16 +87,18 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        if (event.getHand() != EquipmentSlot.HAND) return;
+        if (event.getHand() == null) return;
 
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
         if (item == null || !item.hasItemMeta()) return;
 
         ItemMeta meta = item.getItemMeta();
-        String displayName = meta.getDisplayName();
+        
+        // Identify using PersistentDataContainer (supports both custom heads and vanilla items)
+        if (!com.floki.strengthsmp.util.ItemFactory.isStrengthItem(item)) return;
 
-        if (!displayName.equals(ChatColor.GOLD + "" + ChatColor.BOLD + "STRENGTH ITEM")) return;
+        if (meta.getLore() == null || meta.getLore().isEmpty()) return;
 
         event.setCancelled(true);
         event.setUseItemInHand(Event.Result.DENY);
@@ -115,7 +117,7 @@ public class PlayerListener implements Listener {
         }
 
         if (dataManager.isAtMaxStrength(uuid)) {
-            com.floki.strengthsmp.util.MessageUtil.send(player, "strength.max-reached");
+            com.floki.strengthsmp.util.MessageUtil.send(player, "strength.max-reached", "amount", String.valueOf(plugin.getConfigManager().getMaxStrength()));
             return;
         }
 
@@ -139,6 +141,9 @@ public class PlayerListener implements Listener {
         if (isMonarch) {
             plugin.getMonarchService().applyMonarchEffects(player);
         } else {
+            // REMOVE Monarch effects if they are not the monarch
+            player.removePotionEffect(PotionEffectType.FIRE_RESISTANCE);
+            
             org.bukkit.scoreboard.Scoreboard sb = Bukkit.getScoreboardManager().getMainScoreboard();
             org.bukkit.scoreboard.Team team = sb.getTeam("MonarchGlow");
             if (team != null && team.hasEntry(player.getName())) {
@@ -146,17 +151,20 @@ public class PlayerListener implements Listener {
             }
         }
 
-        boolean hasBounty = dataManager.getBounty(player.getUniqueId()) > 0;
+        int bounty = dataManager.getBounty(player.getUniqueId());
         long bountyExp = dataManager.getBountyGlowExpiration(player.getUniqueId());
-        boolean hasBountyGlow = hasBounty || (bountyExp > System.currentTimeMillis());
+        boolean hasBountyGlow = bounty > 0 || (bountyExp > System.currentTimeMillis());
 
         if (hasBountyGlow) {
-            player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 0, false, false), true);
+            plugin.getAestheticService().updateBountyGlow(player, bounty > 0 ? bounty : 1);
         } else {
             if (bountyExp > 0) dataManager.clearBountyGlowExpiration(player.getUniqueId());
-            player.removePotionEffect(PotionEffectType.GLOWING);
             if (!isMonarch) {
                 player.setGlowing(false);
+                // Clear from bounty teams
+                Bukkit.getScoreboardManager().getMainScoreboard().getTeams().forEach(t -> {
+                    if (t.getName().startsWith("Bounty_")) t.removeEntry(player.getName());
+                });
             }
         }
 

@@ -24,7 +24,8 @@ public class CombatCommandListener implements Listener {
      */
     private static final Set<String> ALLOWED_COMMANDS = Set.of(
         "whisper", "w", "msg", "tell", "message",  // whisper / private message aliases
-        "strength", "str", "power"                   // /strength and its aliases
+        "strength", "str", "power",                  // /strength and its aliases
+        "mimictest", "identity", "mimic"           // IdentityMimic commands
     );
 
     public CombatCommandListener(StrengthSMP plugin) {

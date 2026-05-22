@@ -18,6 +18,8 @@ import org.bukkit.util.Vector;
 
 import java.util.UUID;
 
+import org.bukkit.event.entity.EntityShootBowEvent;
+
 public class CrossbowListener implements Listener {
 
     private final StrengthSMP plugin;
@@ -25,6 +27,15 @@ public class CrossbowListener implements Listener {
 
     public CrossbowListener(StrengthSMP plugin) {
         this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onShoot(EntityShootBowEvent event) {
+        if (!(event.getEntity() instanceof Player)) return;
+        if (!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (event.getBow() != null && event.getBow().getType() == Material.CROSSBOW) {
+            arrow.setMetadata("crossbow_shot", new FixedMetadataValue(plugin, true));
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

@@ -72,10 +72,12 @@ public class CombatListener implements Listener {
             MessageUtil.broadcast("combat.penalty", "player", player.getName(), "killer", attackerName);
 
             // PENALTY: Remove 1 strength instead of killing (keeps inventory safe)
-            plugin.getStrengthService().removeStrength(player, 1);
+            boolean removed = plugin.getStrengthService().removeStrength(player, 1);
             
-            // Drop physical item at logout location
-            player.getWorld().dropItemNaturally(player.getLocation(), com.floki.strengthsmp.util.ItemFactory.createStrengthItem(1));
+            // Drop physical item at logout location only if they actually lost strength
+            if (removed) {
+                player.getWorld().dropItemNaturally(player.getLocation(), com.floki.strengthsmp.util.ItemFactory.createStrengthItem(1));
+            }
             
             // Record the "kill" for the attacker if they exist, but don't transfer items
             if (attackerUUID != null) {

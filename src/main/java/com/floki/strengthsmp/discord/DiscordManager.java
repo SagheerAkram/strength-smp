@@ -4,6 +4,7 @@ import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.config.Config;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -18,11 +19,13 @@ import java.util.stream.Collectors;
 /**
  * Lightweight Discord integration using Webhooks.
  * Replaces the heavy JDA library to reduce plugin size.
+ * Now supports message editing to prevent spam.
  */
 public class DiscordManager {
 
     private final StrengthSMP plugin;
     private final HttpClient httpClient;
+    private final LinkedList<String> killFeed = new LinkedList<>();
 
     public DiscordManager(StrengthSMP plugin, String unused) {
         this.plugin = plugin;
@@ -45,46 +48,114 @@ public class DiscordManager {
             createEmbed("🔴 System Offline", "Strength SMP system has been disabled.", 0xe74c3c));
     }
 
+    private final java.util.concurrent.atomic.AtomicBoolean isUpdating = new java.util.concurrent.atomic.AtomicBoolean(false);
+    private long lastUpdate = 0;
+
     public void updateDashboard() {
         if (!plugin.getConfigManager().isLbEnabled()) return;
         
-        String webhook = plugin.getConfigManager().getLeaderboardWebhook();
-        if (webhook == null || webhook.isEmpty()) return;
+        // Throttling: Max once every 30 seconds to prevent rate limits and spam
+        long now = System.currentTimeMillis();
+        if (now - lastUpdate < 30000 && lastUpdate != 0) return;
+        
+        // Lock: Prevent concurrent updates
+        if (!isUpdating.compareAndSet(false, true)) return;
 
-        JsonObject embed = createLeaderboardEmbed();
-        sendWebhook(webhook, embed);
+        String webhookUrl = plugin.getConfigManager().getLeaderboardWebhook();
+        if (webhookUrl == null || webhookUrl.isEmpty() || webhookUrl.equals("YOUR_WEBHOOK_URL_HERE")) {
+            isUpdating.set(false);
+            return;
+        }
+
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                lastUpdate = System.currentTimeMillis();
+                String messageId = plugin.getDataManager().getLeaderboardMessageId();
+                JsonObject embed = createLeaderboardEmbed();
+                
+                JsonObject payload = new JsonObject();
+                JsonArray embeds = new JsonArray();
+                embeds.add(embed);
+                payload.add("embeds", embeds);
+
+                String finalUrl = webhookUrl;
+                String method = "POST";
+
+                if (messageId != null && !messageId.isEmpty()) {
+                    // Attempt to edit existing message
+                    finalUrl = webhookUrl + "/messages/" + messageId;
+                    method = "PATCH";
+                } else {
+                    // New message, ask for ID in response
+                    finalUrl = webhookUrl + "?wait=true";
+                }
+
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(finalUrl))
+                        .header("Content-Type", "application/json")
+                        .method(method, HttpRequest.BodyPublishers.ofString(payload.toString()))
+                        .build();
+
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+                if (response.statusCode() == 404 && method.equals("PATCH")) {
+                    // Message was deleted, clear ID and retry once
+                    plugin.getDataManager().setLeaderboardMessageId(null);
+                    isUpdating.set(false); // Release lock before retry
+                    updateDashboard(); 
+                    return;
+                } else if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                    if (method.equals("POST")) {
+                        // Save the message ID from the response
+                        JsonObject responseJson = JsonParser.parseString(response.body()).getAsJsonObject();
+                        if (responseJson.has("id")) {
+                            String newId = responseJson.get("id").getAsString();
+                            plugin.getDataManager().setLeaderboardMessageId(newId);
+                        }
+                    }
+                } else {
+                    plugin.getLogger().warning("Discord Webhook error: " + response.statusCode() + " - " + response.body());
+                }
+            } catch (Exception e) {
+                plugin.getLogger().warning("Failed to update Discord leaderboard: " + e.getMessage());
+            } finally {
+                isUpdating.set(false);
+            }
+        });
     }
 
     public void logKill(Player killer, Player victim, int bounty) {
-        String webhook = plugin.getConfigManager().getAuditWebhook();
-        if (webhook == null || webhook.isEmpty()) return;
-
-        JsonObject embed = new JsonObject();
-        if (killer == null) {
-            embed.addProperty("title", "🚫 COMBAT LOG");
-            embed.addProperty("description", "**" + victim.getName() + "** logged out in combat!");
-            embed.addProperty("color", 0xe74c3c);
-        } else {
-            embed.addProperty("title", "⚔️ KILL LOG");
-            embed.addProperty("description", "**" + killer.getName() + "** killed **" + victim.getName() + "**");
-            embed.addProperty("color", 0xe67e22);
-            if (bounty > 0) {
-                JsonObject footer = new JsonObject();
-                footer.addProperty("text", "Bounty Claimed: " + bounty + " Strength");
-                embed.add("footer", footer);
-            }
-        }
-        embed.addProperty("timestamp", Instant.now().toString());
+        String killerName = (killer != null) ? killer.getName() : "Unknown";
+        String victimName = victim.getName();
         
-        sendWebhook(webhook, embed);
+        String entry;
+        if (killer == null) {
+            entry = "🔴 **" + victimName + "** logged out in combat!";
+        } else {
+            entry = "⚔️ **" + killerName + "** killed **" + victimName + "** " + (bounty > 0 ? "*(+" + bounty + " STR)*" : "");
+        }
+        
+        synchronized (killFeed) {
+            killFeed.addFirst(entry);
+            if (killFeed.size() > 5) killFeed.removeLast();
+        }
+        
+        // Trigger dashboard update immediately to show the new kill
+        updateDashboard();
     }
 
     private JsonObject createLeaderboardEmbed() {
         Config config = plugin.getConfigManager();
         JsonObject embed = new JsonObject();
-        embed.addProperty("title", "🏆 Strength SMP Leaderboard");
-        embed.addProperty("description", "Live competitive rankings updated automatically.");
-        embed.addProperty("color", Integer.parseInt(config.getLbColor().replace("#", ""), 16));
+        embed.addProperty("title", "🏆 Strength SMP Dashboard");
+        embed.addProperty("description", "Live competitive status and recent activity.");
+        int color = 0xf1c40f; // Default gold
+        try {
+            String hex = config.getLbColor().replace("#", "");
+            color = Integer.parseInt(hex, 16);
+        } catch (NumberFormatException ignored) {}
+        
+        embed.addProperty("color", color);
         
         JsonArray fields = new JsonArray();
 
@@ -107,49 +178,50 @@ public class DiscordManager {
                         .append(entry.getValue()).append(" STR\n");
             }
         }
-        fields.add(createField("⚡ Top Strength", strBuilder.toString(), false));
+        fields.add(createField("⚡ Top Players", strBuilder.toString(), false));
 
-        // 1.5 MONARCH
+        // 1.5 MONARCH SPOTLIGHT
         if (config.lbShowMonarch()) {
             UUID monarchUUID = plugin.getDataManager().getMonarch();
-            String monarchName = "None";
             if (monarchUUID != null) {
-                monarchName = Bukkit.getOfflinePlayer(monarchUUID).getName();
+                String monarchName = Bukkit.getOfflinePlayer(monarchUUID).getName();
                 if (monarchName == null) monarchName = "Unknown";
+                
+                int strength = plugin.getDataManager().getStrength(monarchUUID);
+                fields.add(createField("👑 Current Monarch", "**" + monarchName + "** (" + strength + " STR)\n*The throne is claimed by the strongest.*", true));
+            } else {
+                fields.add(createField("👑 Current Monarch", "*Throne is currently vacant.*", true));
             }
-            fields.add(createField("👑 Current Monarch", "**" + monarchName + "**", true));
         }
 
-        // 2. TOP KILLERS
-        if (config.lbShowKills()) {
-            Map<UUID, Integer> killStats = plugin.getDataManager().getKillsCache();
-            List<Map.Entry<UUID, Integer>> topKillers = killStats.entrySet().stream()
-                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                    .limit(3)
-                    .collect(Collectors.toList());
+        // 2. GLOBAL STATS
+        int totalStrength = strengthStats.values().stream().mapToInt(Integer::intValue).sum();
+        int activePlayers = (int) strengthStats.values().stream().filter(s -> s > 0).count();
+        fields.add(createField("📊 Global Stats", 
+                "**Total Strength:** " + totalStrength + " STR\n" +
+                "**Active Warriors:** " + activePlayers, true));
 
-            StringBuilder killBuilder = new StringBuilder();
-            if (topKillers.isEmpty()) {
-                killBuilder.append("No kills recorded yet.");
+        // 3. LIVE KILL FEED
+        StringBuilder feedBuilder = new StringBuilder();
+        synchronized (killFeed) {
+            if (killFeed.isEmpty()) {
+                feedBuilder.append("*No recent combat activity.*");
             } else {
-                for (int i = 0; i < topKillers.size(); i++) {
-                    Map.Entry<UUID, Integer> entry = topKillers.get(i);
-                    String name = Bukkit.getOfflinePlayer(entry.getKey()).getName();
-                    killBuilder.append(rankIcons[i]).append(" **").append(name != null ? name : "Unknown").append("** — ")
-                            .append(entry.getValue()).append(" Kills\n");
+                for (String entry : killFeed) {
+                    feedBuilder.append(entry).append("\n");
                 }
             }
-            fields.add(createField("⚔️ Top Killers", killBuilder.toString(), true));
         }
+        fields.add(createField("📜 Recent Activity", feedBuilder.toString(), false));
 
-        // 3. SERVER STATUS
+        // 4. SERVER STATUS
         if (config.lbShowStatus()) {
-            fields.add(createField("📡 Status", "🟢 **Online** (" + Bukkit.getOnlinePlayers().size() + " online)", true));
+            fields.add(createField("📡 Server Status", "🟢 **Online** (" + Bukkit.getOnlinePlayers().size() + " players)", true));
         }
 
         embed.add("fields", fields);
         JsonObject footer = new JsonObject();
-        footer.addProperty("text", "Updates periodically • Floki Strength SMP");
+        footer.addProperty("text", "Auto-updating • Floki Strength SMP");
         embed.add("footer", footer);
         embed.addProperty("timestamp", Instant.now().toString());
 

@@ -4,6 +4,7 @@
 sword:
   cosmetic-name: "&b&lDuelist Sword"
   rename-on-bind: true
+  custom-model-data: 12348
   passive-combo-hits: 3
   passive-damage-mult: 1.25
   shockwave:
@@ -15,6 +16,7 @@ sword:
 axe:
   cosmetic-name: "&c&lHeirloom Axe"
   rename-on-bind: true
+  custom-model-data: 12349
   passive-crit-hits: 5
   stun-duration-ticks: 20
   bleed:
@@ -24,6 +26,7 @@ axe:
 bow:
   cosmetic-name: "&e&lRecurve Bow"
   rename-on-bind: true
+  custom-model-data: 12350
   explosion:
     radius: 4.0
     damage: 3.0
@@ -33,6 +36,7 @@ bow:
 crossbow:
   cosmetic-name: "&6&lHeavy Crossbow"
   rename-on-bind: true
+  custom-model-data: 12351
   pull-strength: 1.5
   chain:
     radius: 5.0
@@ -41,6 +45,7 @@ crossbow:
 trident:
   cosmetic-name: "&3&lRoyal Trident"
   rename-on-bind: true
+  custom-model-data: 12352
   lightning-hits: 4
   lightning-damage: 2.0
   speed-level: 1
@@ -49,6 +54,7 @@ trident:
 shield:
   cosmetic-name: "&f&lBulwark Shield"
   rename-on-bind: true
+  custom-model-data: 12353
   speed-level: 1
   speed-ticks: 100
   counter:

@@ -41,7 +41,7 @@ totem:
 # Strength & Reroll
 strength:
   insufficient: "&c&lINSUFFICIENT STRENGTH! &7You need at least &e1 strength &7to reroll your class."
-  free-reroll-reward: "&x&F&F&A&A&0&0&l[ʀᴇᴡᴀʀᴅ] &fʏᴏᴜ'ᴠᴇ ʀᴇᴄᴇɪᴠᴇᴅ ᴀ &6&lғʀᴇᴇ ʀᴇʀᴏʟʟ ʙᴏᴏᴋ&f! &7ᴜsᴇ ɪᴛ ᴛᴏ ᴄʜᴀɴɢᴇ ʏᴏᴜʀ ᴄʟᴀss."
+  free-reroll-reward: "&x&F&F&A&A&0&0&l[ʀᴇᴡᴀʀᴅ] &fʏᴏᴜ'ᴠᴇ ʀᴇᴄᴇɪᴠᴇᴅ ᴀ &6&lғʀᴇᴇ ʀᴇʀᴏʟʟ ʙᴏᴏᴋ&f! &7ᴜsᴇ ɪᴛ ᴛᴏ ᴄʜᴀɴɢᴇ ʏᴏᴜʀ ᴄʜᴀss."
   cooldown: "&c&lCOOLDOWN! &7You must wait &e%time%s &7before using another strength item."
   max-reached: "&c&lMAX STRENGTH! &7You have already reached the maximum strength limit."
   protection-granted: "&x&00&D&B&FF&l[ᴘʀᴏᴛᴇᴄᴛᴇᴅ] &fYou have been granted &b4 hours &fof death protection. You cannot lose strength during this time."
@@ -53,3 +53,7 @@ strength:
   newbie-protected: "&7Your target is a &anew player &7and is protected. No STR gained."
   newbie-no-gain: "&7(( Newbie protection active — you cannot gain STR from kills yet. Ask teammates to /withdraw for you! ))"
   protected-no-gain: "&7(( Death protection active — you cannot gain STR from kills while protected. ))"
+  gain: "&a&lSTRENGTH GAINED! &7Your strength has increased to &e%strength%&7."
+  loss: "&c&lSTRENGTH LOST! &7Your strength has decreased to &e%strength%&7."
+  at-minimum: "&c&lAT MINIMUM! &7You are at the minimum strength limit and cannot lose any more strength."
+  victim-at-minimum: "&c&lAT MINIMUM! &7Your target %victim% is already at the minimum strength limit. No strength was gained."
