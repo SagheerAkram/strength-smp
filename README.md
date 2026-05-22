@@ -17,6 +17,8 @@
 🔗 **Links:**  
 👉 [BuiltByBit (BBB) Official Page](https://builtbybit.com/resources/strength-smp-by-floki.105677/)  
 👉 [SpigotMC Resource](https://www.spigotmc.org/resources/strengthsmp.105677/)  
+👉 [Modrinth Project](https://modrinth.com/plugin/strength-smp-/)  
+👉 [CurseForge Page](https://www.curseforge.com/minecraft/bukkit-plugins/strength-smp)  
 👉 [GitHub Repository](https://github.com/SagheerAkram/strength-smp)  
 *Developer: Sagheer Akram (aka Floki)*
 
