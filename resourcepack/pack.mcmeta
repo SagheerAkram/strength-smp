@@ -1,6 +1,7 @@
 {
   "pack": {
     "pack_format": 34,
-    "description": "StrengthSMP Custom Textures"
+    "supported_formats": [34, 46],
+    "description": "Strength SMP custom item textures"
   }
 }

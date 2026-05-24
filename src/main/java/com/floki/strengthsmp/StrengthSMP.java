@@ -28,8 +28,6 @@ public class StrengthSMP extends JavaPlugin {
     private com.floki.strengthsmp.services.TotemService totemService;
     private com.floki.strengthsmp.services.AestheticService aestheticService;
     private com.floki.strengthsmp.services.RiftService riftService;
-    private com.floki.strengthsmp.services.SkillService skillService;
-    private com.floki.strengthsmp.gui.SkillTreeGUI skillTreeGUI;
     private com.floki.strengthsmp.util.ResourcePackServer resourcePackServer;
     
     @Override
@@ -61,9 +59,7 @@ public class StrengthSMP extends JavaPlugin {
         this.aestheticService = new com.floki.strengthsmp.services.AestheticService(this);
         this.aestheticService.startAestheticTasks();
         this.riftService = new com.floki.strengthsmp.services.RiftService(this);
-        this.skillService = new com.floki.strengthsmp.services.SkillService(this);
-        this.skillTreeGUI = new com.floki.strengthsmp.gui.SkillTreeGUI(this);
-        getLogger().info("✓ System Services Initialized (Monarch, Strength, Totem, Aesthetics, Rift, Skills)");
+        getLogger().info("✓ System Services Initialized (Monarch, Strength, Totem, Aesthetics, Rift)");
 
         // 4. Hook PlaceholderAPI
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -108,7 +104,7 @@ public class StrengthSMP extends JavaPlugin {
         
         long loadTime = System.currentTimeMillis() - startTime;
         getLogger().info("╔════════════════════════════════════════════════════════════╗");
-        getLogger().info("║          ✅ FLOKI SMP STRENGTH SYSTEM READY TO GO ✅         ║");
+        getLogger().info("║            ✅ STRENGTH SMP SYSTEM READY TO GO ✅             ║");
         getLogger().info("║                 Load time: " + loadTime + "ms                        ║");
         getLogger().info("╚════════════════════════════════════════════════════════════╝");
     }
@@ -130,7 +126,7 @@ public class StrengthSMP extends JavaPlugin {
         if (resourcePackServer != null) {
             resourcePackServer.stop();
         }
-        getLogger().info("🔴 Floki Strength SMP disabled. All data saved.");
+        getLogger().info("🔴 Strength SMP disabled. All data saved.");
     }
     
     private void registerEventListeners() {
@@ -240,7 +236,6 @@ public class StrengthSMP extends JavaPlugin {
         new KillResetCommand(this);
         new NoNewbieCommand(this);
         new RemoveProtectionCommand(this);
-        new SkillCommand(this);
         new com.floki.strengthsmp.commands.BindCommand(this);
     }
     
@@ -316,13 +311,5 @@ public class StrengthSMP extends JavaPlugin {
 
     public com.floki.strengthsmp.services.RiftService getRiftService() {
         return riftService;
-    }
-
-    public com.floki.strengthsmp.services.SkillService getSkillService() {
-        return skillService;
-    }
-
-    public com.floki.strengthsmp.gui.SkillTreeGUI getSkillTreeGUI() {
-        return skillTreeGUI;
     }
 }

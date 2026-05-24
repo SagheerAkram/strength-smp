@@ -413,7 +413,17 @@ public class DataManager {
 
     public void setWeaponType(UUID uuid, WeaponType weapon) {
         weaponCache.put(uuid, weapon);
+        
+        // Remove weapon bindings when class changes!
+        setBoundWeaponId(uuid, null);
+        setHasBoundWeapon(uuid, false);
+        
         savePlayer(uuid);
+        
+        org.bukkit.entity.Player player = org.bukkit.Bukkit.getPlayer(uuid);
+        if (player != null && player.isOnline()) {
+            com.floki.strengthsmp.util.ItemFactory.unbindAllPlayerItems(player);
+        }
     }
 
     // Aliases for compatibility with command classes

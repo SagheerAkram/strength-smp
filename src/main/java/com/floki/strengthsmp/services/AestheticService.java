@@ -137,7 +137,7 @@ public class AestheticService {
 
         meta.setPages(page.toString());
         meta.setTitle("Ledger of Legends");
-        meta.setAuthor("Floki SMP");
+        meta.setAuthor("Strength SMP");
         
         book.setItemMeta(meta);
         viewer.openBook(book);

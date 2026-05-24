@@ -14,6 +14,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import org.bukkit.event.entity.ItemSpawnEvent;
+import org.bukkit.event.entity.ItemDespawnEvent;
+import org.bukkit.entity.Item;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -94,5 +97,59 @@ public class ItemInteractionListener implements Listener {
         }
     }
 
+    /**
+     * Prevents custom Reroll Books and Strength Items from ever despawning naturally.
+     */
+    @EventHandler
+    public void onItemSpawn(ItemSpawnEvent event) {
+        Item itemEntity = event.getEntity();
+        ItemStack stack = itemEntity.getItemStack();
+        if (com.floki.strengthsmp.util.ItemFactory.isRerollItem(stack) || 
+            com.floki.strengthsmp.util.ItemFactory.isStrengthItem(stack)) {
+            // Set unlimited lifetime to bypass standard Minecraft despawn
+            itemEntity.setUnlimitedLifetime(true);
+            // Mark invulnerable so standard splash, damage, and primitive clear lags ignore it
+            itemEntity.setInvulnerable(true);
+            // Make sure the item entity persists across server reloads/restarts perfectly
+            itemEntity.setPersistent(true);
+        }
+    }
 
+    @EventHandler
+    public void onItemDespawn(ItemDespawnEvent event) {
+        Item itemEntity = event.getEntity();
+        ItemStack stack = itemEntity.getItemStack();
+        if (com.floki.strengthsmp.util.ItemFactory.isRerollItem(stack) || 
+            com.floki.strengthsmp.util.ItemFactory.isStrengthItem(stack)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onItemDamage(org.bukkit.event.entity.EntityDamageEvent event) {
+        if (event.getEntity() instanceof Item itemEntity) {
+            ItemStack stack = itemEntity.getItemStack();
+            if (com.floki.strengthsmp.util.ItemFactory.isRerollItem(stack) || 
+                com.floki.strengthsmp.util.ItemFactory.isStrengthItem(stack)) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onItemMerge(org.bukkit.event.entity.ItemMergeEvent event) {
+        Item target = event.getTarget();
+        Item entity = event.getEntity();
+        ItemStack stack = target.getItemStack();
+        if (com.floki.strengthsmp.util.ItemFactory.isRerollItem(stack) || 
+            com.floki.strengthsmp.util.ItemFactory.isStrengthItem(stack)) {
+            target.setUnlimitedLifetime(true);
+            target.setInvulnerable(true);
+            target.setPersistent(true);
+            
+            entity.setUnlimitedLifetime(true);
+            entity.setInvulnerable(true);
+            entity.setPersistent(true);
+        }
+    }
 }

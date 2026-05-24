@@ -1,6 +1,6 @@
 name: StrengthSMP
-version: 1.1.0
-description: "Professional Strength PvP system for Floki SMP"
+version: 1.1.1
+description: "Professional Strength PvP system for Minecraft Servers"
 main: com.floki.strengthsmp.StrengthSMP
 api-version: "1.13"
 authors:
@@ -62,10 +62,6 @@ commands:
   removeprotection:
     description: Remove your own death or newbie protection
     usage: "/removeprotection"
-
-  skills:
-    description: Open the skill tree GUI
-    usage: "/skills"
 
   bind:
     description: Bind your class weapon to you by spending 3 strength

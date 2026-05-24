@@ -80,7 +80,7 @@ public class CrossbowListener implements Listener {
                 burstArrow.setCritical(true);
 
                 shooter.getWorld().playSound(shooter.getLocation(), Sound.ITEM_CROSSBOW_SHOOT, 0.8f, 1.5f + (count * 0.1f));
-                shooter.getWorld().spawnParticle(org.bukkit.Particle.SMOKE_NORMAL, shooter.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0.05);
+                com.floki.strengthsmp.util.CompatUtil.spawnParticle(shooter.getWorld(), "SMOKE_NORMAL", shooter.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0.05);
 
                 count++;
             }

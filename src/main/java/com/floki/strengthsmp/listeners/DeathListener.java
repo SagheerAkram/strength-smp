@@ -77,7 +77,7 @@ public class DeathListener implements Listener {
         
         // Initial burst
         com.floki.strengthsmp.util.CompatUtil.spawnParticle(victim.getWorld(), "SCULK_CHARGE_POP", start, 20, 0.3, 0.3, 0.3, 0.05);
-        victim.getWorld().spawnParticle(Particle.SPELL_WITCH, start, 30, 0.5, 0.5, 0.5, 0.1);
+        com.floki.strengthsmp.util.CompatUtil.spawnParticle(victim.getWorld(), "SPELL_WITCH", start, 30, 0.5, 0.5, 0.5, 0.1);
         
         new BukkitRunnable() {
             int ticks = 0;
@@ -91,7 +91,7 @@ public class DeathListener implements Listener {
                 org.bukkit.Location kLoc = killer.getLocation().add(0, 1.2, 0);
                 org.bukkit.Location current = start.clone().add(kLoc.toVector().subtract(start.toVector()).multiply(ticks / 20.0));
                 
-                victim.getWorld().spawnParticle(Particle.SOUL, current, 3, 0.05, 0.05, 0.05, 0.02);
+                com.floki.strengthsmp.util.CompatUtil.spawnParticle(victim.getWorld(), "SOUL", current, 3, 0.05, 0.05, 0.05, 0.02);
                 com.floki.strengthsmp.util.CompatUtil.spawnParticle(victim.getWorld(), "SCULK_SOUL", current, 2, 0.02, 0.02, 0.02, 0.01);
                 
                 if (ticks % 5 == 0) {

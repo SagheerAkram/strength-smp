@@ -36,16 +36,20 @@ public class DiscordManager {
 
     public void connect() {
         plugin.getLogger().info("✓ Discord Webhook system ready (Ultra-Lightweight)");
-        // Send initial heartbeat/announcement
-        sendWebhook(plugin.getConfigManager().getAnnouncementWebhook(), 
-            createEmbed("🛡️ Strength SMP", "System initialized and monitoring combat.", 0x2ecc71));
+        // Send initial heartbeat/announcement conditionally to prevent reload spam
+        if (plugin.getConfigManager().isDiscordHeartbeatEnabled()) {
+            sendWebhook(plugin.getConfigManager().getAnnouncementWebhook(), 
+                createEmbed("🛡️ Strength SMP", "System initialized and monitoring combat.", 0x2ecc71));
+        }
         
         updateDashboard(); // Initial leaderboard push
     }
 
     public void disconnect() {
-        sendWebhook(plugin.getConfigManager().getAnnouncementWebhook(), 
-            createEmbed("🔴 System Offline", "Strength SMP system has been disabled.", 0xe74c3c));
+        if (plugin.getConfigManager().isDiscordHeartbeatEnabled()) {
+            sendWebhook(plugin.getConfigManager().getAnnouncementWebhook(), 
+                createEmbed("🔴 System Offline", "Strength SMP system has been disabled.", 0xe74c3c));
+        }
     }
 
     private final java.util.concurrent.atomic.AtomicBoolean isUpdating = new java.util.concurrent.atomic.AtomicBoolean(false);
@@ -159,26 +163,44 @@ public class DiscordManager {
         
         JsonArray fields = new JsonArray();
 
-        // 1. TOP STRENGTH
+        // 1. TOP STRENGTH (Chunked to support higher player limits like 1-20, 21-40 without spam or truncation)
         Map<UUID, Integer> strengthStats = plugin.getDataManager().getStrengthCache();
+        int limit = config.getLbLimit();
+        if (limit <= 0) limit = 20;
         List<Map.Entry<UUID, Integer>> topStrength = strengthStats.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .limit(5)
+                .limit(limit)
                 .collect(Collectors.toList());
 
-        StringBuilder strBuilder = new StringBuilder();
-        String[] rankIcons = { "🥇", "🥈", "🥉", "🏅", "🏅" };
         if (topStrength.isEmpty()) {
-            strBuilder.append("No rankings available yet.");
+            fields.add(createField("⚡ Top Players", "No rankings available yet.", false));
         } else {
-            for (int i = 0; i < topStrength.size(); i++) {
-                Map.Entry<UUID, Integer> entry = topStrength.get(i);
-                String name = Bukkit.getOfflinePlayer(entry.getKey()).getName();
-                strBuilder.append(rankIcons[i]).append(" **").append(name != null ? name : "Unknown").append("** — ")
-                        .append(entry.getValue()).append(" STR\n");
+            int chunkSize = 20;
+            for (int chunkStart = 0; chunkStart < topStrength.size(); chunkStart += chunkSize) {
+                int chunkEnd = Math.min(chunkStart + chunkSize, topStrength.size());
+                StringBuilder strBuilder = new StringBuilder();
+                
+                for (int i = chunkStart; i < chunkEnd; i++) {
+                    Map.Entry<UUID, Integer> entry = topStrength.get(i);
+                    String name = Bukkit.getOfflinePlayer(entry.getKey()).getName();
+                    if (name == null) name = "Unknown";
+                    
+                    int rank = i + 1;
+                    String rankIcon;
+                    if (rank == 1) rankIcon = "🥇";
+                    else if (rank == 2) rankIcon = "🥈";
+                    else if (rank == 3) rankIcon = "🥉";
+                    else if (rank <= 10) rankIcon = "🏅";
+                    else rankIcon = "🔹";
+                    
+                    strBuilder.append(rankIcon).append(" **").append(name).append("** — ")
+                            .append(entry.getValue()).append(" STR\n");
+                }
+                
+                String fieldName = "⚡ Top Players #" + (chunkStart + 1) + "-" + chunkEnd;
+                fields.add(createField(fieldName, strBuilder.toString(), false));
             }
         }
-        fields.add(createField("⚡ Top Players", strBuilder.toString(), false));
 
         // 1.5 MONARCH SPOTLIGHT
         if (config.lbShowMonarch()) {
@@ -221,7 +243,7 @@ public class DiscordManager {
 
         embed.add("fields", fields);
         JsonObject footer = new JsonObject();
-        footer.addProperty("text", "Auto-updating • Floki Strength SMP");
+        footer.addProperty("text", "Auto-updating • Strength SMP");
         embed.add("footer", footer);
         embed.addProperty("timestamp", Instant.now().toString());
 

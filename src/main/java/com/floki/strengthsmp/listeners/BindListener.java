@@ -80,8 +80,9 @@ public class BindListener implements Listener {
                             String activeBoundId = plugin.getDataManager().getBoundWeaponId(player.getUniqueId());
                             if (activeBoundId != null && activeBoundId.equals(itemBoundId)) {
                                 // Emit subtle portal/enchantment particles
-                                player.getWorld().spawnParticle(
-                                    Particle.SPELL_WITCH, 
+                                com.floki.strengthsmp.util.CompatUtil.spawnParticle(
+                                    player.getWorld(),
+                                    "SPELL_WITCH", 
                                     player.getLocation().add(0, 1.0, 0), 
                                     2, 
                                     0.2, 0.4, 0.2, 
@@ -164,6 +165,8 @@ public class BindListener implements Listener {
         Player player = event.getPlayer();
         ItemStack item = event.getItemDrop().getItemStack();
         plugin.getLogger().info("[DEBUG] onPlayerDropItem fired for " + player.getName() + " with " + (item != null ? item.getType() : "null"));
+        
+        // Only cancel the drop and trigger the active ability if the dropped item itself is their own active bound item!
         if (isOwnActiveBoundItem(item, player.getUniqueId())) {
             plugin.getLogger().info("[DEBUG] onPlayerDropItem: isOwnActiveBoundItem = true! Triggering ability...");
             event.setCancelled(true);
@@ -515,8 +518,8 @@ public class BindListener implements Listener {
                 if (ticks % 3 == 0) {
                     currentPos.getWorld().playSound(currentPos, Sound.ITEM_TRIDENT_THROW, 0.8f, 0.6f + (ticks * 0.05f));
                 }
-                currentPos.getWorld().spawnParticle(Particle.SPELL_WITCH, currentPos, 5, 0.1, 0.1, 0.1, 0.02);
-                currentPos.getWorld().spawnParticle(Particle.CRIT, currentPos, 3, 0.1, 0.1, 0.1, 0.05);
+                com.floki.strengthsmp.util.CompatUtil.spawnParticle(currentPos.getWorld(), "SPELL_WITCH", currentPos, 5, 0.1, 0.1, 0.1, 0.02);
+                com.floki.strengthsmp.util.CompatUtil.spawnParticle(currentPos.getWorld(), "CRIT", currentPos, 3, 0.1, 0.1, 0.1, 0.05);
 
                 // Knockback entities in path
                 for (Entity nearby : flyingItem.getNearbyEntities(kbRadius, kbRadius, kbRadius)) {

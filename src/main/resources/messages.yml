@@ -1,59 +1,60 @@
 # StrengthSMP Messages
-prefix: "&x&F&F&A&A&0&0&lS&x&F&F&B&B&0&0&lT&x&F&F&C&C&0&0&lR&x&F&F&D&D&0&0&lE&x&F&F&E&E&0&0&lN&x&F&F&F&F&0&0&lG&x&F&F&F&F&0&0&lT&x&F&F&F&F&0&0&lH &8» "
+prefix: "&x&f&f&8&c&0&0&lS&x&f&f&9&7&0&a&lT&x&f&f&a&3&1&4&lR&x&f&f&a&e&1&e&lE&x&f&f&b&a&2&8&lN&x&f&f&c&5&3&2&lG&x&f&f&d&1&3&c&lT&x&f&f&d&c&4&6&lH &8» "
 
 # General
-no-permission: "&cYou do not have permission to use this command."
-only-players: "&cOnly players can use this command."
-player-not-found: "&cPlayer not found."
-invalid-amount: "&cInvalid amount specified."
+no-permission: "&c&l✖ &c&lɴᴏ ᴘᴇʀᴍɪssɪᴏɴ! &7ʏᴏᴜ ᴅᴏ ɴᴏᴛ ʜᴀᴠᴇ ᴀᴄᴄᴇss ᴛᴏ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ."
+only-players: "&c&l✖ &c&lᴘʟᴀʏᴇʀs ᴏɴʟʏ! &7ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ᴄᴀɴ ᴏɴʟʏ ʙᴇ ʀᴜɴ ɪɴ-ɢᴀᴍᴇ."
+player-not-found: "&c&l✖ &c&lᴘʟᴀʏᴇʀ ɴᴏᴛ ꜰᴏᴜɴᴅ! &7ᴛʜᴇ sᴘᴇᴄɪғɪᴇᴅ ᴘʟᴀʏᴇʀ ɪs ɴᴏᴛ ᴏɴʟɪɴᴇ."
+invalid-amount: "&c&l✖ &c&lɪɴᴠᴀʟɪᴅ ᴀᴍᴏᴜɴᴛ! &7ᴘʟᴇᴀsᴇ sᴘᴇᴄɪғʏ ᴀ ᴠᴀʟɪᴅ ᴘᴏsɪᴛɪᴠᴇ ɴᴜᴍʙᴇʀ."
 
 # Combat Logging
 combat:
-  tagged: "&c&lCOMBAT TAG! &7Do not logout or you will be penalized!"
-  expired: "&a&lCOMBAT EXPIRED! &7You can now safely logout."
-  penalty: "&c&lLOGOUT PENALTY! &e%player% logged out during combat and was executed."
-  command-blocked: "&c&lCOMBAT! &7You cannot use commands while in combat. Only &e/whisper &7and &e/strength &7are allowed."
+  tagged: "&c&l☠ &c&lᴄᴏᴍʙᴀᴛ ᴛᴀɢ! &7ʏᴏᴜ ᴀʀᴇ ɪɴ ᴄᴏᴍʙᴀᴛ! &8(&cᴅᴏ ɴᴏᴛ ʟᴏɢᴏᴜᴛ&8)"
+  expired: "&a&l✔ &a&lᴄᴏᴍʙᴀᴛ ᴇxᴘɪʀᴇᴅ! &7ʏᴏᴜ ᴄᴀɴ ɴᴏᴡ sᴀꜰᴇʟʏ ʟᴏɢᴏᴜᴛ."
+  penalty: "&c&l☠ &c&lʟᴏɢᴏᴜᴛ ᴘᴇɴᴀʟᴛʏ! &e%player% &7ʟᴏɢɢᴇᴅ ᴏᴜᴛ ᴅᴜʀɪɴɢ ᴄᴏᴍʙᴀᴛ ᴀɴᴅ ᴡᴀs &cᴇxᴇᴄᴜᴛᴇᴅ&7!"
+  command-blocked: "&c&l☠ &c&lᴄᴏᴍʙᴀᴛ! &7ʏᴏᴜ ᴄᴀɴɴᴏᴛ ᴜsᴇ ᴄᴏᴍᴍᴀɴᴅs ᴡʜɪʟᴇ ɪɴ ᴄᴏᴍʙᴀᴛ."
 
 # Bounty System
 bounty:
-  set: "&x&F&F&0&0&0&0&l[ʙᴏᴜɴᴛʏ] &f%sender% &7ᴘʟᴀᴄᴇᴅ ᴀ &4%amount% &7sᴛʀᴇɴɢᴛʜ ʙᴏᴜɴᴛʏ ᴏɴ &c%target%!"
-  claim: "&x&F&F&0&0&0&0&l[ʙᴏᴜɴᴛʏ] &f%player% &7ᴄʟᴀɪᴍᴇᴅ ᴀ &4%amount% &7sᴛʀᴇɴɢᴛʜ ʙᴏᴜɴᴛʏ ʙʏ ᴋɪʟʟɪɴɢ &c%target%!"
-  claim-bonus-skip: "&7&o(( Normal kill strength suppressed since a bounty was claimed ))"
+  set: "&6&l🎯 [ʙᴏᴜɴᴛʏ] &f%sender% &7ᴘʟᴀᴄᴇᴅ ᴀ &6%amount% ꜱᴛʀ &7ʙᴏᴜɴᴛʏ ᴏɴ &e%target%&7!"
+  claim: "&6&l🎯 [ʙᴏᴜɴᴛʏ] &e%player% &7ᴄʟᴀɪᴍᴇᴅ &6%amount% ꜱᴛʀ &7ʙʏ ᴅᴇꜰᴇᴀᴛɪɴɢ &e%target%&7!"
+  claim-bonus-skip: "&8(( ʙᴏᴜɴᴛʏ ᴄʟᴀɪᴍᴇᴅ — ɴᴏʀᴍᴀʟ ᴋɪʟʟ ꜱᴛʀᴇɴɢᴛʜ ɢᴀɪɴ sᴜᴘᴘʀᴇssᴇᴅ ))"
 
 # Monarch System
 monarch:
-  new: "&x&F&F&D&7&0&0&l[ᴍᴏɴᴀʀᴄʜ] &f%player% &7ɪs ᴛʜᴇ ɴᴇᴡ sᴇʀᴠᴇʀ ᴍᴏɴᴀʀᴄʜ!"
-  dethroned: "&x&F&F&D&7&0&0&l[ᴍᴏɴᴀʀᴄʜ] &f%player% &7ʜᴀs ʙᴇᴇɴ ᴅᴇᴛʜʀᴏɴᴇᴅ!"
+  new: "&e&l👑 [ᴍᴏɴᴀʀᴄʜ] &f%player% &7ʜᴀs ᴀsᴄᴇɴᴅᴇᴅ ᴛᴏ ʙᴇᴄᴏᴍᴇ ᴛʜᴇ &e&lꜱᴇʀᴠᴇʀ ᴍᴏɴᴀʀᴄʜ&7!"
+  dethroned: "&e&l👑 [ᴍᴏɴᴀʀᴄʜ] &f%player% &7ʜᴀs ʙᴇᴇɴ &cᴅᴇᴛʜʀᴏɴᴇᴅ &7ᴀs ᴍᴏɴᴀʀᴄʜ!"
 
 # Seasons & Contracts
 season:
-  day: "&x&0&0&F&F&A&A&l[sᴇᴀsᴏɴ] &fᴄᴜʀʀᴇɴᴛ sᴇᴀsᴏɴ ᴅᴀʏ: &b%day%"
+  day: "&b&l📅 [sᴇᴀsᴏɴ] &7ᴄᴜʀʀᴇɴᴛ ꜱᴇᴀꜱᴏɴ ᴅᴀʏ: &b%day%"
 contract:
-  complete: "&x&F&F&A&A&0&0&l[ᴄᴏɴᴛʀᴀᴄᴛ] &fʏᴏᴜ'ᴠᴇ ᴄᴏᴍᴘʟᴇᴛᴇᴅ ᴀ ᴅᴀɪʟʏ ᴄᴏɴᴛʀᴀᴄᴛ! &7ʀᴇᴡᴀʀᴅ: &e+%reward% sᴛʀ"
+  complete: "&a&l✔ [ᴄᴏɴᴛʀᴀᴄᴛ] &7ʏᴏᴜ'ᴠᴇ ᴄᴏᴍᴘʟᴇᴛᴇᴅ ᴀ ᴅᴀɪʟʏ ᴄᴏɴᴛʀᴀᴄᴛ! &8(&a+%reward% ꜱᴛʀ&8)"
 
 # Discord Integration
 discord:
-  kill-log: ":crossed_swords: **%attacker%** killed **%victim%** and gained **%amount%** strength!"
+  kill-log: ":crossed_swords: **%attacker%** defeated **%victim%** and gained **%amount%** strength! ⚔"
   bounty-log: ":moneybag: **%attacker%** claimed **%victim%**'s bounty of **%amount%** strength!"
 
 # Totem Limit
 totem:
+
 # Strength & Reroll
 strength:
-  insufficient: "&c&lINSUFFICIENT STRENGTH! &7You need at least &e1 strength &7to reroll your class."
-  free-reroll-reward: "&x&F&F&A&A&0&0&l[ʀᴇᴡᴀʀᴅ] &fʏᴏᴜ'ᴠᴇ ʀᴇᴄᴇɪᴠᴇᴅ ᴀ &6&lғʀᴇᴇ ʀᴇʀᴏʟʟ ʙᴏᴏᴋ&f! &7ᴜsᴇ ɪᴛ ᴛᴏ ᴄʜᴀɴɢᴇ ʏᴏᴜʀ ᴄʜᴀss."
-  cooldown: "&c&lCOOLDOWN! &7You must wait &e%time%s &7before using another strength item."
-  max-reached: "&c&lMAX STRENGTH! &7You have already reached the maximum strength limit."
-  protection-granted: "&x&00&D&B&FF&l[ᴘʀᴏᴛᴇᴄᴛᴇᴅ] &fYou have been granted &b4 hours &fof death protection. You cannot lose strength during this time."
-  protected: "&x&00&D&B&FF&l[ᴘʀᴏᴛᴇᴄᴛᴇᴅ] &fYou are protected! &7No strength was lost."
-  protection-blocked: "&7Your target is &bprotected &7and cannot lose strength right now."
-  anti-farm: "&7(( Kill ignored — anti-farm cooldown active for this target ))"
-  newbie-protection-start: "&x&00&FF&7F&l[NEWBIE] &fWelcome! You have &a8 hours &fof newbie protection. You cannot lose or gain STR from PvP during this time."
-  newbie-you-protected: "&x&00&FF&7F&l[PROTECTED] &fYou are under newbie protection. No STR lost."
-  newbie-protected: "&7Your target is a &anew player &7and is protected. No STR gained."
-  newbie-no-gain: "&7(( Newbie protection active — you cannot gain STR from kills yet. Ask teammates to /withdraw for you! ))"
-  protected-no-gain: "&7(( Death protection active — you cannot gain STR from kills while protected. ))"
-  gain: "&a&lSTRENGTH GAINED! &7Your strength has increased to &e%strength%&7."
-  loss: "&c&lSTRENGTH LOST! &7Your strength has decreased to &e%strength%&7."
-  at-minimum: "&c&lAT MINIMUM! &7You are at the minimum strength limit and cannot lose any more strength."
-  victim-at-minimum: "&c&lAT MINIMUM! &7Your target %victim% is already at the minimum strength limit. No strength was gained."
+  insufficient: "&c&l✖ &c&lɪɴꜱᴜꜰꜰɪᴄɪᴇɴᴛ ꜱᴛʀᴇɴɢᴛʜ! &7ʏᴏᴜ ɴᴇᴇᴅ ᴀᴛ ʟᴇᴀꜱᴛ &e1 ꜱᴛʀ &7ᴛᴏ ʀᴇʀᴏʟʟ ʏᴏᴜʀ ᴄʟᴀꜱꜱ."
+  free-reroll-reward: "&b&l🎁 [ʀᴇᴡᴀʀᴅ] &fʏᴏᴜ ʀᴇᴄᴇɪᴠᴇᴅ ᴀ &d&lꜰʀᴇᴇ ʀᴇʀᴏʟʟ ʙᴏᴏᴋ&f! &7ʀɪɢʜᴛ-ᴄʟɪᴄᴋ ᴛᴏ ᴜꜱᴇ."
+  cooldown: "&c&l⌛ [ᴄᴏᴏʟᴅᴏᴡɴ] &7ᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ &c%time%s &7ʙᴇꜰᴏʀᴇ ᴜꜱɪɴɢ ᴀɴᴏᴛʜᴇʀ ꜱᴛʀᴇɴɢᴛʜ ɪᴛᴇᴍ."
+  max-reached: "&d&l⚡ [ᴍᴀx ꜱᴛʀᴇɴɢᴛʜ] &7ʏᴏᴜ ᴀʀᴇ ᴀʟʀᴇᴀᴅʏ ᴀᴛ ᴛʜᴇ ᴍᴀxɪᴍᴜᴍ ꜱᴛʀᴇɴɢᴛʜ ʟɪᴍɪᴛ."
+  protection-granted: "&b&l🛡 [ᴘʀᴏᴛᴇᴄᴛᴇᴅ] &fʏᴏᴜ ɢᴀɪɴᴇᴅ &b4 ʜᴏᴜʀꜱ &ꜰᴏꜰ &b&lᴅᴇᴀᴛʜ ᴘʀᴏᴛᴇᴄᴛɪᴏɴ&f! &7(ɴᴏ ꜱᴛʀᴇɴɢᴛʜ ʟᴏꜱᴛ)"
+  protected: "&b&l🛡 [ᴘʀᴏᴛᴇᴄᴛᴇᴅ] &fʏᴏᴜ ᴀʀᴇ ᴜɴᴅᴇʀ &b&lᴘʀᴏᴛᴇᴄᴛɪᴏɴ&f! &7(ɴᴏ ꜱᴛʀᴇɴɢᴛʜ ʟᴏꜱᴛ)"
+  protection-blocked: "&7(( ʏᴏᴜʀ ᴛᴀʀɢᴇᴛ ɪs &bᴘʀᴏᴛᴇᴄᴛᴇᴅ &7ᴀɴᴅ ᴄᴀɴɴᴏᴛ ʟᴏsᴇ sᴛʀᴇɴɢᴛʜ ))"
+  anti-farm: "&8(( ᴋɪʟʟ ɪɢɴᴏʀᴇᴅ — ʏᴏᴜ ʜᴀᴠᴇ ʀᴇᴄᴇɴᴛʟʏ ᴋɪʟʟᴇᴅ ᴛʜɪs ᴘʟᴀʏᴇʀ ᴛᴏᴏ ᴍᴜᴄʜ ))"
+  newbie-protection-start: "&a&l☘ [ɴᴇᴡʙɪᴇ] &fᴡᴇʟᴄᴏᴍᴇ! &a8 ʜᴏᴜʀꜱ &ꜰᴏꜰ newbie protection granted."
+  newbie-you-protected: "&a&l☘ [ɴᴇᴡʙɪᴇ] &fʏᴏᴜ ᴀʀᴇ ᴜɴᴅᴇʀ &a&lɴᴇᴡʙɪᴇ ᴘʀᴏᴛᴇᴄᴛɪᴏɴ&f! &7(ɴᴏ ꜱᴛʀ ʟᴏꜱᴛ)"
+  newbie-protected: "&7(( ʏᴏᴜʀ ᴛᴀʀɢᴇᴛ ɪs ᴀ &aɴᴇᴡ ᴘʟᴀʏᴇʀ &7ᴀɴᴅ ɪs ᴘʀᴏᴛᴇᴄᴛᴇᴅ ))"
+  newbie-no-gain: "&8(( ʏᴏᴜ ᴄᴀɴɴᴏᴛ ɢᴀɪɴ ꜱᴛʀ ꜰʀᴏᴍ ᴋɪʟʟꜱ ᴡʜɪʟᴇ ᴜɴᴅᴇʀ ɴᴇᴡʙɪᴇ ᴘʀᴏᴛᴇᴄᴛɪᴏɴ ))"
+  protected-no-gain: "&8(( ʏᴏᴜ ᴄᴀɴɴᴏᴛ ɢᴀɪɴ ꜱᴛʀ ꜰʀᴏᴍ ᴋɪʟʟꜱ ᴡʜɪʟᴇ ᴜɴᴅᴇʀ ᴅᴇᴀᴛʜ ᴘʀᴏᴛᴇᴄᴛɪᴏɴ ))"
+  gain: "&a&l⚡ [ꜱᴛʀᴇɴɢᴛʜ ɢᴀɪɴᴇᴅ] &7ʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ɪɴᴄʀᴇᴀꜱᴇᴅ ᴛᴏ &e&l%strength% STR&7!"
+  loss: "&c&l⚡ [ꜱᴛʀᴇɴɢᴛʜ ʟᴏꜱᴛ] &7ʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ᴅᴇᴄʀᴇᴀꜱᴇᴅ ᴛᴏ &c&l%strength% STR&7!"
+  at-minimum: "&c&l✖ [ᴀᴛ ᴍɪɴɪᴍᴜᴍ] &7ʏᴏᴜ ᴀʀᴇ ᴀᴛ ᴛʜᴇ ᴍɪɴɪᴍᴜᴍ ꜱᴛʀᴇɴɢᴛʜ ʟɪᴍɪᴛ."
+  victim-at-minimum: "&c&l✖ [ᴀᴛ ᴍɪɴɪᴍᴜᴍ] &7ʏᴏᴜʀ ᴛᴀʀɢᴇᴛ ɪs ᴀʟʀᴇᴀᴅʏ ᴀᴛ ᴛʜᴇ ᴍɪɴɪᴍᴜᴍ ꜱᴛʀᴇɴɢᴛʜ."

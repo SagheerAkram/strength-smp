@@ -41,7 +41,7 @@ public class AxeListener implements Listener {
                 victim.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.SLOW, stunTicks, 10, false, false, false));
                 victim.addPotionEffect(new org.bukkit.potion.PotionEffect(org.bukkit.potion.PotionEffectType.JUMP, stunTicks, 200, false, false, false));
                 
-                victim.getWorld().spawnParticle(Particle.CRIT, victim.getLocation().add(0, 1, 0), 10, 0.2, 0.2, 0.2, 0.05);
+                com.floki.strengthsmp.util.CompatUtil.spawnParticle(victim.getWorld(), "CRIT", victim.getLocation().add(0, 1, 0), 10, 0.2, 0.2, 0.2, 0.05);
                 victim.getWorld().playSound(victim.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1.0f, 0.5f);
 
                 // No messages for mobs
@@ -84,7 +84,7 @@ public class AxeListener implements Listener {
 
     private void triggerGroundPound(Player player) {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 0.8f);
-        player.getWorld().spawnParticle(org.bukkit.Particle.EXPLOSION_HUGE, player.getLocation(), 1);
+        com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "EXPLOSION_HUGE", player.getLocation(), 1);
         com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "BLOCK_CRACK", player.getLocation(), 100, 3.0, 0.1, 3.0, 0, org.bukkit.Material.DIRT.createBlockData());
 
         for (Entity entity : player.getNearbyEntities(6.0, 4.0, 6.0)) {

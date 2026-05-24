@@ -66,7 +66,7 @@ public class TridentListener implements Listener {
         player.setVelocity(direction.multiply(2.0));
         
         player.getWorld().playSound(player.getLocation(), Sound.ITEM_TRIDENT_RIPTIDE_3, 1.0f, 1.0f);
-        player.getWorld().spawnParticle(Particle.NAUTILUS, player.getLocation(), 50, 0.5, 0.5, 0.5, 0.1);
+        com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "NAUTILUS", player.getLocation(), 50, 0.5, 0.5, 0.5, 0.1);
 
         // Damage entities in path
         org.bukkit.scheduler.BukkitRunnable damageTask = new org.bukkit.scheduler.BukkitRunnable() {
@@ -82,7 +82,7 @@ public class TridentListener implements Listener {
                     if (entity instanceof LivingEntity && !entity.equals(player)) {
                         LivingEntity victim = (LivingEntity) entity;
                         victim.damage(6.0, player);
-                        victim.getWorld().spawnParticle(Particle.FLASH, victim.getLocation().add(0, 1, 0), 1);
+                        com.floki.strengthsmp.util.CompatUtil.spawnParticle(victim.getWorld(), "FLASH", victim.getLocation().add(0, 1, 0), 1);
                     }
                 }
                 ticks++;

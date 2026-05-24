@@ -53,7 +53,7 @@ public class ShieldListener implements Listener {
                 attacker.damage(damage, victim); // Reflect 100%
                 
                 victim.getWorld().playSound(victim.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1.0f, 2.0f);
-                victim.getWorld().spawnParticle(Particle.FLASH, victim.getLocation().add(0, 1, 0), 5);
+                com.floki.strengthsmp.util.CompatUtil.spawnParticle(victim.getWorld(), "FLASH", victim.getLocation().add(0, 1, 0), 5);
             }
         }
     }
@@ -85,7 +85,7 @@ public class ShieldListener implements Listener {
         reflecting.add(player.getUniqueId());
         player.sendMessage("§6§lREFLECT §r§7— You are reflecting all damage for 7s!");
         player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0f, 1.5f);
-        player.getWorld().spawnParticle(org.bukkit.Particle.ENCHANTMENT_TABLE, player.getLocation(), 100, 0.5, 1.0, 0.5, 0.1);
+        com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "ENCHANTMENT_TABLE", player.getLocation(), 100, 0.5, 1.0, 0.5, 0.1);
 
         org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
             reflecting.remove(player.getUniqueId());

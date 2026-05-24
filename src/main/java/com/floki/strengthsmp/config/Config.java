@@ -164,10 +164,12 @@ public class Config {
     public String  getAnnouncementWebhook() { return getD().getString ("webhooks.announcements", ""); }
     public String  getLeaderboardWebhook()  { return getD().getString ("webhooks.leaderboard",   ""); }
     public int     getDiscordUpdateInterval(){ return getD().getInt   ("update-interval",     30); }
+    public boolean isDiscordHeartbeatEnabled() { return getD().getBoolean("system-heartbeats", false); }
 
     // Discord Leaderboard (discord.yml)
     public boolean isLbEnabled()       { return getD().getBoolean("leaderboard.enabled", true); }
     public int     getLbUpdateMins()   { return getD().getInt("leaderboard.update-minutes", 5); }
+    public int     getLbLimit()        { return getD().getInt("leaderboard.limit", 20); }
     public String  getLbColor()        { return getD().getString("leaderboard.color", "gold"); }
     public boolean lbShowKills()       { return getD().getBoolean("leaderboard.show-kills", true); }
     public boolean lbShowBounties()    { return getD().getBoolean("leaderboard.show-bounties", true); }
@@ -253,7 +255,7 @@ public class Config {
     //  WEAPON BINDING SYSTEM
     // ════════════════════════════════════════════════════════════════
     public boolean isBindSystemEnabled()       { return getC().getBoolean("bind-system.enabled", false); }
-    public int     getBindCostStrength()       { return getC().getInt("bind-system.cost-strength", 3); }
+    public int     getBindCostStrength()       { return getC().getInt("bind-system.cost-strength", 1); }
     public String  getBindLorePrefix()         { return getC().getString("bind-system.formatted-lore-prefix", "&d&l⚡ BOUND WEAPON ⚡"); }
     public int     getBindAnimationTicks()     { return getC().getInt("bind-system.animation-ticks", 40); }
     public double  getBindKnockbackRadius()     { return getC().getDouble("bind-system.knockback-radius", 2.0); }

@@ -5,7 +5,6 @@ import com.floki.strengthsmp.data.WeaponType;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -71,6 +70,7 @@ public class BindAbilityManager implements Listener {
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GHAST_SHOOT, 1.0f, 0.7f);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0f, 0.5f);
+        com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "FLASH", start, 3, 0.1, 0.1, 0.1, 0.0);
 
         new BukkitRunnable() {
             int step = 0;
@@ -90,9 +90,10 @@ public class BindAbilityManager implements Listener {
                     Vector curveVec = dir.clone().multiply((1.5 - Math.abs(offset)) * 0.25);
                     Location point = center.clone().add(offsetVec).add(curveVec);
                     
-                    // Golden/Magical crescent sparks
-                    player.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, point, 2, 0.05, 0.05, 0.05, 0.02);
-                    player.getWorld().spawnParticle(Particle.CRIT_MAGIC, point, 2, 0.05, 0.05, 0.05, 0.02);
+                    // Golden/Magical crescent sparks with fine glowing trail rods
+                    com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "FIREWORKS_SPARK", point, 2, 0.05, 0.05, 0.05, 0.02);
+                    com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "CRIT_MAGIC", point, 2, 0.05, 0.05, 0.05, 0.02);
+                    com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "END_ROD", point, 1, 0.02, 0.02, 0.02, 0.01);
                     
                     // Hit detection
                     for (Entity entity : player.getWorld().getNearbyEntities(point, 1.0, 1.0, 1.0)) {
@@ -101,7 +102,7 @@ public class BindAbilityManager implements Listener {
                             if (hitList.add(target.getUniqueId())) {
                                 target.damage(beamDamage, player);
                                 target.setVelocity(new Vector(0, 0.5, 0));
-                                target.getWorld().spawnParticle(Particle.CRIT, target.getLocation().add(0, 1, 0), 8, 0.2, 0.2, 0.2, 0.1);
+                                com.floki.strengthsmp.util.CompatUtil.spawnParticle(target.getWorld(), "CRIT", target.getLocation().add(0, 1, 0), 8, 0.2, 0.2, 0.2, 0.1);
                                 target.getWorld().playSound(target.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.0f);
                             }
                         }
@@ -139,9 +140,17 @@ public class BindAbilityManager implements Listener {
                 if (ticks >= 40) {
                     this.cancel();
                     
-                    // Implosion!
+                    // Implosion shockwave detonation!
                     CompatUtil.spawnParticle(crackCenter.getWorld(), "SONIC_BOOM", crackCenter, 1);
                     CompatUtil.playSound(crackCenter.getWorld(), crackCenter, "ENTITY_WARDEN_SONIC_BOOM", 1.2f, 1.0f);
+                    
+                    // Spawn dramatic expanding rings of black dust and ash
+                    for (int i = 0; i < 30; i++) {
+                        double angle = i * (2.0 * Math.PI / 30.0);
+                        Location pLoc = crackCenter.clone().add(2.5 * Math.cos(angle), 0.5, 2.5 * Math.sin(angle));
+                        com.floki.strengthsmp.util.CompatUtil.spawnParticle(crackCenter.getWorld(), "SMOKE_LARGE", pLoc, 2, 0.05, 0.05, 0.05, 0.02);
+                        com.floki.strengthsmp.util.CompatUtil.spawnParticle(crackCenter.getWorld(), "FLASH", pLoc, 1, 0, 0, 0, 0);
+                    }
                     
                     for (Entity entity : crackCenter.getWorld().getNearbyEntities(crackCenter, 5.0, 5.0, 5.0)) {
                         if (entity instanceof LivingEntity && !entity.equals(player) && !(entity instanceof ArmorStand)) {
@@ -160,9 +169,10 @@ public class BindAbilityManager implements Listener {
                             .add(finalPerp.clone().multiply(offset))
                             .add(up.clone().multiply(offset * 0.7)); // Slanted diagonal angle
 
-                    // Dark void portal particles + neon purple witch highlights
-                    crackCenter.getWorld().spawnParticle(Particle.PORTAL, point, 3, 0.05, 0.05, 0.05, 0.02);
-                    crackCenter.getWorld().spawnParticle(Particle.SPELL_WITCH, point, 2, 0.05, 0.05, 0.05, 0.02);
+                    // Dark void portal particles + neon purple witch + thick dragon void mist
+                    com.floki.strengthsmp.util.CompatUtil.spawnParticle(crackCenter.getWorld(), "PORTAL", point, 3, 0.05, 0.05, 0.05, 0.02);
+                    com.floki.strengthsmp.util.CompatUtil.spawnParticle(crackCenter.getWorld(), "SPELL_WITCH", point, 2, 0.05, 0.05, 0.05, 0.02);
+                    com.floki.strengthsmp.util.CompatUtil.spawnParticle(crackCenter.getWorld(), "DRAGON_BREATH", point, 1, 0.01, 0.01, 0.01, 0.01);
                 }
 
                 // Vacuum Pull Logic (Pull all entities towards the crack)
@@ -207,7 +217,7 @@ public class BindAbilityManager implements Listener {
                     triggerBlackhole(singularityBall.getLocation(), player);
                     return;
                 }
-                singularityBall.getWorld().spawnParticle(Particle.PORTAL, singularityBall.getLocation(), 4, 0.1, 0.1, 0.1, 0.05);
+                com.floki.strengthsmp.util.CompatUtil.spawnParticle(singularityBall.getWorld(), "PORTAL", singularityBall.getLocation(), 4, 0.1, 0.1, 0.1, 0.05);
             }
         }.runTaskTimer(plugin, 0L, 1L);
     }
@@ -228,20 +238,33 @@ public class BindAbilityManager implements Listener {
                 if (ticks >= duration || !owner.isOnline()) {
                     this.cancel();
                     bowRapidFirePlayers.remove(owner.getUniqueId());
-                    loc.getWorld().spawnParticle(Particle.FLASH, loc, 5, 0.5, 0.5, 0.5, 0.1);
+                    com.floki.strengthsmp.util.CompatUtil.spawnParticle(loc.getWorld(), "FLASH", loc, 5, 0.5, 0.5, 0.5, 0.1);
                     loc.getWorld().playSound(loc, Sound.ENTITY_ENDER_DRAGON_FLAP, 1.0f, 0.5f);
                     return;
                 }
 
-                // Render Swirling Vortex
+                // Render Swirling Vortex lines drawing inwards like a real cosmic singularity
                 for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
                     double r = 1.8 + Math.sin(ticks / 5.0) * 0.5; // Pulsing radius
                     double x = Math.cos(angle + (ticks * 0.2)) * r;
                     double z = Math.sin(angle + (ticks * 0.2)) * r;
                     Location particleLoc = loc.clone().add(x, 1.0, z);
 
-                    loc.getWorld().spawnParticle(Particle.PORTAL, particleLoc, 1, 0, 0, 0, 0);
-                    loc.getWorld().spawnParticle(Particle.SPELL_WITCH, particleLoc, 1, 0, 0, 0, 0);
+                    com.floki.strengthsmp.util.CompatUtil.spawnParticle(loc.getWorld(), "PORTAL", particleLoc, 1, 0, 0, 0, 0);
+                    com.floki.strengthsmp.util.CompatUtil.spawnParticle(loc.getWorld(), "SPELL_WITCH", particleLoc, 1, 0, 0, 0, 0);
+                }
+
+                // Gorgeous Cosmic Spiral Drawing into center
+                for (int i = 0; i < 3; i++) {
+                    double offsetAngle = i * (2.0 * Math.PI / 3.0);
+                    double spiralAngle = (ticks * 0.3) + offsetAngle;
+                    double spiralRadius = 3.5 - ((ticks * 0.12) % 3.5); // spiral drawing inward
+                    double sx = Math.cos(spiralAngle) * spiralRadius;
+                    double sz = Math.sin(spiralAngle) * spiralRadius;
+                    Location sLoc = loc.clone().add(sx, 1.0, sz);
+                    
+                    com.floki.strengthsmp.util.CompatUtil.spawnParticle(loc.getWorld(), "PORTAL", sLoc, 3, 0, 0, 0, 0.02);
+                    com.floki.strengthsmp.util.CompatUtil.spawnParticle(loc.getWorld(), "DRAGON_BREATH", sLoc, 1, 0.01, 0.01, 0.01, 0.01);
                 }
 
                 // Pull enemies inside 8 blocks to the center
@@ -264,12 +287,12 @@ public class BindAbilityManager implements Listener {
         double maxRange = plugin.getConfigManager().getScorpionHookRange();
 
         // Robust cone-based target search using distance and field-of-view dot product
-        Player victim = null;
+        LivingEntity victim = null;
         double bestDot = 0.90; // Cone of ~25 degrees for smooth targeting under latency
 
         for (Entity entity : player.getWorld().getNearbyEntities(eye, maxRange, maxRange, maxRange)) {
-            if (entity instanceof Player && !entity.equals(player)) {
-                Player target = (Player) entity;
+            if (entity instanceof LivingEntity && !entity.equals(player) && !(entity instanceof ArmorStand)) {
+                LivingEntity target = (LivingEntity) entity;
                 Vector toTarget = target.getEyeLocation().toVector().subtract(eye.toVector());
                 double distance = toTarget.length();
                 if (distance <= maxRange) {
@@ -291,33 +314,39 @@ public class BindAbilityManager implements Listener {
         }
 
         // Hit!
-        final Player target = victim;
+        final LivingEntity target = victim;
         Location startLoc = player.getLocation().add(0, 1.0, 0);
         Location targetLoc = target.getLocation().add(0, 1.0, 0);
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FISHING_BOBBER_THROW, 1.2f, 0.6f);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT, 1.0f, 1.5f);
 
-        // Render chain particles instantly
+        // Render fiery rusty chain hook particles instantly
         Vector chainDir = targetLoc.toVector().subtract(startLoc.toVector());
         double dist = chainDir.length();
         Vector chainStep = chainDir.normalize().multiply(0.4);
 
         for (double i = 0; i < dist; i += 0.4) {
             Location chainPoint = startLoc.clone().add(chainStep.clone().multiply(i / 0.4));
-            player.getWorld().spawnParticle(Particle.CRIT, chainPoint, 2, 0.05, 0.05, 0.05, 0.01);
-            player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, chainPoint, 1, 0, 0, 0, 0);
+            com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "CRIT", chainPoint, 3, 0.05, 0.05, 0.05, 0.02);
+            com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "LAVA", chainPoint, 1, 0, 0, 0, 0.0);
+            com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "SMOKE_NORMAL", chainPoint, 1, 0, 0, 0, 0);
         }
 
         // Pull victim straight to owner's feet
         Vector pull = player.getLocation().toVector().subtract(target.getLocation().toVector()).normalize().multiply(1.35).setY(0.25);
         target.setVelocity(pull);
 
+        // Particle puff of dirt/drag on arrival
+        com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "EXPLOSION_NORMAL", target.getLocation(), 10, 0.3, 0.2, 0.3, 0.05);
+
         // Apply 1.2 second Stun (Axe-style complete movement block)
         target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 24, 10, false, false, false));
         target.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 24, 200, false, false, false));
 
-        target.sendMessage("§c⚡ You were pulled and stunned by " + player.getName() + "'s Scorpion Hook!");
+        if (target instanceof Player) {
+            ((Player) target).sendMessage("§c⚡ You were pulled and stunned by " + player.getName() + "'s Scorpion Hook!");
+        }
         player.sendMessage("§a⚡ Scorpion Hook hit! Dragged " + target.getName() + " directly to you!");
     }
 
@@ -339,6 +368,23 @@ public class BindAbilityManager implements Listener {
         for (Location strike : strikes) {
             Location highest = player.getWorld().getHighestBlockAt(strike).getLocation();
             highest.getWorld().strikeLightningEffect(highest);
+            
+            // Ocean/Storm themed splash circle ripples expanding at strikes
+            for (int i = 0; i < 20; i++) {
+                double angle = i * (2.0 * Math.PI / 20.0);
+                Location ringLoc = highest.clone().add(2.0 * Math.cos(angle), 0.2, 2.0 * Math.sin(angle));
+                com.floki.strengthsmp.util.CompatUtil.spawnParticle(highest.getWorld(), "WATER_SPLASH", ringLoc, 4, 0.1, 0.2, 0.1, 0.1);
+                com.floki.strengthsmp.util.CompatUtil.spawnParticle(highest.getWorld(), "WATER_WAKE", ringLoc, 2, 0.1, 0.1, 0.1, 0.05);
+            }
+        }
+
+        // Casters Storm electricity aura around them
+        Location casterLoc = player.getLocation().add(0, 1.0, 0);
+        for (int i = 0; i < 24; i++) {
+            double angle = i * (2.0 * Math.PI / 24.0);
+            Location ringLoc = casterLoc.clone().add(1.8 * Math.cos(angle), 0, 1.8 * Math.sin(angle));
+            CompatUtil.spawnParticle(player.getWorld(), "ELECTRIC_SPARK", ringLoc, 2, 0.05, 0.05, 0.05, 0.02);
+            com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "CRIT_MAGIC", ringLoc, 1, 0.02, 0.02, 0.02, 0.01);
         }
 
         // Deal manual damage, knockback, and ignite targets within a 6 block radius
@@ -353,7 +399,7 @@ public class BindAbilityManager implements Listener {
                 Vector knock = target.getLocation().subtract(player.getLocation()).toVector().normalize().multiply(1.1).setY(0.3);
                 target.setVelocity(knock);
                 
-                target.getWorld().spawnParticle(Particle.FLAME, target.getLocation().add(0, 1, 0), 10, 0.3, 0.3, 0.3, 0.05);
+                com.floki.strengthsmp.util.CompatUtil.spawnParticle(target.getWorld(), "FLAME", target.getLocation().add(0, 1, 0), 10, 0.3, 0.3, 0.3, 0.05);
             }
         }
     }
@@ -380,13 +426,29 @@ public class BindAbilityManager implements Listener {
                 double radius = tick * (maxRadius / 5.0);
 
                 // Draw horizontal circular wave particles
-                for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 12) {
+                for (double angle = 0; angle < Math.PI * 2; angle += Math.PI / 16) {
                     double x = Math.cos(angle) * radius;
                     double z = Math.sin(angle) * radius;
                     Location particleLoc = loc.clone().add(x, 0, z);
 
-                    loc.getWorld().spawnParticle(Particle.CLOUD, particleLoc, 1, 0, 0, 0, 0.02);
-                    CompatUtil.spawnParticle(loc.getWorld(), "ELECTRIC_SPARK", particleLoc, 1, 0, 0, 0, 0.02);
+                    com.floki.strengthsmp.util.CompatUtil.spawnParticle(loc.getWorld(), "CLOUD", particleLoc, 1, 0, 0, 0, 0.02);
+                    com.floki.strengthsmp.util.CompatUtil.spawnParticle(loc.getWorld(), "ELECTRIC_SPARK", particleLoc, 1, 0, 0, 0, 0.02);
+                }
+
+                // Render beautiful expanding dome hemispherical bubble shell
+                for (int i = 0; i < 20; i++) {
+                    double u = Math.random();
+                    double v = Math.random();
+                    double theta = u * 2.0 * Math.PI;
+                    double phi = Math.acos(2.0 * v - 1.0);
+                    
+                    double py = Math.abs(Math.sin(phi) * radius); // only top hemisphere dome
+                    double px = Math.cos(theta) * Math.sin(phi) * radius;
+                    double pz = Math.sin(theta) * Math.sin(phi) * radius;
+                    Location sphereLoc = loc.clone().add(px, py, pz);
+                    
+                    com.floki.strengthsmp.util.CompatUtil.spawnParticle(loc.getWorld(), "CLOUD", sphereLoc, 1, 0.01, 0.01, 0.01, 0.0);
+                    com.floki.strengthsmp.util.CompatUtil.spawnParticle(loc.getWorld(), "ELECTRIC_SPARK", sphereLoc, 1, 0.01, 0.01, 0.01, 0.0);
                 }
 
                 // Push and slow entities caught in the expanding ring
@@ -398,7 +460,7 @@ public class BindAbilityManager implements Listener {
                             target.setVelocity(push);
                             target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1)); // Slow II for 3 seconds
                             
-                            target.getWorld().spawnParticle(Particle.FLASH, target.getLocation().add(0, 1, 0), 1);
+                            com.floki.strengthsmp.util.CompatUtil.spawnParticle(target.getWorld(), "FLASH", target.getLocation().add(0, 1, 0), 1);
                         }
                     }
                 }
@@ -437,7 +499,7 @@ public class BindAbilityManager implements Listener {
         arrow.setCritical(true);
         
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1.0f, 1.0f);
-        player.getWorld().spawnParticle(Particle.SPELL_INSTANT, player.getEyeLocation().add(player.getEyeLocation().getDirection().multiply(1.0)), 5, 0.1, 0.1, 0.1, 0.05);
+        com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "SPELL_INSTANT", player.getEyeLocation().add(player.getEyeLocation().getDirection().multiply(1.0)), 5, 0.1, 0.1, 0.1, 0.05);
     }
 
     private boolean hasArrow(Player player) {

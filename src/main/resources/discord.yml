@@ -14,8 +14,14 @@ webhooks:
 leaderboard:
   enabled: true
   update-minutes: 10 # Periodic updates
+  limit: 20 # Limit of players shown (chunked in groups of 20 to support up to 100 players)
   color: "#f1c40f"
   show-kills: true
   show-bounties: true
   show-monarch: true
   show-status: true
+
+# System Heartbeats
+# Set to true to send startup/shutdown status messages to Discord announcements.
+# Set to false to avoid webhook spam during server restarts or reloads.
+system-heartbeats: false

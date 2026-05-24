@@ -14,7 +14,7 @@ public class ResourcePackServer {
 
     private final StrengthSMP plugin;
     private HttpServer server;
-    private String publicIp;
+    private String publicIp = "127.0.0.1";
     private final File packFile;
 
     public ResourcePackServer(StrengthSMP plugin) {
@@ -28,12 +28,15 @@ public class ResourcePackServer {
         if (!plugin.getConfigManager().isResourcePackEnabled()) return;
         if (!plugin.getConfigManager().getResourcePackMode().equalsIgnoreCase("INTERNAL")) return;
 
+        // Detect IP early so publicIp is never null
+        detectIp();
+
         // Always overwrite to ensure the zip is synchronized with compile/jar updates
         if (packFile.exists()) {
             packFile.delete();
         }
         try {
-            plugin.saveResource("strengthsmp.zip", false);
+            plugin.saveResource("strengthsmp.zip", true);
         } catch (Exception e) {
             plugin.getLogger().warning("Could not save strengthsmp.zip: " + e.getMessage());
         }
@@ -50,14 +53,14 @@ public class ResourcePackServer {
             server.setExecutor(null);
             server.start();
 
-            detectIp();
-
             plugin.getLogger().info("🌐 Internal Resource Pack Server started on port " + port);
             plugin.getLogger().info("🔗 Serving pack at: http://" + publicIp + ":" + port + "/strengthsmp.zip");
             plugin.getLogger().info("🔑 Calculated SHA-1 Hash: " + calculatedHash);
             
         } catch (IOException e) {
-            plugin.getLogger().severe("❌ Failed to start internal resource pack server: " + e.getMessage());
+            plugin.getLogger().warning("⚠️ Internal resource pack server port " + plugin.getConfigManager().getResourcePackPort() + " is already in use. The existing server on this port will continue serving the pack.");
+            plugin.getLogger().info("🔗 Serving pack at: http://" + publicIp + ":" + plugin.getConfigManager().getResourcePackPort() + "/strengthsmp.zip");
+            plugin.getLogger().info("🔑 Calculated SHA-1 Hash: " + calculatedHash);
         }
     }
 
@@ -114,7 +117,7 @@ public class ResourcePackServer {
 
     public String getPackUrl() {
         if (plugin.getConfigManager().getResourcePackMode().equalsIgnoreCase("INTERNAL")) {
-            return "http://" + publicIp + ":" + plugin.getConfigManager().getResourcePackPort() + "/strengthsmp.zip";
+            return "http://" + publicIp + ":" + plugin.getConfigManager().getResourcePackPort() + "/strengthsmp.zip?v=" + getPackHash();
         }
         return plugin.getConfigManager().getResourcePackUrl();
     }

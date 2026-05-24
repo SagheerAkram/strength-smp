@@ -83,8 +83,8 @@ public class WithdrawCommand extends BaseCommand {
             double angle = Math.toRadians(i);
             double x = Math.cos(angle) * 0.8;
             double z = Math.sin(angle) * 0.8;
-            player.getWorld().spawnParticle(org.bukkit.Particle.ENCHANTMENT_TABLE, player.getLocation().add(x, 1, z), 5, 0.1, 0.1, 0.1, 0.05);
-            player.getWorld().spawnParticle(org.bukkit.Particle.FIREWORKS_SPARK, player.getLocation().add(x, 0.5, z), 2, 0.05, 0.05, 0.05, 0.02);
+            com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "ENCHANTMENT_TABLE", player.getLocation().add(x, 1, z), 5, 0.1, 0.1, 0.1, 0.05);
+            com.floki.strengthsmp.util.CompatUtil.spawnParticle(player.getWorld(), "FIREWORKS_SPARK", player.getLocation().add(x, 0.5, z), 2, 0.05, 0.05, 0.05, 0.02);
         }
         
         return true;

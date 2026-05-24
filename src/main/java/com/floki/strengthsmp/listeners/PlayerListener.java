@@ -37,6 +37,9 @@ public class PlayerListener implements Listener {
         dataManager.initializePlayer(player.getUniqueId());
         updatePlayerDisplay(player);
 
+        // Auto-upgrade legacy custom heads to resource pack vanilla materials (or vice-versa)
+        com.floki.strengthsmp.util.ItemFactory.upgradeInventoryItems(player);
+
         if (!player.hasPlayedBefore() && plugin.getConfigManager().isNewbieProtectionEnabled()) {
             com.floki.strengthsmp.util.MessageUtil.send(player, "monarch.broadcast", "player", player.getName());
             long durationHours = plugin.getConfigManager().getNewbieProtectionHours();
@@ -90,6 +93,10 @@ public class PlayerListener implements Listener {
         if (event.getHand() == null) return;
 
         Player player = event.getPlayer();
+        
+        // Auto-upgrade legacy custom heads on interaction just in case
+        com.floki.strengthsmp.util.ItemFactory.upgradeInventoryItems(player);
+
         ItemStack item = event.getItem();
         if (item == null || !item.hasItemMeta()) return;
 
@@ -181,12 +188,20 @@ public class PlayerListener implements Listener {
     }
 
     private String getStrengthPrefix(int strength) {
-        if      (strength >= 5)  return ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "TITAN " + ChatColor.GRAY + "[" + strength + "]";
-        else if (strength >= 3)  return ChatColor.AQUA + "" + ChatColor.BOLD + "WARRIOR " + ChatColor.GRAY + "[" + strength + "]";
-        else if (strength >= 1)  return ChatColor.GREEN + "" + ChatColor.BOLD + "FIGHTER " + ChatColor.GRAY + "[" + strength + "]";
-        else if (strength == 0)  return ChatColor.GRAY + "" + ChatColor.BOLD + "NEUTRAL " + ChatColor.GRAY + "[" + strength + "]";
-        else if (strength >= -2) return ChatColor.GOLD + "" + ChatColor.BOLD + "WEAK " + ChatColor.GRAY + "[" + strength + "]";
-        else if (strength >= -4) return ChatColor.RED + "" + ChatColor.BOLD + "FRAGILE " + ChatColor.GRAY + "[" + strength + "]";
-        else                     return ChatColor.DARK_RED + "" + ChatColor.BOLD + "FRAIL " + ChatColor.GRAY + "[" + strength + "]";
+        String rankName = plugin.getConfigManager().getRankNameForStrength(strength);
+        return com.floki.strengthsmp.util.MessageUtil.color(rankName) + com.floki.strengthsmp.util.MessageUtil.color(" &8[" + strength + "]");
+    }
+
+    @EventHandler
+    public void onInventoryClick(org.bukkit.event.inventory.InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) return;
+        Player player = (Player) event.getWhoClicked();
+        
+        // Scan and upgrade items after the click has been processed
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (player.isOnline()) {
+                com.floki.strengthsmp.util.ItemFactory.upgradeInventoryItems(player);
+            }
+        });
     }
 }

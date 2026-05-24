@@ -2,6 +2,7 @@ package com.floki.strengthsmp.services;
 
 import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.data.DataManager;
+import com.floki.strengthsmp.util.CompatUtil;
 import com.floki.strengthsmp.util.ItemFactory;
 import com.floki.strengthsmp.util.MessageUtil;
 import org.bukkit.Sound;
@@ -75,6 +76,9 @@ public class StrengthService {
 
         MessageUtil.send(player, "strength.gain", "strength", String.valueOf(next));
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.2f);
+        player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 1.5f);
+        CompatUtil.spawnParticle(player.getWorld(), "TOTEM", player.getLocation().add(0, 1, 0), 40, 0.5, 0.5, 0.5, 0.15);
+        CompatUtil.spawnParticle(player.getWorld(), "VILLAGER_HAPPY", player.getLocation().add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.1);
 
         // Update UI
         plugin.updateDisplay(player);
@@ -118,6 +122,9 @@ public class StrengthService {
         
         MessageUtil.send(player, "strength.loss", "strength", String.valueOf(next));
         player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 0.8f);
+        player.playSound(player.getLocation(), Sound.ENTITY_WITHER_DEATH, 0.5f, 0.8f);
+        CompatUtil.spawnParticle(player.getWorld(), "SMOKE_LARGE", player.getLocation().add(0, 1, 0), 40, 0.5, 0.5, 0.5, 0.1);
+        CompatUtil.spawnParticle(player.getWorld(), "SOUL", player.getLocation().add(0, 1, 0), 15, 0.3, 0.3, 0.3, 0.05);
         
         // Update UI
         plugin.updateDisplay(player);
