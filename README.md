@@ -8,7 +8,7 @@
   <a href="https://hangar.papermc.io/SagheerAkram/StrengthSMP"><img src="https://img.shields.io/hangar/dt/StrengthSMP?logo=paper&style=flat&color=2ecc71" alt="Hangar Downloads"></a>
   <a href="https://modrinth.com/plugin/strength-smp-"><img src="https://img.shields.io/modrinth/dt/strength-smp-?logo=modrinth&style=flat&color=1bd96a" alt="Modrinth Downloads"></a>
   <a href="https://www.curseforge.com/minecraft/bukkit-plugins/strength-smp"><img src="https://img.shields.io/badge/CurseForge-Available-f16436?logo=curseforge&style=flat" alt="CurseForge"></a>
-  <a href="https://www.spigotmc.org/resources/strengthsmp.105677/"><img src="https://img.shields.io/badge/Spigot-Available-ffaa00?logo=spigotmc&style=flat" alt="Spigot"></a>
+  <a href="https://www.spigotmc.org/resources/strength-smp.134679/"><img src="https://img.shields.io/badge/Spigot-Available-ffaa00?logo=spigotmc&style=flat" alt="Spigot"></a>
 </p>
 
 
@@ -25,7 +25,7 @@
 
 🔗 **Links:**  
 👉 [BuiltByBit (BBB) Official Page](https://builtbybit.com/resources/strength-smp-by-floki.105677/)  
-👉 [SpigotMC Resource](https://www.spigotmc.org/resources/strengthsmp.105677/)  
+👉 [SpigotMC Resource](https://www.spigotmc.org/resources/strength-smp.134679/)  
 👉 [Modrinth Project](https://modrinth.com/plugin/strength-smp-)  
 👉 [CurseForge Page](https://www.curseforge.com/minecraft/bukkit-plugins/strength-smp)  
 👉 [GitHub Repository](https://github.com/SagheerAkram/strength-smp)  
