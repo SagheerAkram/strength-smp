@@ -7,9 +7,10 @@
 <p align="center">
   <a href="https://hangar.papermc.io/SagheerAkram/StrengthSMP"><img src="https://img.shields.io/hangar/dt/StrengthSMP?logo=paper&style=flat&color=2ecc71" alt="Hangar Downloads"></a>
   <a href="https://modrinth.com/plugin/strength-smp-"><img src="https://img.shields.io/modrinth/dt/strength-smp-?logo=modrinth&style=flat&color=1bd96a" alt="Modrinth Downloads"></a>
-  <a href="https://www.curseforge.com/minecraft/bukkit-plugins/strength-smp"><img src="https://img.shields.io/curseforge/dt/105677?logo=curseforge&style=flat&color=f16436" alt="CurseForge Downloads"></a>
-  <a href="https://www.spigotmc.org/resources/strengthsmp.105677/"><img src="https://img.shields.io/spigot/downloads/105677?logo=spigotmc&style=flat&color=ffaa00" alt="Spigot Downloads"></a>
+  <a href="https://www.curseforge.com/minecraft/bukkit-plugins/strength-smp"><img src="https://img.shields.io/badge/CurseForge-Available-f16436?logo=curseforge&style=flat" alt="CurseForge"></a>
+  <a href="https://www.spigotmc.org/resources/strengthsmp.105677/"><img src="https://img.shields.io/badge/Spigot-Available-ffaa00?logo=spigotmc&style=flat" alt="Spigot"></a>
 </p>
+
 
 **StrengthSMP** is the ultimate competitive combat overhaul. Now **Ultra-Lightweight** and **Universally Compatible** across all modern Minecraft versions.
 
