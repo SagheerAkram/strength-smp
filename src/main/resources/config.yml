@@ -5,13 +5,24 @@
 
 # ─── Core Strength Settings ─────────────────────────────────────────────
 strength:
-  min: 0           # Minimum strength a player can reach
-  max: 5           # Maximum strength a player can reach
+  min: -10         # Minimum strength a player can reach
+  max: 10          # Maximum strength a player can reach
   default: 0       # Starting strength for new players
+
 
   # On PvP kill: victim loses this many, attacker gets an item worth this many
   death-penalty: 1
   death-gain: 1
+  # How strength is distributed on kill.
+  # "DIRECT" = Added directly to the killer's strength.
+  # "DROP"   = Dropped as a physical Strength Shard item on the ground at the victim's death location.
+  kill-transfer-style: DROP
+
+  # How bounty strength is distributed on claim.
+  # "DIRECT" = Added directly to the killer's strength.
+  # "DROP"   = Dropped as physical Strength Shard items on the ground at the victim's death location.
+  # If not specified, it will fall back to the kill-transfer-style.
+  bounty-transfer-style: DIRECT
 
   # Underdog rule: negative-strength player killing a high-strength player gains more
   underdog-multiplier: 2  # multiplied strength gain
@@ -47,13 +58,15 @@ items:
 # IMPORTANT: Set only-on-weapon-match: true to prevent bare-hand overpowering.
 damage-scaling:
   enabled: true
+  # If true, show custom damage/strength info in the action bar to the attacker and victim on hit.
+  show-actionbar: true
   # If true, bonus ONLY applies when the attacker holds their class weapon.
   # Prevents bare-fist hits from being overpowered.
-  only-on-weapon-match: true
-  # Extra raw damage per strength point (0.5 = +0.25 hearts per strength)
-  per-strength: 0.5
-  # Damage reduction per victim strength point
-  victim-reduction-per-strength: 0.3
+  only-on-weapon-match: false
+  # Extra raw damage per strength point (0.05 = +5% damage per strength)
+  per-strength: 0.05
+  # Damage reduction per victim strength point (0.03 = +3% reduction per strength)
+  victim-reduction-per-strength: 0.03
 
 # ─── Weapon Abilities ───────────────────────────────────────────────────
 weapons:
@@ -145,9 +158,6 @@ potions:
 system:
   active-on-startup: false
   maintenance-keep-inventory: true
-  contracts:
-    count-per-day: 3
-    reward-strength: 1
 
 # ─── Totem Limit ────────────────────────────────────────────────────────
 totem-limit:
@@ -181,13 +191,13 @@ resource-pack:
   
   # --- Hosting Options ---
   hosting:
-    mode: "INTERNAL"
+    mode: "INTERNAL"       # INTERNAL = plugin serves the pack / EXTERNAL = use url below
     internal-port: 8080
-    public-ip: "127.0.0.1"
+    public-ip: "AUTO"     # AUTO = detect server's public IP automatically
   
-  # --- External Link ---
-  url: "http://127.0.0.1:8080/strengthsmp.zip"
-  hash: "d6e2726423b2646242f401c8f35c85056face837"
+  # --- External Link (used when mode is EXTERNAL) ---
+  url: "https://raw.githubusercontent.com/SagheerAkram/strength-smp/main/strengthsmp.zip"
+  hash: "5737d5e768b099e74cdb66c5ff9f0c192ec5bdb9"
   
   force: true
   prompt-message: "&6&lStrengthSMP &7requires a custom resource pack for the best experience. &fWould you like to install it?"
@@ -237,3 +247,37 @@ bind-system:
     poseidons-wrath-damage: 7.0 # Damage dealt by trident lightning strikes (3.5 hearts)
     force-field-radius: 6.0     # Radius of the shield kinetic blast
 
+
+# ─── Crafting Recipes Configuration ──────────────────────────────────────
+# You can customize the shape and ingredients for the custom recipes.
+# Material names must match Bukkit Material enum names (e.g. NETHERITE_INGOT).
+recipes:
+  strength-item:
+    shape:
+      - "DPD"
+      - "ESE"
+      - "DND"
+    ingredients:
+      D: DIAMOND_BLOCK
+      P: DIAMOND_PICKAXE
+      E: ENDER_EYE
+      S: NETHERITE_INGOT
+      N: NETHER_STAR
+  reroll-weapon:
+    shape:
+      - "DHD"
+      - "SWS"
+      - "DND"
+    ingredients:
+      D: DIAMOND
+      H: TRIPWIRE_HOOK
+      S: PRISMARINE_CRYSTALS
+      W: WITHER_SKELETON_SKULL
+      N: NETHER_STAR
+
+# ─── Metrics & Tracking ──────────────────────────────────────────────────
+# Tracks anonymous usage metrics (servers running the plugin, players sum).
+# You can register your plugin on bstats.org to get your own plugin ID.
+metrics:
+  enabled: true
+  plugin-id: 31813

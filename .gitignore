@@ -21,6 +21,5 @@ scratch/
 dependency-reduced-pom.xml
 
 # Zips and binaries
-*.zip
-src/main/resources/strengthsmp.zip
+# (Allowed strengthsmp.zip to be pushed to GitHub for public resource pack hosting)
 
