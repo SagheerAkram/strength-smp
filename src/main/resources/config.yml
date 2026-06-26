@@ -193,11 +193,11 @@ resource-pack:
   hosting:
     mode: "INTERNAL"       # INTERNAL = plugin serves the pack / EXTERNAL = use url below
     internal-port: 8080
-    public-ip: "AUTO"     # AUTO = detect server's public IP automatically
+    public-ip: "127.0.0.1"     # AUTO = detect server's public IP automatically
   
   # --- External Link (used when mode is EXTERNAL) ---
   url: "https://raw.githubusercontent.com/SagheerAkram/strength-smp/main/strengthsmp.zip"
-  hash: "5737d5e768b099e74cdb66c5ff9f0c192ec5bdb9"
+  hash: "61ab22141ba33db2964d287bab79ba4c311084db"
   
   force: true
   prompt-message: "&6&lStrengthSMP &7requires a custom resource pack for the best experience. &fWould you like to install it?"
@@ -231,7 +231,7 @@ strength-ranks:
 # ─── Weapon Binding System ──────────────────────────────────────────────
 bind-system:
   enabled: true
-  cost-strength: 3
+  cost-strength: 1
   formatted-lore-prefix: "&d&l⚡ BOUND WEAPON ⚡"
   animation-ticks: 40           # Duration of loyalty-like flying weapon effect
   knockback-radius: 2.0         # Radius to push away blocking players/mobs
