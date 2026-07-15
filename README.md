@@ -1,8 +1,13 @@
 <p align="center">
-  <img src="https://i.postimg.cc/C57JRHpf/sword-ezgif-com-optimize.gif" alt="StrengthSMP Banner">
+  <img src="https://cdn.modrinth.com/data/cached_images/bed2b23cc62873fd95ae03c36db515e82b5b00b4.png" alt="StrengthSMP Banner" width="600"/>
 </p>
 
-# ⚔️ **StrengthSMP | Professional Strength PvP System**
+<h1 align="center">⚔️ StrengthSMP (v1.1.6) ⚔️</h1>
+
+<p align="center">
+  <b>The Ultimate Competitive Strength PvP Overhaul for Minecraft Servers</b><br/>
+  <i>Ultra-Lightweight • Universally Compatible (1.16.5 - 1.21.4+) • Fully Customizable</i>
+</p>
 
 <p align="center">
   <a href="https://hangar.papermc.io/SagheerAkram/StrengthSMP"><img src="https://img.shields.io/hangar/dt/StrengthSMP?logo=paper&style=flat&color=2ecc71" alt="Hangar Downloads"></a>
@@ -11,130 +16,174 @@
   <a href="https://www.spigotmc.org/resources/strength-smp.134679/"><img src="https://img.shields.io/badge/Spigot-Available-ffaa00?logo=spigotmc&style=flat" alt="Spigot"></a>
 </p>
 
+---
 
-**StrengthSMP** is the ultimate competitive combat overhaul. Now **Ultra-Lightweight** and **Universally Compatible** across all modern Minecraft versions.
+## 🌟 What's New in Version 1.1.6?
 
-### 🚀 **What's New in v1.1.1 (The Visual & Combat Update)?**
-* **Stunning Live Particles:** Custom models for the Strength Orb, Reroll Book, and Death Certificate now feature live visual particles that react in hands and inventories!
-* **Dynamic Prefix Chat Ranks:** Prefix titles scale up or down automatically in chat based on players' active Strength level, ranging from the divine **[Demigod]** down to the rock-bottom **[Hopeless]** peasant!
-* **Weapon Soul-Binding (`/bind`):** Bind your weapon class to your soul for 1 Strength. Keep your bound weapon on death, and watch it spin/fly back to your hand upon respawning via a custom Loyalty return flight animation!
-* **Advanced Statistics Grimoires:** Tracks Souls Harvested (with dynamic lore listing recent PvP victims), Damage Dealt, Soul Sacrifices, Duration Bound, and Active Ability Triggers inside the `/bind` GUI.
-* **PlaceholderAPI Support:** Expanded placeholders including `%strengthsmp_has_bound_weapon%` and `%strengthsmp_bound_weapon_class%`.
-* **Universal Compatibility (1.16.5 - 1.21.4+):** Smooth reflection-based skin loaders and dynamic retro-compatible sound/particle resolvers supporting both legacy (`1.16.5 - 1.21.1`) and modern (`1.21.2 - 1.21.4+`) clients.
-* **Optimized Size:** Shaded jar optimized down to a super-lightweight **275KB**.
-
-🔗 **Links:**  
-👉 [BuiltByBit (BBB) Official Page](https://builtbybit.com/resources/strength-smp-by-floki.105677/)  
-👉 [SpigotMC Resource](https://www.spigotmc.org/resources/strength-smp.134679/)  
-👉 [Modrinth Project](https://modrinth.com/plugin/strength-smp-)  
-👉 [CurseForge Page](https://www.curseforge.com/minecraft/bukkit-plugins/strength-smp)  
-👉 [GitHub Repository](https://github.com/SagheerAkram/strength-smp)  
-*Developer: Sagheer Akram (aka Floki)*
+* **✨ Enhanced Administrative Controls:** Added full TabCompleter support for `/strengthsmp` and new commands like `/bountyrefund`, `/notimer`, `/nonewbie`, and `/killreset`.
+* **🎨 Visual & Particle Polish:** Fine-tuned particle rendering engine and model textures across modern client versions (1.20.x - 1.21.4+).
+* **🗡️ Weapon Soul-Binding (`/bind`):** Bind your weapon class to your soul for 1 Strength. Retain your bound weapon upon death with dynamic Loyalty return animations.
+* **📜 Grimoire Statistics Tracking:** Track Souls Harvested, Victims Log, Total Damage Dealt, Soul Sacrifices, and Ability Activation metrics directly inside `/bind` GUI.
+* **⚡ PlaceholderAPI 2.0 Integration:** Complete set of expansion placeholders for strength levels, rank titles, contracts, active bounties, monarch tracking, and combat statuses.
+* **🌐 Discord Webhook Expansion:** Integrated real-time Discord notifications for Monarch victories, Season resets, and admin announcements (`/announce`).
 
 ---
 
-## ✨ Core Features
+## 🔗 Official Links
+- 🛒 **BuiltByBit (BBB):** [Official Resource Page](https://builtbybit.com/resources/strength-smp-by-floki.105677/)
+- 🌐 **SpigotMC:** [Spigot Resource](https://www.spigotmc.org/resources/strength-smp.134679/)
+- 🟢 **Modrinth:** [Modrinth Page](https://modrinth.com/plugin/strength-smp-)
+- 🔥 **CurseForge:** [CurseForge Resource](https://www.curseforge.com/minecraft/bukkit-plugins/strength-smp)
+- 🐙 **GitHub Repo:** [SagheerAkram/strength-smp](https://github.com/SagheerAkram/strength-smp)
 
-### 📦 Custom 3D Items & Live Particles
+---
+
+## 💎 Core Features
+
+### 🔮 Custom 3D Items & Live Particles
 ![Items](https://cdn.modrinth.com/data/cached_images/bed2b23cc62873fd95ae03c36db515e82b5b00b4.png)
 
 Every custom item features **stunning, live-updating particle effects** in player hands and inventories:
-* 🌟 **Strength Orb:** Swirls with golden fire sparks that radiate power.
-* 🔮 **Reroll Book:** Surrounded by floating purple magical runes and dark particles.
-* 📜 **Death Certificate:** A premium dark document with a glowing blood-red wax skull seal.
+* 🌟 **Strength Orb:** Swirls with golden fire sparks radiating raw combat power.
+* 🔮 **Reroll Book:** Surrounded by floating purple magical runes and dark void particles.
+* 📜 **Death Certificate:** Dark premium parchment sealed with a glowing red wax skull.
 
-### 🩸 **Dynamic Strength & Items**
-Killing players lets you steal their strength, making you more powerful with every victory.
-* **Physical Withdrawals:** Convert strength into physical shards to trade or store.
-* **Underdog System:** Weaker players gain a **2x boost** when defeating giants.
+---
 
-**Showcase & Recipe:**
+### 🩸 Dynamic Strength Economy & Shards
+Killing players steals their strength, elevating your status while demoting your victim.
+* 💎 **Physical Withdrawals:** Convert active Strength into physical **Strength Shards** (`/withdraw`) to trade in shop GUIs or store safely in vaults.
+* 🛡️ **Underdog Advantage:** Weaker players earn **2x Strength** when defeating higher-ranked giants.
+
 ![Strength Showcase](https://cdn.modrinth.com/data/cached_images/57e2258a70261028e61c20158a320ad3f73278ef.png)
 ![Strength Recipe](https://cdn.modrinth.com/data/cached_images/22ed879942fb3732cc367571434f160355fbc37b.png)
 
-### 🔒 **Weapon Soul-Binding (`/bind`)**
-Prevent loss of your custom weapons while maintaining precise competition statistics!
+---
+
+### 🗡️ Soul-Binding GUI (`/bind`)
+Prevent loss of your precious class weapon upon death while unlocking deep statistics tracking!
 ![Weapon Binding GUI](https://i.postimg.cc/T3xf7bHJ/weapon-binding-gui.png)
 
-### 🎲 **Weapon Reroll & Awakening System**
-Cinematic, crate-style animated shuffle animations when using Reroll grimoire books.
+---
+
+### 🎲 Weapon Reroll & Awakening Crate System
+Cinematic, crate-style shuffle animations when using Reroll Grimoire books to roll a new weapon class.
 ![Reroll Showcase](https://cdn.modrinth.com/data/cached_images/0b9ac9ab90f17b2abc405dbdf2bc54329aef0e47.png)
-![Reroll Recipe](https://cdn.modrinth.com/data/cached_images/14b8cdceccc752b2064b81c5103b188a9a5d8400.jpeg)
 
 ---
 
-## 👑 Dynamic Strength Prefix Ranks
-Chat prefixes scale up or down automatically based on players' active **Strength level**, creating a highly competitive atmosphere!
+## 👑 Dynamic Strength Chat Ranks
 
-* 👑 **`+10 STR` — [Demigod]** (Fiery Gold): The ultimate server champion. Only the elite touch this divine prefix!
-* 😈 **`+9 STR` — [Overlord]** (Vibrant Pink): A ruling force that commands respect.
-* 🌌 **`+8 STR` — [Grandmaster]** (Dark Purple): A master of unmatched battlefield tactics.
-* 🏆 **`+5 STR` — [Champion]** (Red): A top-tier PvP legend.
-* ⚪ **` 0 STR` — [Neutral]** (Yellow): The starting point. Every warrior begins their journey here.
-* 🪦 **`-10 STR` — [Hopeless]** (Dark Gray): Stripped of all power. These players must fight twice as hard to rise back up!
+Prefix titles scale up or down automatically in chat based on players' active **Strength level**:
+
+| Strength Level | Prefix Title | Color / Style | Description |
+| :--- | :--- | :--- | :--- |
+| **+10 STR** | `[Demigod]` | 🟨 **Fiery Gold** | The ultimate server champion |
+| **+9 STR** | `[Overlord]` | 🟪 **Vibrant Pink** | A ruling warlord commanding respect |
+| **+8 STR** | `[Grandmaster]`| 🟣 **Dark Purple** | Master of battlefield tactics |
+| **+5 STR** | `[Champion]` | 🟥 **Blood Red** | Top-tier PvP warrior |
+| **0 STR** | `[Neutral]` | 🟨 **Yellow** | Default starting tier |
+| **-10 STR** | `[Hopeless]` | ⬛ **Dark Gray** | Stripped of all power, double effort needed |
 
 ---
 
-## ⚡ Unique Weapon Abilities
-Every weapon class features passive bonuses and powerful active abilities (**Right-Click**):
+## ⚔️ Weapon Classes & Abilities
 
-### ✦ **Sword (Assassin)**
+Right-click with your designated weapon class to activate custom active abilities:
+
+### 🗡️ **Sword (Assassin)**
 * **Active (Excalibur Beam):** Fires a crescent slicing wave of golden sparks forward 12 blocks, piercing through enemies and launching them upwards.
 ![Sword Ability](https://i.postimg.cc/C57JRHpf/sword-ezgif-com-optimize.gif)
 
-### ✦ **Crossbow (Scorpion)**
-* **Active (Scorpion Hook):** Fires a high-velocity chain and hook dragging the hit target directly to your feet and stunning them.
+### 🎯 **Crossbow (Scorpion)**
+* **Active (Scorpion Hook):** Fires a high-velocity chain and hook dragging hit targets directly to your feet and stunning them.
 ![Crossbow Ability](https://i.postimg.cc/XJDgfNz6/crossbow-ezgif-com-optimize.gif)
 
-### ✦ **Shield (Tank)**
-* **Active (Shield Forcefield):** Releases an expanding electric ring (6-block radius) pushing back enemies and applying Slow II for 3 seconds. Features passive damage counter-attacks on block!
+### 🛡️ **Shield (Tank)**
+* **Active (Shield Forcefield):** Releases an expanding electric ring (6-block radius) pushing back enemies and applying Slowness II for 3s. Features passive damage counter-attacks!
 ![Shield Ability](https://i.postimg.cc/LsBkb8Yj/shield-ezgif-com-optimize.gif)
 
-### ✦ **Axe (Juggernaut)**
-* **Active (Dimensional Cleave):** Creates a spatial rift 3.5 blocks ahead that vacuums nearby entities for 2 seconds, followed by a sonic boom implosion. Includes passive shield-disable and stuns.
+### 🪓 **Axe (Juggernaut)**
+* **Active (Dimensional Cleave):** Creates a spatial rift 3.5 blocks ahead that vacuums nearby entities for 2s, followed by a sonic boom implosion. Passive shield-disabling stuns.
 
-### ✦ **Bow (Archer)**
+### 🏹 **Bow (Archer)**
 * **Active (Gravity Singularity):** Launches a gravity arrow that spawns a vortex on impact, pulling all entities within 8 blocks to the center.
 
-### ✦ **Trident (Gladiator)**
-* **Active (Poseidon Riptide):** Propels yourself forward in air or land with spectacular aqua nautilus trails, damaging all entities caught in your flight path.
+### 🔱 **Trident (Gladiator)**
+* **Active (Poseidon Riptide):** Propels yourself forward in air or land with aqua nautilus trails, damaging all entities caught in your flight path.
 
 ---
 
-## 👑 Monarch & Bounties
-* **Monarch System:** The top killer becomes the Monarch. They receive perks but their location is broadcasted.
-* **Bounty System:** Place item-based bounties on players to start server-wide hunts.
+## 👑 Monarch & Bounty Systems
+* **Monarch System:** The top killer on the server is crowned the Monarch, broadcasting their status and location with unique perks.
+* **Bounty System:** Place item/strength bounties on enemies to prompt server-wide bounty hunts (`/bounty`).
 ![Bounty System](https://i.postimg.cc/B6h1D8yg/bounty-ezgif-com-optimize.gif)
 
 ---
 
-## 🛡️ Fair Play & Balancing
-* **Totem Limits:** Configurable cap on totem usage.
-* **Anti-Farming:** Prevents repeated kills of the same player.
-* **Potion Ban:** Disables vanilla Strength potions for balance.
+## 🔒 Fair Play & Safeguards
+* **Totem Limits:** Configurable cap on Totem of Undying usage per engagement.
+* **Anti-Kill Farming:** Prevents repeated strength stealing from the same target within a cooldown period.
+* **Potion Ban:** Optional toggle to ban vanilla Strength potions for true skill-based balance.
+* **Death & Newbie Protection:** Temporary death cooldown protection to allow fallen players to recover.
+
 ![Totem Limit](https://i.postimg.cc/zBcWRbHX/totemgif-ezgif-com-optimize.gif)
 
 ---
 
-## ⌨️ Documentation & Commands
+## 📜 Commands & Permissions
 
-### Player Commands
-* `/bind` - Open the Soul-Binding menu (requires 1 strength to bind, 1 to swap).
-* `/strength` - View your current stats and active prefix.
-* `/withdraw <amount>` - Turn strength into Strength Shard items.
-* `/ability` - Activate weapon ability.
+### 👤 Player Commands
+| Command | Alias | Description |
+| :--- | :--- | :--- |
+| `/bind` | - | Open the Soul-Binding menu & statistics grimoire |
+| `/strength` | `/str`, `/power` | View active strength level and current rank |
+| `/withdraw <amount>` | - | Withdraw strength into physical Strength Shard items |
+| `/bounty <player> <amount>`| - | Place a bounty on a target player |
+| `/removeprotection` | - | Remove your active death or newbie protection |
 
-### Admin Commands (strengthsmp.admin)
-* `/strengthsmp reload` - Reload configurations, message strings, and Discord webhooks.
-* `/strengthsmp setstrength <player> <amount>` - Manually set player strength.
-* `/strengthsmp setweapon <player> <weapon>` - Set a player's class weapon.
-* `/strengthsmp reroll <player>` - Reroll a player's class via the Weapon Shuffle GUI.
-* `/punish <player>` - Force double strength loss.
-* `/killreset` - Reset global seasonal leaderboards.
-* `/notimer <player>` - Toggle safety protection.
+### 🛠️ Admin Commands (`strengthsmp.admin`)
+| Command | Description |
+| :--- | :--- |
+| `/strengthsmp reload` | Reload configuration files, message strings, and Discord webhooks |
+| `/strengthsmp setstrength <player> <amount>` | Set a player's exact strength value |
+| `/strengthsmp setweapon <player> <weapon>` | Set a player's active class weapon |
+| `/strengthsmp reroll <player>` | Force reroll a player's class weapon via GUI animation |
+| `/strengthsmp info <player>` | View administrative diagnostics for a player |
+| `/strengthsmp setupboard` / `setupleaderboard` | Initialize hologram or scoreboard leaderboards |
+| `/bountyrefund <player>` | Refund an active bounty placed on a player |
+| `/announce [info\|monarch]` | Send custom broadcast announcements to linked Discord channels |
+| `/punish <player>` | Punish a player (doubles strength loss on death for 24h) |
+| `/notimer <player>` | Remove 4-hour death protection from a player |
+| `/nonewbie <player>` | Remove newbie protection from a player |
+| `/killreset` | Perform seasonal leaderboard and kill resets |
 
 ---
 
-## 📞 Support
-Need help or want to suggest features?
-👉 **[Join the Support Server](https://discord.gg/rACYmjqxNw)**
+## 🔌 PlaceholderAPI Integration
+
+StrengthSMP provides high-performance expansion placeholders via identifier `%strengthsmp_*%`:
+
+| Placeholder | Output Description | Example Output |
+| :--- | :--- | :--- |
+| `%strengthsmp_strength%` | Current active Strength | `5` |
+| `%strengthsmp_strength_rank%` | Configured rank title | `[Champion]` |
+| `%strengthsmp_max_strength%` | Server max strength cap | `10` |
+| `%strengthsmp_bounty%` | Current active bounty on player | `250` |
+| `%strengthsmp_monarch%` | Name of current Monarch | `SagheerAkram` |
+| `%strengthsmp_season_day%` | Current season day counter | `14` |
+| `%strengthsmp_contract_progress%` | Player contract progress | `3` |
+| `%strengthsmp_contract_goal%` | Player contract target goal | `5` |
+| `%strengthsmp_contract_percentage%` | Contract progress percentage | `60%` |
+| `%strengthsmp_combat_status%` | In-combat indicator | `In Combat` / `Safe` |
+| `%strengthsmp_weapon_class%` | Player class weapon | `Sword (Assassin)` |
+| `%strengthsmp_has_bound_weapon%` | Soul-bound status | `Yes` / `No` |
+| `%strengthsmp_bound_weapon_class%`| Bound weapon name | `Sword` / `None` |
+| `%strengthsmp_kill_history_count%`| Total logged PvP kills | `42` |
+
+---
+
+## 👥 Support & Community
+Need assistance or want to suggest new features?
+- 💬 **Discord Support Server:** [Join Community Discord](https://discord.gg/rACYmjqxNw)
+- 👨‍💻 **Developer:** **Sagheer Akram** *(aka Floki)*
