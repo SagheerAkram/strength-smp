@@ -1,20 +1,21 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  org.bukkit.Bukkit
+ */
 package com.floki.strengthsmp.services;
 
 import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.data.DataManager;
 import com.floki.strengthsmp.util.MessageUtil;
-import org.bukkit.Bukkit;
-
+import java.lang.invoke.CallSite;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.bukkit.Bukkit;
 
-/**
- * Manages seasonal progression and resets.
- */
 public class SeasonService {
-
     private final StrengthSMP plugin;
     private final DataManager dataManager;
 
@@ -23,50 +24,38 @@ public class SeasonService {
         this.dataManager = plugin.getDataManager();
     }
 
-    /**
-     * Ends the current season, archiving top players and resetting everyone's stats.
-     */
     public void endSeason() {
-        int currentSeason = plugin.getInternalConfigManager().getEvents().getInt("seasons.current-season", 1);
-        
-        // 1. Capture Hall of Fame (Top 3)
-        List<Map.Entry<UUID, Integer>> sorted = new ArrayList<>(dataManager.getStrengthCache().entrySet());
-        sorted.sort((a, b) -> b.getValue().compareTo(a.getValue()));
-        
-        List<String> hof = new ArrayList<>();
-        for (int i = 0; i < Math.min(3, sorted.size()); i++) {
-            Map.Entry<UUID, Integer> entry = sorted.get(i);
-            String name = Bukkit.getOfflinePlayer(entry.getKey()).getName();
-            hof.add((i + 1) + ". " + (name != null ? name : "Unknown") + " (" + entry.getValue() + " Strength)");
+        int currentSeason = this.plugin.getInternalConfigManager().getEvents().getInt("seasons.current-season", 1);
+        ArrayList<Map.Entry<UUID, Integer>> sorted = new ArrayList<Map.Entry<UUID, Integer>>(this.dataManager.getStrengthCache().entrySet());
+        sorted.sort((a, b) -> ((Integer)b.getValue()).compareTo((Integer)a.getValue()));
+        ArrayList<CallSite> hof = new ArrayList<CallSite>();
+        for (int i = 0; i < Math.min(3, sorted.size()); ++i) {
+            Map.Entry entry = (Map.Entry)sorted.get(i);
+            String name = Bukkit.getOfflinePlayer((UUID)((UUID)entry.getKey())).getName();
+            hof.add((CallSite)((Object)(i + 1 + ". " + (name != null ? name : "Unknown") + " (" + String.valueOf(entry.getValue()) + " Strength)")));
         }
-        
-        // 2. Save to events.yml
         String path = "seasons.history.season-" + currentSeason;
-        plugin.getInternalConfigManager().getEvents().set(path + ".top-players", hof);
-        plugin.getInternalConfigManager().getEvents().set(path + ".end-timestamp", System.currentTimeMillis());
-        
-        // 3. Broadcast and Reset
+        this.plugin.getInternalConfigManager().getEvents().set(path + ".top-players", hof);
+        this.plugin.getInternalConfigManager().getEvents().set(path + ".end-timestamp", (Object)System.currentTimeMillis());
         MessageUtil.broadcast("season.ended", "season", String.valueOf(currentSeason));
-        
-        dataManager.resetAllStats();
-        dataManager.setLastSeasonReset(System.currentTimeMillis());
-        
-        // 4. Increment season
-        plugin.getInternalConfigManager().getEvents().set("seasons.current-season", currentSeason + 1);
-        plugin.getInternalConfigManager().saveEvents();
-        
+        this.dataManager.resetAllStats();
+        this.dataManager.setLastSeasonReset(System.currentTimeMillis());
+        this.plugin.getInternalConfigManager().getEvents().set("seasons.current-season", (Object)(currentSeason + 1));
+        this.plugin.getInternalConfigManager().saveEvents();
         MessageUtil.broadcast("season.started", "season", String.valueOf(currentSeason + 1));
     }
 
     public int getSeasonDay() {
-        long reset = dataManager.getLastSeasonReset();
-        if (reset == 0) return 1;
-        
+        long reset = this.dataManager.getLastSeasonReset();
+        if (reset == 0L) {
+            return 1;
+        }
         long diff = System.currentTimeMillis() - reset;
-        return (int) (diff / (1000 * 60 * 60 * 24)) + 1;
+        return (int)(diff / 86400000L) + 1;
     }
 
     public double getStrengthMultiplier() {
-        return plugin.getInternalConfigManager().getEvents().getDouble("seasons.modifiers.strength-gain-multiplier", 1.0);
+        return this.plugin.getInternalConfigManager().getEvents().getDouble("seasons.modifiers.strength-gain-multiplier", 1.0);
     }
 }
+

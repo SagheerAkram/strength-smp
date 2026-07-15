@@ -1,61 +1,81 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  org.bukkit.Material
+ */
 package com.floki.strengthsmp.data;
 
-/**
- * Represents the different weapon classes in Strength SMP
- */
+import java.util.concurrent.ThreadLocalRandom;
+import org.bukkit.Material;
+
 public enum WeaponType {
-    SWORD("🗡", "Sword", "Dual-wield & Auto-crit passive"),
-    AXE("🪓", "Axe", "Critical hits Stun + Kinetic Damage Storage"),
-    TRIDENT("🔱", "Trident", "Lightning passive + Water Wave mobility"),
-    SHIELD("🛡", "Shield", "Speed II on stun + 15s Immortality"),
-    BOW("🏹", "Bow", "Linear Sonic Beam Ultimate (AOE)"),
-    CROSSBOW("➶", "Crossbow", "Glowing arrows + Leash Ultimate");
-    
+    SWORD("\ud83d\udde1", "Sword", "Dual-wield & Auto-crit passive"),
+    AXE("\ud83e\ude93", "Axe", "Critical hits Stun + Kinetic Damage Storage"),
+    TRIDENT("\ud83d\udd31", "Trident", "Lightning passive + Water Wave mobility"),
+    SHIELD("\ud83d\udee1", "Shield", "Speed II on stun + 15s Immortality"),
+    BOW("\ud83c\udff9", "Bow", "Linear Sonic Beam Ultimate (AOE)"),
+    CROSSBOW("\u27b6", "Crossbow", "Glowing arrows + Leash Ultimate");
+
     private final String icon;
     private final String displayName;
     private final String description;
-    
-    WeaponType(String icon, String displayName, String description) {
+
+    private WeaponType(String icon, String displayName, String description) {
         this.icon = icon;
         this.displayName = displayName;
         this.description = description;
     }
-    
+
     public String getIcon() {
-        return icon;
+        return this.icon;
     }
-    
+
     public String getDisplayName() {
-        return displayName;
+        return this.displayName;
     }
-    
+
     public String getDescription() {
-        return description;
+        return this.description;
     }
-    
-    public boolean isValidMaterial(org.bukkit.Material material) {
+
+    public boolean isValidMaterial(Material material) {
         String name = material.name();
         switch (this) {
-            case SWORD:    return name.contains("SWORD");
-            case AXE:      return name.contains("_AXE");
-            case BOW:      return name.equals("BOW");
-            case CROSSBOW: return name.equals("CROSSBOW");
-            case TRIDENT:  return name.equals("TRIDENT");
-            case SHIELD:   return name.equals("SHIELD");
-            default:       return false;
+            case SWORD: {
+                return name.contains("SWORD");
+            }
+            case AXE: {
+                return name.contains("_AXE");
+            }
+            case BOW: {
+                return name.equals("BOW");
+            }
+            case CROSSBOW: {
+                return name.equals("CROSSBOW");
+            }
+            case TRIDENT: {
+                return name.equals("TRIDENT");
+            }
+            case SHIELD: {
+                return name.equals("SHIELD");
+            }
         }
+        return false;
     }
-    
-    public static WeaponType fromMaterial(org.bukkit.Material material) {
-        for (WeaponType type : values()) {
-            if (type.isValidMaterial(material)) return type;
+
+    public static WeaponType fromMaterial(Material material) {
+        for (WeaponType type : WeaponType.values()) {
+            if (!type.isValidMaterial(material)) continue;
+            return type;
         }
         return null;
     }
 
     public static WeaponType getRandomWeapon() {
-        WeaponType[] values = values();
-        int index = java.util.concurrent.ThreadLocalRandom.current().nextInt(values.length);
+        WeaponType[] values = WeaponType.values();
+        int index = ThreadLocalRandom.current().nextInt(values.length);
         return values[index];
     }
 }
+

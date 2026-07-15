@@ -1,391 +1,313 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  org.bukkit.ChatColor
+ *  org.bukkit.Material
+ *  org.bukkit.NamespacedKey
+ *  org.bukkit.entity.Player
+ *  org.bukkit.inventory.ItemFlag
+ *  org.bukkit.inventory.ItemStack
+ *  org.bukkit.inventory.meta.ItemMeta
+ *  org.bukkit.persistence.PersistentDataType
+ *  org.bukkit.plugin.Plugin
+ */
 package com.floki.strengthsmp.util;
 
+import com.floki.strengthsmp.StrengthSMP;
+import com.floki.strengthsmp.config.Config;
+import com.floki.strengthsmp.util.MessageUtil;
+import com.floki.strengthsmp.util.SkullTextureUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import org.bukkit.plugin.Plugin;
 
 public class ItemFactory {
-
-    // Persistent Data keys for identifying custom items (more reliable than CustomModelData)
     private static final String STRENGTH_ITEM_KEY = "smp_strength_item";
     private static final String REROLL_ITEM_KEY = "smp_reroll_token";
     private static final String DEATH_CERT_KEY = "smp_death_certificate";
 
-    /**
-     * Translates & codes to ChatColor
-     */
     private static String color(String msg) {
-        return ChatColor.translateAlternateColorCodes('&', msg);
+        return ChatColor.translateAlternateColorCodes((char)'&', (String)msg);
     }
 
-    /**
-     * Creates the custom Strength Item.
-     * If custom heads are enabled, renders as a 3D orange energy orb.
-     * Otherwise falls back to the configured vanilla material.
-     */
     public static ItemStack createStrengthItem(int amount) {
-        com.floki.strengthsmp.config.Config config = com.floki.strengthsmp.StrengthSMP.getInstance().getConfigManager();
-        org.bukkit.plugin.Plugin plugin = com.floki.strengthsmp.StrengthSMP.getInstance();
-
-        Material mat = Material.matchMaterial(config.getStrengthItemMaterial());
-        if (mat == null) mat = Material.NAUTILUS_SHELL;
-        ItemStack item = new ItemStack(mat, amount);
-
-        ItemMeta meta = item.getItemMeta();
-        
-        if (meta != null) {
-            meta.setDisplayName(color("&6&lSTRENGTH ITEM"));
-            
-            List<String> lore = new ArrayList<>();
-            lore.add(color("&fRight click to add &4+1&f strength"));
+        ItemStack item;
+        ItemMeta meta;
+        Config config = StrengthSMP.getInstance().getConfigManager();
+        StrengthSMP plugin = StrengthSMP.getInstance();
+        Material mat = Material.matchMaterial((String)config.getStrengthItemMaterial());
+        if (mat == null) {
+            mat = Material.NAUTILUS_SHELL;
+        }
+        if ((meta = (item = new ItemStack(mat, amount)).getItemMeta()) != null) {
+            meta.setDisplayName(ItemFactory.color("&6&lSTRENGTH ITEM"));
+            ArrayList<String> lore = new ArrayList<String>();
+            lore.add(ItemFactory.color("&fRight click to add &4+1&f strength"));
             meta.setLore(lore);
-            
-            // Always set CustomModelData for resource pack users
-            meta.setCustomModelData(config.getStrengthItemModel());
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS);
-
-            // Tag with PersistentDataContainer for reliable identification
-            meta.getPersistentDataContainer().set(
-                    new NamespacedKey(plugin, STRENGTH_ITEM_KEY),
-                    PersistentDataType.STRING, "true");
-
-            item.setItemMeta(meta);
-        }
-        
-        return item;
-    }
-
-    /**
-     * Creates the Reroll Item (Book).
-     * If custom heads are enabled, renders as a 3D enchanted grimoire.
-     * Otherwise falls back to the configured vanilla material.
-     */
-    public static ItemStack createRerollItem(org.bukkit.plugin.Plugin plugin, int amount) {
-        com.floki.strengthsmp.config.Config config = com.floki.strengthsmp.StrengthSMP.getInstance().getConfigManager();
-
-        Material mat = Material.matchMaterial(config.getRerollItemMaterial());
-        if (mat == null) mat = Material.BOOK;
-        ItemStack item = new ItemStack(mat, amount);
-
-        ItemMeta meta = item.getItemMeta();
-        
-        if (meta != null) {
-            meta.setDisplayName(color("&6&lREROLL WEAPON"));
-            
-            meta.setLore(Arrays.asList(
-                color("&fRight click to reroll your weapon"),
-                "",
-                color("&c&lCOST: &71 Strength")
-            ));
-            
-            meta.setCustomModelData(config.getRerollItemModel());
-            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, REROLL_ITEM_KEY), 
-                    PersistentDataType.STRING, "true");
-            
-            item.setItemMeta(meta);
-        }
-        
-        return item;
-    }
-
-    /**
-     * Creates a Sealed Destiny item for first-time joins.
-     */
-    public static ItemStack createSealedDestiny(org.bukkit.plugin.Plugin plugin) {
-        ItemStack item = createRerollItem(plugin, 1);
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(color("&d&lSEALED DESTINY"));
-            meta.setLore(Arrays.asList(
-                color("&7An ancient artifact that reveals"),
-                color("&7your inner warrior potential."),
-                "",
-                color("&fRight-click to &bAWAKEN &fyour power!"),
-                "",
-                color("&a&lFREE &7(First Join Reward)")
-            ));
+            meta.setCustomModelData(Integer.valueOf(config.getStrengthItemModel()));
+            meta.addItemFlags(new ItemFlag[]{ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS});
+            meta.getPersistentDataContainer().set(new NamespacedKey((Plugin)plugin, STRENGTH_ITEM_KEY), PersistentDataType.STRING, "true");
             item.setItemMeta(meta);
         }
         return item;
     }
 
-    /**
-     * Creates a Death Certificate item.
-     * If custom heads are enabled, renders as a 3D tombstone.
-     * Otherwise falls back to the configured vanilla material.
-     */
-    public static ItemStack createDeathCertificate(org.bukkit.plugin.Plugin plugin, String victimName, String killerName) {
-        com.floki.strengthsmp.config.Config config = com.floki.strengthsmp.StrengthSMP.getInstance().getConfigManager();
+    public static ItemStack createRerollItem(Plugin plugin, int amount) {
+        ItemStack item;
+        ItemMeta meta;
+        Config config = StrengthSMP.getInstance().getConfigManager();
+        Material mat = Material.matchMaterial((String)config.getRerollItemMaterial());
+        if (mat == null) {
+            mat = Material.BOOK;
+        }
+        if ((meta = (item = new ItemStack(mat, amount)).getItemMeta()) != null) {
+            meta.setDisplayName(ItemFactory.color("&6&lREROLL WEAPON"));
+            meta.setLore(Arrays.asList(ItemFactory.color("&fRight click to reroll your weapon"), "", ItemFactory.color("&c&lCOST: &71 Strength")));
+            meta.setCustomModelData(Integer.valueOf(config.getRerollItemModel()));
+            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, REROLL_ITEM_KEY), PersistentDataType.STRING, "true");
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
 
-        Material mat = Material.matchMaterial(config.getDeathCertMaterial());
-        if (mat == null) mat = Material.PAPER;
-        ItemStack item = new ItemStack(mat);
-
+    public static ItemStack createSealedDestiny(Plugin plugin) {
+        ItemStack item = ItemFactory.createRerollItem(plugin, 1);
         ItemMeta meta = item.getItemMeta();
-        
         if (meta != null) {
-            meta.setDisplayName(color("&c&lDEATH CERTIFICATE"));
-            
-            List<String> lore = new ArrayList<>();
-            lore.add(color("&7&m-----------------------"));
-            lore.add(color("&fVICTIM: &c" + victimName));
-            lore.add(color("&fKILLER: &a" + killerName));
-            lore.add(color("&7&m-----------------------"));
-            lore.add(color("&8&oA memento of a fallen warrior"));
-            
+            meta.setDisplayName(ItemFactory.color("&d&lSEALED DESTINY"));
+            meta.setLore(Arrays.asList(ItemFactory.color("&7An ancient artifact that reveals"), ItemFactory.color("&7your inner warrior potential."), "", ItemFactory.color("&fRight-click to &bAWAKEN &fyour power!"), "", ItemFactory.color("&a&lFREE &7(First Join Reward)")));
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    public static ItemStack createDeathCertificate(Plugin plugin, String victimName, String killerName) {
+        ItemStack item;
+        ItemMeta meta;
+        Config config = StrengthSMP.getInstance().getConfigManager();
+        Material mat = Material.matchMaterial((String)config.getDeathCertMaterial());
+        if (mat == null) {
+            mat = Material.PAPER;
+        }
+        if ((meta = (item = new ItemStack(mat)).getItemMeta()) != null) {
+            meta.setDisplayName(ItemFactory.color("&c&lDEATH CERTIFICATE"));
+            ArrayList<String> lore = new ArrayList<String>();
+            lore.add(ItemFactory.color("&7&m-----------------------"));
+            lore.add(ItemFactory.color("&fVICTIM: &c" + victimName));
+            lore.add(ItemFactory.color("&fKILLER: &a" + killerName));
+            lore.add(ItemFactory.color("&7&m-----------------------"));
+            lore.add(ItemFactory.color("&8&oA memento of a fallen warrior"));
             meta.setLore(lore);
-            meta.setCustomModelData(config.getDeathCertModel());
-
-            // Tag for identification
-            meta.getPersistentDataContainer().set(
-                    new NamespacedKey(plugin, DEATH_CERT_KEY),
-                    PersistentDataType.STRING, "true");
-
+            meta.setCustomModelData(Integer.valueOf(config.getDeathCertModel()));
+            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, DEATH_CERT_KEY), PersistentDataType.STRING, "true");
             item.setItemMeta(meta);
         }
-        
         return item;
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    //  Item Identification Helpers
-    // ═══════════════════════════════════════════════════════════════
-
-    /**
-     * Checks if an item is a Strength Item using PersistentDataContainer.
-     * Works regardless of whether the item is a custom head or vanilla material.
-     */
     public static boolean isStrengthItem(ItemStack item) {
-        if (item == null || !item.hasItemMeta()) return false;
+        if (item == null || !item.hasItemMeta()) {
+            return false;
+        }
         ItemMeta meta = item.getItemMeta();
-        if (meta == null) return false;
-
-        org.bukkit.plugin.Plugin plugin = com.floki.strengthsmp.StrengthSMP.getInstance();
-        NamespacedKey key = new NamespacedKey(plugin, STRENGTH_ITEM_KEY);
-
-        // Check PDC first (new items), then fall back to CustomModelData (legacy items from shops)
+        if (meta == null) {
+            return false;
+        }
+        StrengthSMP plugin = StrengthSMP.getInstance();
+        NamespacedKey key = new NamespacedKey((Plugin)plugin, STRENGTH_ITEM_KEY);
         if (meta.getPersistentDataContainer().has(key, PersistentDataType.STRING)) {
             return true;
         }
-
-        // Legacy fallback: items created before this update or from external shops
         return meta.hasCustomModelData() && meta.getCustomModelData() == 12345;
     }
 
-    /**
-     * Checks if an item is a Reroll Item using PersistentDataContainer.
-     */
     public static boolean isRerollItem(ItemStack item) {
-        if (item == null || !item.hasItemMeta()) return false;
+        if (item == null || !item.hasItemMeta()) {
+            return false;
+        }
         ItemMeta meta = item.getItemMeta();
-        if (meta == null) return false;
-
-        org.bukkit.plugin.Plugin plugin = com.floki.strengthsmp.StrengthSMP.getInstance();
-        NamespacedKey key = new NamespacedKey(plugin, REROLL_ITEM_KEY);
-
+        if (meta == null) {
+            return false;
+        }
+        StrengthSMP plugin = StrengthSMP.getInstance();
+        NamespacedKey key = new NamespacedKey((Plugin)plugin, REROLL_ITEM_KEY);
         if (meta.getPersistentDataContainer().has(key, PersistentDataType.STRING)) {
             return true;
         }
-
-        // Legacy fallback
         return meta.hasCustomModelData() && meta.getCustomModelData() == 12346;
     }
 
-    /**
-     * Checks if an item is a Death Certificate using PersistentDataContainer.
-     */
     public static boolean isDeathCertificate(ItemStack item) {
-        if (item == null || !item.hasItemMeta()) return false;
+        if (item == null || !item.hasItemMeta()) {
+            return false;
+        }
         ItemMeta meta = item.getItemMeta();
-        if (meta == null) return false;
-
-        org.bukkit.plugin.Plugin plugin = com.floki.strengthsmp.StrengthSMP.getInstance();
-        NamespacedKey key = new NamespacedKey(plugin, DEATH_CERT_KEY);
-
+        if (meta == null) {
+            return false;
+        }
+        StrengthSMP plugin = StrengthSMP.getInstance();
+        NamespacedKey key = new NamespacedKey((Plugin)plugin, DEATH_CERT_KEY);
         if (meta.getPersistentDataContainer().has(key, PersistentDataType.STRING)) {
             return true;
         }
-
-        // Legacy fallback
         return meta.hasCustomModelData() && meta.getCustomModelData() == 12347;
     }
 
-    /**
-     * Scans and upgrades any custom items (Strength Item, Reroll Token, Death Certificate)
-     * in the player's inventory to match the current configured materials.
-     * Converts legacy custom heads (PLAYER_HEAD) to the new material (NAUTILUS_SHELL, etc.)
-     * if the server configuration currently does not use custom heads, and vice versa.
-     */
-    public static void upgradeInventoryItems(org.bukkit.entity.Player player) {
-        com.floki.strengthsmp.config.Config config = com.floki.strengthsmp.StrengthSMP.getInstance().getConfigManager();
-        org.bukkit.plugin.Plugin plugin = com.floki.strengthsmp.StrengthSMP.getInstance();
+    public static void upgradeInventoryItems(Player player) {
+        Config config = StrengthSMP.getInstance().getConfigManager();
+        StrengthSMP plugin = StrengthSMP.getInstance();
         boolean useCustomHeads = false;
-
         ItemStack[] contents = player.getInventory().getContents();
         boolean changed = false;
-
-        for (int i = 0; i < contents.length; i++) {
+        for (int i = 0; i < contents.length; ++i) {
+            ItemStack newItem;
             ItemStack item = contents[i];
             if (item == null || item.getType() == Material.AIR) continue;
-
             Material targetMaterial = null;
             int customModelData = 0;
             String pdcKey = null;
-
-            if (isStrengthItem(item)) {
+            if (ItemFactory.isStrengthItem(item)) {
                 if (useCustomHeads && !config.getStrengthHeadTexture().isEmpty()) {
                     targetMaterial = Material.PLAYER_HEAD;
                 } else {
-                    targetMaterial = Material.matchMaterial(config.getStrengthItemMaterial());
-                    if (targetMaterial == null) targetMaterial = Material.NAUTILUS_SHELL;
+                    targetMaterial = Material.matchMaterial((String)config.getStrengthItemMaterial());
+                    if (targetMaterial == null) {
+                        targetMaterial = Material.NAUTILUS_SHELL;
+                    }
                 }
                 customModelData = config.getStrengthItemModel();
                 pdcKey = STRENGTH_ITEM_KEY;
-            } else if (isRerollItem(item)) {
+            } else if (ItemFactory.isRerollItem(item)) {
                 if (useCustomHeads && !config.getRerollHeadTexture().isEmpty()) {
                     targetMaterial = Material.PLAYER_HEAD;
                 } else {
-                    targetMaterial = Material.matchMaterial(config.getRerollItemMaterial());
-                    if (targetMaterial == null) targetMaterial = Material.BOOK;
+                    targetMaterial = Material.matchMaterial((String)config.getRerollItemMaterial());
+                    if (targetMaterial == null) {
+                        targetMaterial = Material.BOOK;
+                    }
                 }
                 customModelData = config.getRerollItemModel();
                 pdcKey = REROLL_ITEM_KEY;
-            } else if (isDeathCertificate(item)) {
+            } else if (ItemFactory.isDeathCertificate(item)) {
                 if (useCustomHeads && !config.getDeathCertHeadTexture().isEmpty()) {
                     targetMaterial = Material.PLAYER_HEAD;
                 } else {
-                    targetMaterial = Material.matchMaterial(config.getDeathCertMaterial());
-                    if (targetMaterial == null) targetMaterial = Material.PAPER;
+                    targetMaterial = Material.matchMaterial((String)config.getDeathCertMaterial());
+                    if (targetMaterial == null) {
+                        targetMaterial = Material.PAPER;
+                    }
                 }
                 customModelData = config.getDeathCertModel();
                 pdcKey = DEATH_CERT_KEY;
             }
-
-            if (targetMaterial != null && item.getType() != targetMaterial) {
-                // We need to convert it!
-                int amount = item.getAmount();
-                ItemStack newItem;
-
-                if (targetMaterial == Material.PLAYER_HEAD) {
-                    String headTex = "";
-                    if (pdcKey.equals(STRENGTH_ITEM_KEY)) headTex = config.getStrengthHeadTexture();
-                    else if (pdcKey.equals(REROLL_ITEM_KEY)) headTex = config.getRerollHeadTexture();
-                    else if (pdcKey.equals(DEATH_CERT_KEY)) headTex = config.getDeathCertHeadTexture();
-
-                    newItem = SkullTextureUtil.createCustomHead(headTex);
-                    newItem.setAmount(amount);
-                } else {
-                    newItem = new ItemStack(targetMaterial, amount);
+            if (targetMaterial == null || item.getType() == targetMaterial) continue;
+            int amount = item.getAmount();
+            if (targetMaterial == Material.PLAYER_HEAD) {
+                String headTex = "";
+                if (pdcKey.equals(STRENGTH_ITEM_KEY)) {
+                    headTex = config.getStrengthHeadTexture();
+                } else if (pdcKey.equals(REROLL_ITEM_KEY)) {
+                    headTex = config.getRerollHeadTexture();
+                } else if (pdcKey.equals(DEATH_CERT_KEY)) {
+                    headTex = config.getDeathCertHeadTexture();
                 }
-
-                // Copy over item meta where applicable
-                ItemMeta oldMeta = item.getItemMeta();
-                ItemMeta newMeta = newItem.getItemMeta();
-
-                if (oldMeta != null && newMeta != null) {
-                    if (oldMeta.hasDisplayName()) {
-                        newMeta.setDisplayName(oldMeta.getDisplayName());
-                    }
-                    if (oldMeta.hasLore()) {
-                        newMeta.setLore(oldMeta.getLore());
-                    }
-                    newMeta.setCustomModelData(customModelData);
-                    
-                    // Copy existing PDC tags
-                    oldMeta.getPersistentDataContainer().getKeys().forEach(key -> {
-                        try {
-                            String val = oldMeta.getPersistentDataContainer().get(key, PersistentDataType.STRING);
-                            if (val != null) {
-                                newMeta.getPersistentDataContainer().set(key, PersistentDataType.STRING, val);
-                            }
-                        } catch (Exception ignored) {}
-                    });
-
-                    // Ensure target tag is present
-                    newMeta.getPersistentDataContainer().set(
-                            new NamespacedKey(plugin, pdcKey),
-                            PersistentDataType.STRING, "true");
-
-                    newItem.setItemMeta(newMeta);
-                }
-
-                contents[i] = newItem;
-                changed = true;
+                newItem = SkullTextureUtil.createCustomHead(headTex);
+                newItem.setAmount(amount);
+            } else {
+                newItem = new ItemStack(targetMaterial, amount);
             }
+            ItemMeta oldMeta = item.getItemMeta();
+            ItemMeta newMeta = newItem.getItemMeta();
+            if (oldMeta != null && newMeta != null) {
+                if (oldMeta.hasDisplayName()) {
+                    newMeta.setDisplayName(oldMeta.getDisplayName());
+                }
+                if (oldMeta.hasLore()) {
+                    newMeta.setLore(oldMeta.getLore());
+                }
+                newMeta.setCustomModelData(Integer.valueOf(customModelData));
+                oldMeta.getPersistentDataContainer().getKeys().forEach(key -> {
+                    try {
+                        String val = (String)oldMeta.getPersistentDataContainer().get(key, PersistentDataType.STRING);
+                        if (val != null) {
+                            newMeta.getPersistentDataContainer().set(key, PersistentDataType.STRING, val);
+                        }
+                    }
+                    catch (Exception exception) {
+                        // empty catch block
+                    }
+                });
+                newMeta.getPersistentDataContainer().set(new NamespacedKey((Plugin)plugin, pdcKey), PersistentDataType.STRING, "true");
+                newItem.setItemMeta(newMeta);
+            }
+            contents[i] = newItem;
+            changed = true;
         }
-
         if (changed) {
             player.getInventory().setContents(contents);
             player.updateInventory();
-            plugin.getLogger().info("🔄 Legacy/mismatched custom items upgraded in " + player.getName() + "'s inventory.");
+            plugin.getLogger().info("\ud83d\udd04 Legacy/mismatched custom items upgraded in " + player.getName() + "'s inventory.");
         }
     }
 
-    /**
-     * Unbinds and clears the custom model data/bound tags from all items matching the player's uuid.
-     */
-    public static void unbindAllPlayerItems(org.bukkit.entity.Player player) {
-        org.bukkit.plugin.Plugin plugin = com.floki.strengthsmp.StrengthSMP.getInstance();
-        NamespacedKey boundKey = new NamespacedKey(plugin, "bound_player_uuid");
-        NamespacedKey itemIdKey = new NamespacedKey(plugin, "bound_item_id");
-
+    public static void unbindAllPlayerItems(Player player) {
+        StrengthSMP plugin = StrengthSMP.getInstance();
+        NamespacedKey boundKey = new NamespacedKey((Plugin)plugin, "bound_player_uuid");
+        NamespacedKey itemIdKey = new NamespacedKey((Plugin)plugin, "bound_item_id");
         ItemStack[] contents = player.getInventory().getContents();
         boolean changed = false;
-
-        for (int i = 0; i < contents.length; i++) {
+        for (int i = 0; i < contents.length; ++i) {
+            ItemMeta meta;
             ItemStack item = contents[i];
-            if (item == null || item.getType() == Material.AIR) continue;
-            if (!item.hasItemMeta()) continue;
-
-            ItemMeta meta = item.getItemMeta();
-            if (meta == null) continue;
-
-            if (meta.getPersistentDataContainer().has(boundKey, PersistentDataType.STRING)) {
-                String ownerUuidStr = meta.getPersistentDataContainer().get(boundKey, PersistentDataType.STRING);
-                if (player.getUniqueId().toString().equals(ownerUuidStr)) {
-                    // Remove item metadata
-                    meta.getPersistentDataContainer().remove(boundKey);
-                    meta.getPersistentDataContainer().remove(itemIdKey);
-                    if (meta.hasCustomModelData()) {
-                        meta.setCustomModelData(null);
-                    }
-
-                    // Remove lore prefix
-                    List<String> lore = meta.getLore();
-                    if (lore != null) {
-                        String prefix = MessageUtil.color(com.floki.strengthsmp.StrengthSMP.getInstance().getConfigManager().getBindLorePrefix());
-                        lore.remove(prefix);
-                        // Also try stripped prefix or MessageUtil.parse styled versions just in case
-                        String parsedPrefix = MessageUtil.parse(com.floki.strengthsmp.StrengthSMP.getInstance().getConfigManager().getBindLorePrefix());
-                        lore.remove(parsedPrefix);
-                        lore.remove(ChatColor.stripColor(parsedPrefix));
-                        meta.setLore(lore);
-                    }
-
-                    // Clean display name
-                    if (meta.hasDisplayName()) {
-                        String strippedName = ChatColor.stripColor(meta.getDisplayName());
-                        strippedName = strippedName.replace("⚡", "").trim();
-                        meta.setDisplayName(color("&f" + strippedName));
-                    }
-
-                    item.setItemMeta(meta);
-                    changed = true;
-                }
+            if (item == null || item.getType() == Material.AIR || !item.hasItemMeta() || (meta = item.getItemMeta()) == null || !meta.getPersistentDataContainer().has(boundKey, PersistentDataType.STRING)) continue;
+            String ownerUuidStr = (String)meta.getPersistentDataContainer().get(boundKey, PersistentDataType.STRING);
+            if (!player.getUniqueId().toString().equals(ownerUuidStr)) continue;
+            meta.getPersistentDataContainer().remove(boundKey);
+            meta.getPersistentDataContainer().remove(itemIdKey);
+            NamespacedKey origCmdKey = new NamespacedKey((Plugin)plugin, "smp_original_cmd");
+            NamespacedKey origNameKey = new NamespacedKey((Plugin)plugin, "smp_original_name");
+            if (meta.getPersistentDataContainer().has(origCmdKey, PersistentDataType.INTEGER)) {
+                int origCmd = (Integer)meta.getPersistentDataContainer().get(origCmdKey, PersistentDataType.INTEGER);
+                meta.setCustomModelData(Integer.valueOf(origCmd));
+                meta.getPersistentDataContainer().remove(origCmdKey);
+            } else {
+                meta.setCustomModelData(null);
             }
+            List lore = meta.getLore();
+            if (lore != null) {
+                String prefix = MessageUtil.color(StrengthSMP.getInstance().getConfigManager().getBindLorePrefix());
+                lore.remove(prefix);
+                String parsedPrefix = MessageUtil.parse(StrengthSMP.getInstance().getConfigManager().getBindLorePrefix());
+                lore.remove(parsedPrefix);
+                lore.remove(ChatColor.stripColor((String)parsedPrefix));
+                meta.setLore(lore);
+            }
+            if (meta.getPersistentDataContainer().has(origNameKey, PersistentDataType.STRING)) {
+                String origName = (String)meta.getPersistentDataContainer().get(origNameKey, PersistentDataType.STRING);
+                meta.setDisplayName(origName);
+                meta.getPersistentDataContainer().remove(origNameKey);
+            } else if (meta.hasDisplayName()) {
+                String strippedName = ChatColor.stripColor((String)meta.getDisplayName());
+                strippedName = strippedName.replace("\u26a1", "").trim();
+                meta.setDisplayName(ItemFactory.color("&f" + strippedName));
+            }
+            item.setItemMeta(meta);
+            changed = true;
         }
-
         if (changed) {
             player.updateInventory();
-            plugin.getLogger().info("⚡ All bound items have been automatically unbound for player " + player.getName());
+            plugin.getLogger().info("\u26a1 All bound items have been automatically unbound for player " + player.getName());
         }
     }
 }
+

@@ -1,29 +1,52 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  org.bukkit.Material
+ *  org.bukkit.Sound
+ *  org.bukkit.entity.Arrow
+ *  org.bukkit.entity.Entity
+ *  org.bukkit.entity.LivingEntity
+ *  org.bukkit.entity.Player
+ *  org.bukkit.event.EventHandler
+ *  org.bukkit.event.EventPriority
+ *  org.bukkit.event.Listener
+ *  org.bukkit.event.entity.EntityDamageByEntityEvent
+ *  org.bukkit.event.entity.EntityShootBowEvent
+ *  org.bukkit.metadata.FixedMetadataValue
+ *  org.bukkit.metadata.MetadataValue
+ *  org.bukkit.plugin.Plugin
+ *  org.bukkit.projectiles.ProjectileSource
+ *  org.bukkit.scheduler.BukkitRunnable
+ *  org.bukkit.util.Vector
+ */
 package com.floki.strengthsmp.listeners;
 
 import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.data.WeaponType;
+import com.floki.strengthsmp.util.CompatUtil;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import java.util.UUID;
-
-import org.bukkit.event.entity.EntityShootBowEvent;
-
-public class CrossbowListener implements Listener {
-
+public class CrossbowListener
+implements Listener {
     private final StrengthSMP plugin;
-    private static final long BURST_COOLDOWN = 25000L; // 25 seconds
+    private static final long BURST_COOLDOWN = 25000L;
 
     public CrossbowListener(StrengthSMP plugin) {
         this.plugin = plugin;
@@ -31,59 +54,73 @@ public class CrossbowListener implements Listener {
 
     @EventHandler
     public void onShoot(EntityShootBowEvent event) {
-        if (!(event.getEntity() instanceof Player)) return;
-        if (!(event.getProjectile() instanceof Arrow arrow)) return;
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+        Entity entity = event.getProjectile();
+        if (!(entity instanceof Arrow)) {
+            return;
+        }
+        Arrow arrow = (Arrow)entity;
         if (event.getBow() != null && event.getBow().getType() == Material.CROSSBOW) {
-            arrow.setMetadata("crossbow_shot", new FixedMetadataValue(plugin, true));
+            arrow.setMetadata("crossbow_shot", (MetadataValue)new FixedMetadataValue((Plugin)this.plugin, (Object)true));
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=true)
     public void onArrowHit(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Arrow arrow)) return;
-        if (!(arrow.getShooter() instanceof Player shooter)) return;
-        if (!(event.getEntity() instanceof LivingEntity victim)) return;
-
-        // Check if it's a Crossbow class player
-        if (plugin.getDataManager().getWeaponType(shooter.getUniqueId()) != WeaponType.CROSSBOW) return;
-        if (shooter.getInventory().getItemInMainHand().getType() != Material.CROSSBOW) return;
-
-        // Check Cooldown
+        long lastUse;
+        Entity entity = event.getDamager();
+        if (!(entity instanceof Arrow)) {
+            return;
+        }
+        Arrow arrow = (Arrow)entity;
+        ProjectileSource projectileSource = arrow.getShooter();
+        if (!(projectileSource instanceof Player)) {
+            return;
+        }
+        Player shooter = (Player)projectileSource;
+        Entity entity2 = event.getEntity();
+        if (!(entity2 instanceof LivingEntity)) {
+            return;
+        }
+        LivingEntity victim = (LivingEntity)entity2;
+        if (this.plugin.getDataManager().getWeaponType(shooter.getUniqueId()) != WeaponType.CROSSBOW) {
+            return;
+        }
+        if (shooter.getInventory().getItemInMainHand().getType() != Material.CROSSBOW) {
+            return;
+        }
         long now = System.currentTimeMillis();
-        long lastUse = plugin.getDataManager().getAbilityCooldown(shooter.getUniqueId(), "crossbow_burst");
-        if (now - lastUse < BURST_COOLDOWN) return;
-
-        // Trigger Burst
-        triggerBurst(shooter, victim);
-        plugin.getDataManager().setAbilityCooldown(shooter.getUniqueId(), "crossbow_burst", now);
+        if (now - (lastUse = this.plugin.getDataManager().getAbilityCooldown(shooter.getUniqueId(), "crossbow_burst")) < 25000L) {
+            return;
+        }
+        this.triggerBurst(shooter, victim);
+        this.plugin.getDataManager().setAbilityCooldown(shooter.getUniqueId(), "crossbow_burst", now);
     }
 
-    private void triggerBurst(Player shooter, LivingEntity victim) {
-        shooter.sendMessage("§b§lRAPID FIRE §r§7— Unleashing burst volley!");
+    private void triggerBurst(final Player shooter, final LivingEntity victim) {
+        shooter.sendMessage("\u00a7b\u00a7lRAPID FIRE \u00a7r\u00a77\u2014 Unleashing burst volley!");
         shooter.playSound(shooter.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 1.0f, 2.0f);
-
-        new BukkitRunnable() {
+        new BukkitRunnable(){
             int count = 0;
-            @Override
+
             public void run() {
-                if (count >= 6 || !shooter.isOnline() || !victim.isValid()) {
+                if (this.count >= 6 || !shooter.isOnline() || !victim.isValid()) {
                     this.cancel();
                     return;
                 }
-
-                // Fire arrow from shooter towards victim
-                Vector dir = victim.getLocation().add(0, 1, 0).toVector().subtract(shooter.getEyeLocation().toVector()).normalize();
-                Arrow burstArrow = shooter.getWorld().spawn(shooter.getEyeLocation(), Arrow.class);
-                burstArrow.setShooter(shooter);
+                Vector dir = victim.getLocation().add(0.0, 1.0, 0.0).toVector().subtract(shooter.getEyeLocation().toVector()).normalize();
+                Arrow burstArrow = (Arrow)shooter.getWorld().spawn(shooter.getEyeLocation(), Arrow.class);
+                burstArrow.setShooter((ProjectileSource)shooter);
                 burstArrow.setVelocity(dir.multiply(2.5));
-                burstArrow.setMetadata("crossbow_burst", new FixedMetadataValue(plugin, true));
+                burstArrow.setMetadata("crossbow_burst", (MetadataValue)new FixedMetadataValue((Plugin)CrossbowListener.this.plugin, (Object)true));
                 burstArrow.setCritical(true);
-
-                shooter.getWorld().playSound(shooter.getLocation(), Sound.ITEM_CROSSBOW_SHOOT, 0.8f, 1.5f + (count * 0.1f));
-                com.floki.strengthsmp.util.CompatUtil.spawnParticle(shooter.getWorld(), "SMOKE_NORMAL", shooter.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0.05);
-
-                count++;
+                shooter.getWorld().playSound(shooter.getLocation(), Sound.ITEM_CROSSBOW_SHOOT, 0.8f, 1.5f + (float)this.count * 0.1f);
+                CompatUtil.spawnParticle(shooter.getWorld(), "SMOKE_NORMAL", shooter.getEyeLocation(), 5, 0.2, 0.2, 0.2, 0.05);
+                ++this.count;
             }
-        }.runTaskTimer(plugin, 0L, 3L); // Burst every 3 ticks
+        }.runTaskTimer((Plugin)this.plugin, 0L, 3L);
     }
 }
+

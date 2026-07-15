@@ -1,19 +1,22 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  me.clip.placeholderapi.expansion.PlaceholderExpansion
+ *  org.bukkit.OfflinePlayer
+ *  org.jetbrains.annotations.NotNull
+ */
 package com.floki.strengthsmp.hooks;
 
 import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.data.DataManager;
+import java.util.UUID;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.UUID;
-
-/**
- * PlaceholderAPI integration for StrengthSMP.
- * Provides placeholders like %strengthsmp_strength%, %strengthsmp_bounty%, etc.
- */
-public class PlaceholderExpansionImpl extends PlaceholderExpansion {
-
+public class PlaceholderExpansionImpl
+extends PlaceholderExpansion {
     private final StrengthSMP plugin;
     private final DataManager dataManager;
 
@@ -22,66 +25,81 @@ public class PlaceholderExpansionImpl extends PlaceholderExpansion {
         this.dataManager = plugin.getDataManager();
     }
 
-    @Override
-    public @NotNull String getIdentifier() {
+    @NotNull
+    public String getIdentifier() {
         return "strengthsmp";
     }
 
-    @Override
-    public @NotNull String getAuthor() {
+    @NotNull
+    public String getAuthor() {
         return "Floki";
     }
 
-    @Override
-    public @NotNull String getVersion() {
-        return plugin.getDescription().getVersion();
+    @NotNull
+    public String getVersion() {
+        return this.plugin.getDescription().getVersion();
     }
 
-    @Override
     public boolean persist() {
-        return true; // Very important for PAPI
+        return true;
     }
 
-    @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
-        if (player == null) return "";
-        UUID uuid = player.getUniqueId();
-
-        switch (params.toLowerCase()) {
-            case "strength":
-                return String.valueOf(dataManager.getStrength(uuid));
-            case "strength_rank":
-                return plugin.getConfigManager().getRankNameForStrength(dataManager.getStrength(uuid));
-            case "max_strength":
-                return String.valueOf(plugin.getConfigManager().getMaxStrength());
-            case "bounty":
-                return String.valueOf(dataManager.getBounty(uuid));
-            case "monarch":
-            case "monarch_name":
-                return dataManager.getTopPlayerName();
-            case "season_day":
-                return String.valueOf(plugin.getSeasonService().getSeasonDay());
-            case "contract_progress":
-                return String.valueOf(plugin.getContractService().getTotalProgress(uuid));
-            case "contract_goal":
-                return String.valueOf(plugin.getContractService().getTotalGoal(uuid));
-            case "contract_percentage":
-                int progress = plugin.getContractService().getTotalProgress(uuid);
-                int goal = plugin.getContractService().getTotalGoal(uuid);
-                if (goal == 0) return "100%";
-                return (int)((double)progress / goal * 100) + "%";
-            case "combat_status":
-                return plugin.getCombatListener().isInCombat(uuid) ? "&cIn Combat" : "&aSafe";
-            case "weapon_class":
-                return dataManager.getWeaponType(uuid).getDisplayName();
-            case "has_bound_weapon":
-                return dataManager.hasBoundWeapon(uuid) ? "Yes" : "No";
-            case "bound_weapon_class":
-                return dataManager.hasBoundWeapon(uuid) ? dataManager.getWeaponType(uuid).getDisplayName() : "None";
-            case "kill_history_count":
-                return String.valueOf(dataManager.getKillHistoryCount(uuid));
-            default:
-                return null;
+        if (player == null) {
+            return "";
         }
+        UUID uuid = player.getUniqueId();
+        switch (params.toLowerCase()) {
+            case "strength": {
+                return String.valueOf(this.dataManager.getStrength(uuid));
+            }
+            case "strength_rank": {
+                return this.plugin.getConfigManager().getRankNameForStrength(this.dataManager.getStrength(uuid));
+            }
+            case "max_strength": {
+                return String.valueOf(this.plugin.getConfigManager().getMaxStrength());
+            }
+            case "bounty": {
+                return String.valueOf(this.dataManager.getBounty(uuid));
+            }
+            case "monarch": 
+            case "monarch_name": {
+                return this.dataManager.getTopPlayerName();
+            }
+            case "season_day": {
+                return String.valueOf(this.plugin.getSeasonService().getSeasonDay());
+            }
+            case "contract_progress": {
+                return String.valueOf(this.plugin.getContractService().getTotalProgress(uuid));
+            }
+            case "contract_goal": {
+                return String.valueOf(this.plugin.getContractService().getTotalGoal(uuid));
+            }
+            case "contract_percentage": {
+                int progress = this.plugin.getContractService().getTotalProgress(uuid);
+                int goal = this.plugin.getContractService().getTotalGoal(uuid);
+                if (goal == 0) {
+                    return "100%";
+                }
+                return (int)((double)progress / (double)goal * 100.0) + "%";
+            }
+            case "combat_status": {
+                return this.plugin.getCombatListener().isInCombat(uuid) ? "&cIn Combat" : "&aSafe";
+            }
+            case "weapon_class": {
+                return this.dataManager.getWeaponType(uuid).getDisplayName();
+            }
+            case "has_bound_weapon": {
+                return this.dataManager.hasBoundWeapon(uuid) ? "Yes" : "No";
+            }
+            case "bound_weapon_class": {
+                return this.dataManager.hasBoundWeapon(uuid) ? this.dataManager.getWeaponType(uuid).getDisplayName() : "None";
+            }
+            case "kill_history_count": {
+                return String.valueOf(this.dataManager.getKillHistoryCount(uuid));
+            }
+        }
+        return null;
     }
 }
+

@@ -1,3 +1,14 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  org.bukkit.Location
+ *  org.bukkit.OfflinePlayer
+ *  org.bukkit.Sound
+ *  org.bukkit.command.CommandSender
+ *  org.bukkit.entity.Player
+ *  org.bukkit.inventory.ItemStack
+ */
 package com.floki.strengthsmp.services;
 
 import com.floki.strengthsmp.StrengthSMP;
@@ -5,17 +16,16 @@ import com.floki.strengthsmp.data.DataManager;
 import com.floki.strengthsmp.util.CompatUtil;
 import com.floki.strengthsmp.util.ItemFactory;
 import com.floki.strengthsmp.util.MessageUtil;
+import java.util.HashMap;
+import java.util.UUID;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-
-/**
- * Handles the Strength economy logic, including gains, losses, and rewards.
- */
 public class StrengthService {
-
     private final StrengthSMP plugin;
     private final DataManager dataManager;
 
@@ -24,188 +34,152 @@ public class StrengthService {
         this.dataManager = plugin.getDataManager();
     }
 
-    /**
-     * Adds strength to a player. If at max, gives a physical item reward instead if they are online.
-     * If offline, drops at the provided location (usually the victim's location).
-     */
-    public void addStrength(org.bukkit.OfflinePlayer player, int amount, org.bukkit.Location fallbackLocation) {
+    public void addStrength(OfflinePlayer player, int amount, Location fallbackLocation) {
+        int max;
         if (player.isOnline()) {
-            addStrength((Player) player, amount);
+            this.addStrength((Player)player, amount);
             return;
         }
-
-        // Offline logic: update data first
-        int current = dataManager.getStrength(player.getUniqueId());
-        int max = plugin.getConfigManager().getMaxStrength();
-        
-        if (current >= max) {
+        int current = this.dataManager.getStrength(player.getUniqueId());
+        if (current >= (max = this.plugin.getConfigManager().getMaxStrength())) {
             if (fallbackLocation != null) {
                 fallbackLocation.getWorld().dropItemNaturally(fallbackLocation, ItemFactory.createStrengthItem(amount));
             } else {
-                // Absolute fallback: if no location provided, we can't drop it. 
-                // In production, fallbackLocation should always be passed from DeathListener.
-                plugin.getLogger().warning("Offline reward LOST for " + player.getName() + " - No fallback location provided.");
+                this.plugin.getLogger().warning("Offline reward LOST for " + player.getName() + " - No fallback location provided.");
             }
             return;
         }
-
-        int added = dataManager.addStrengthCapped(player.getUniqueId(), amount);
-        plugin.getMonarchService().calculateNewMonarch();
-        // Monarch logic removed from here
-        
-        // Handle leftovers if capped offline
+        int added = this.dataManager.addStrengthCapped(player.getUniqueId(), amount);
+        this.plugin.getMonarchService().calculateNewMonarch();
         if (added < amount && fallbackLocation != null) {
             fallbackLocation.getWorld().dropItemNaturally(fallbackLocation, ItemFactory.createStrengthItem(amount - added));
         }
     }
 
-    /**
-     * Adds strength to an online player with sounds and effects.
-     */
     public void addStrength(Player player, int amount) {
-        int current = dataManager.getStrength(player.getUniqueId());
-        int max = plugin.getConfigManager().getMaxStrength();
-        
-        if (current >= max) {
-            handleMaxStrengthReward(player, amount);
+        int max;
+        int current = this.dataManager.getStrength(player.getUniqueId());
+        if (current >= (max = this.plugin.getConfigManager().getMaxStrength())) {
+            this.handleMaxStrengthReward(player, amount);
             return;
         }
-
-        int added = dataManager.addStrengthCapped(player.getUniqueId(), amount);
+        int added = this.dataManager.addStrengthCapped(player.getUniqueId(), amount);
         int next = current + added;
-
-        MessageUtil.send(player, "strength.gain", "strength", String.valueOf(next));
+        MessageUtil.send((CommandSender)player, "strength.gain", "strength", String.valueOf(next));
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.2f);
         player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 1.5f);
-        CompatUtil.spawnParticle(player.getWorld(), "TOTEM", player.getLocation().add(0, 1, 0), 40, 0.5, 0.5, 0.5, 0.15);
-        CompatUtil.spawnParticle(player.getWorld(), "VILLAGER_HAPPY", player.getLocation().add(0, 1, 0), 20, 0.5, 0.5, 0.5, 0.1);
-
-        // Update UI
-        plugin.updateDisplay(player);
-        plugin.getMonarchService().calculateNewMonarch();
-        
-        // Progress Contracts
-        plugin.getContractService().progressContract(player, "STRENGTH", added);
-
-        // If we still have "leftover" strength because we hit the cap mid-way
+        CompatUtil.spawnParticle(player.getWorld(), "TOTEM", player.getLocation().add(0.0, 1.0, 0.0), 40, 0.5, 0.5, 0.5, 0.15);
+        CompatUtil.spawnParticle(player.getWorld(), "VILLAGER_HAPPY", player.getLocation().add(0.0, 1.0, 0.0), 20, 0.5, 0.5, 0.5, 0.1);
+        this.plugin.updateDisplay(player);
+        this.plugin.getMonarchService().calculateNewMonarch();
+        this.plugin.getContractService().progressContract(player, "STRENGTH", added);
         if (added < amount) {
-            handleMaxStrengthReward(player, amount - added);
+            this.handleMaxStrengthReward(player, amount - added);
         }
     }
 
-    public boolean removeStrength(org.bukkit.OfflinePlayer player, int amount) {
+    public boolean removeStrength(OfflinePlayer player, int amount) {
+        int min;
         if (player.isOnline()) {
-            return removeStrength((Player) player, amount);
+            return this.removeStrength((Player)player, amount);
         }
-
-        // Offline logic: just update data
-        int current = dataManager.getStrength(player.getUniqueId());
-        int min = plugin.getConfigManager().getMinStrength();
-        if (current <= min) return false;
-
-        dataManager.subtractStrength(player.getUniqueId(), amount);
-        plugin.getMonarchService().calculateNewMonarch();
+        int current = this.dataManager.getStrength(player.getUniqueId());
+        if (current <= (min = this.plugin.getConfigManager().getMinStrength())) {
+            return false;
+        }
+        this.dataManager.subtractStrength(player.getUniqueId(), amount);
+        this.plugin.getMonarchService().calculateNewMonarch();
         return true;
     }
 
     public boolean removeStrength(Player player, int amount) {
-        int current = dataManager.getStrength(player.getUniqueId());
-        int min = plugin.getConfigManager().getMinStrength();
-        
-        if (current <= min) {
-            MessageUtil.send(player, "strength.at-minimum");
+        int min;
+        int current = this.dataManager.getStrength(player.getUniqueId());
+        if (current <= (min = this.plugin.getConfigManager().getMinStrength())) {
+            MessageUtil.send((CommandSender)player, "strength.at-minimum", new String[0]);
             return false;
         }
-
-        dataManager.subtractStrength(player.getUniqueId(), amount);
+        this.dataManager.subtractStrength(player.getUniqueId(), amount);
         int next = Math.max(min, current - amount);
-        
-        MessageUtil.send(player, "strength.loss", "strength", String.valueOf(next));
+        MessageUtil.send((CommandSender)player, "strength.loss", "strength", String.valueOf(next));
         player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 0.8f);
         player.playSound(player.getLocation(), Sound.ENTITY_WITHER_DEATH, 0.5f, 0.8f);
-        CompatUtil.spawnParticle(player.getWorld(), "SMOKE_LARGE", player.getLocation().add(0, 1, 0), 40, 0.5, 0.5, 0.5, 0.1);
-        CompatUtil.spawnParticle(player.getWorld(), "SOUL", player.getLocation().add(0, 1, 0), 15, 0.3, 0.3, 0.3, 0.05);
-        
-        // Update UI
-        plugin.updateDisplay(player);
-        plugin.getMonarchService().calculateNewMonarch();
+        CompatUtil.spawnParticle(player.getWorld(), "SMOKE_LARGE", player.getLocation().add(0.0, 1.0, 0.0), 40, 0.5, 0.5, 0.5, 0.1);
+        CompatUtil.spawnParticle(player.getWorld(), "SOUL", player.getLocation().add(0.0, 1.0, 0.0), 15, 0.3, 0.3, 0.3, 0.05);
+        this.plugin.updateDisplay(player);
+        this.plugin.getMonarchService().calculateNewMonarch();
         return true;
     }
 
     public void handleKill(Player attacker, Player victim) {
-        java.util.UUID attackerUUID = attacker.getUniqueId();
-        java.util.UUID victimUUID = victim.getUniqueId();
-
+        UUID attackerUUID = attacker.getUniqueId();
+        UUID victimUUID = victim.getUniqueId();
         boolean victimProtected = false;
-
-        // 1. Check Newbie Protection on Victim
-        if (dataManager.isNewbieProtected(victimUUID)) {
-            MessageUtil.send(victim, "strength.newbie-you-protected");
-            MessageUtil.send(attacker, "strength.newbie-protected");
+        if (this.dataManager.isNewbieProtected(victimUUID)) {
+            MessageUtil.send((CommandSender)victim, "strength.newbie-you-protected", new String[0]);
+            MessageUtil.send((CommandSender)attacker, "strength.newbie-protected", new String[0]);
+            victimProtected = true;
+        } else if (this.dataManager.hasDeathProtection(victimUUID)) {
+            MessageUtil.send((CommandSender)victim, "strength.protected", new String[0]);
+            MessageUtil.send((CommandSender)attacker, "strength.protection-blocked", new String[0]);
             victimProtected = true;
         }
-        // 2. Check Death Protection on Victim
-        else if (dataManager.hasDeathProtection(victimUUID)) {
-            MessageUtil.send(victim, "strength.protected");
-            MessageUtil.send(attacker, "strength.protection-blocked");
-            victimProtected = true;
-        }
-
-        // 3. Check Anti-Farm
         boolean isFarm = false;
         if (!victimProtected) {
-            long lastKill = dataManager.getLastKillTime(attackerUUID, victimUUID);
-            long windowMs = plugin.getConfigManager().getAntiFarmWindowMinutes() * 60 * 1000L;
-            if (lastKill > 0 && (System.currentTimeMillis() - lastKill) < windowMs) {
-                MessageUtil.send(attacker, "strength.anti-farm");
+            long lastKill = this.dataManager.getLastKillTime(attackerUUID, victimUUID);
+            long windowMs = (long)(this.plugin.getConfigManager().getAntiFarmWindowMinutes() * 60) * 1000L;
+            if (lastKill > 0L && System.currentTimeMillis() - lastKill < windowMs) {
+                MessageUtil.send((CommandSender)attacker, "strength.anti-farm", new String[0]);
                 isFarm = true;
             }
         }
-
-        // 4. Check Victim Minimum Strength
         boolean victimAtMin = false;
-        int victimStr = dataManager.getStrength(victimUUID);
-        int minStrength = plugin.getConfigManager().getMinStrength();
+        int victimStr = this.dataManager.getStrength(victimUUID);
+        int minStrength = this.plugin.getConfigManager().getMinStrength();
         if (!victimProtected && !isFarm && victimStr <= minStrength) {
-            MessageUtil.send(victim, "strength.at-minimum");
-            MessageUtil.send(attacker, "strength.victim-at-minimum", "victim", victim.getName());
+            MessageUtil.send((CommandSender)victim, "strength.at-minimum", new String[0]);
+            MessageUtil.send((CommandSender)attacker, "strength.victim-at-minimum", "victim", victim.getName());
             victimAtMin = true;
         }
-
-        // ── Do strength adjustments ──
-        if (!victimProtected && !isFarm && !victimAtMin) {
-            // Victim loses strength
-            removeStrength(victim, 1);
-
-            // Attacker gains strength unless attacker is protected
-            if (dataManager.isNewbieProtected(attackerUUID)) {
-                MessageUtil.send(attacker, "strength.newbie-no-gain");
-            } else if (dataManager.hasDeathProtection(attackerUUID)) {
-                MessageUtil.send(attacker, "strength.protected-no-gain");
+        if (!(victimProtected || isFarm || victimAtMin)) {
+            int penalty = this.plugin.getConfigManager().getDeathPenalty();
+            this.removeStrength(victim, penalty);
+            if (this.dataManager.isNewbieProtected(attackerUUID)) {
+                MessageUtil.send((CommandSender)attacker, "strength.newbie-no-gain", new String[0]);
+            } else if (this.dataManager.hasDeathProtection(attackerUUID)) {
+                MessageUtil.send((CommandSender)attacker, "strength.protected-no-gain", new String[0]);
             } else {
-                addStrength(attacker, 1);
+                int attackerStr = this.dataManager.getStrength(attackerUUID);
+                int gain = this.plugin.getConfigManager().getDeathGain();
+                int threshold = this.plugin.getConfigManager().getUnderdogThreshold();
+                int mult = this.plugin.getConfigManager().getUnderdogMultiplier();
+                if (victimStr - attackerStr >= threshold && mult > 1) {
+                    gain *= mult;
+                    MessageUtil.send((CommandSender)attacker, "strength.underdog-bonus", "multiplier", String.valueOf(mult));
+                }
+
+                String transferStyle = this.plugin.getConfigManager().getC().getString("strength.kill-transfer-style", "DIRECT");
+                if ("DROP".equalsIgnoreCase(transferStyle)) {
+                    ItemStack shard = ItemFactory.createStrengthItem(gain);
+                    victim.getWorld().dropItemNaturally(victim.getLocation(), shard);
+                    MessageUtil.send((CommandSender)attacker, "strength.gain-dropped", "amount", String.valueOf(gain));
+                } else {
+                    this.addStrength(attacker, gain);
+                }
             }
         }
-
-        // Anti-farm: record the kill
-        dataManager.recordKill(attackerUUID, victimUUID);
-        
-        // Progress killer's kills stat
-        dataManager.addKill(attackerUUID);
+        this.dataManager.recordKill(attackerUUID, victimUUID);
+        this.dataManager.addKill(attackerUUID);
     }
 
-    /**
-     * Converts excess strength into physical Strength Items.
-     */
     private void handleMaxStrengthReward(Player player, int amount) {
         ItemStack reward = ItemFactory.createStrengthItem(amount);
-        
-        HashMap<Integer, ItemStack> leftover = player.getInventory().addItem(reward);
+        HashMap leftover = player.getInventory().addItem(new ItemStack[]{reward});
         if (!leftover.isEmpty()) {
-            player.getWorld().dropItem(player.getLocation(), leftover.values().iterator().next());
+            player.getWorld().dropItem(player.getLocation(), (ItemStack)leftover.values().iterator().next());
         }
-
-        MessageUtil.send(player, "strength.max-reached", "amount", String.valueOf(plugin.getConfigManager().getMaxStrength()));
+        MessageUtil.send((CommandSender)player, "strength.max-reached", "amount", String.valueOf(this.plugin.getConfigManager().getMaxStrength()));
         player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1.0f, 0.5f);
     }
 }
+

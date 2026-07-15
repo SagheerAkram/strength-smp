@@ -1,31 +1,43 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  org.bukkit.Bukkit
+ *  org.bukkit.entity.Entity
+ *  org.bukkit.entity.Player
+ *  org.bukkit.entity.Projectile
+ *  org.bukkit.event.EventHandler
+ *  org.bukkit.event.EventPriority
+ *  org.bukkit.event.Listener
+ *  org.bukkit.event.entity.EntityDamageByEntityEvent
+ *  org.bukkit.event.player.PlayerQuitEvent
+ */
 package com.floki.strengthsmp.listeners;
 
 import com.floki.strengthsmp.StrengthSMP;
+import com.floki.strengthsmp.util.ItemFactory;
 import com.floki.strengthsmp.util.MessageUtil;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-/**
- * Handles combat tagging and logout penalties.
- * Players who quit while in combat are killed and penalized.
- */
-public class CombatListener implements Listener {
-    
+public class CombatListener
+implements Listener {
     private final StrengthSMP plugin;
-    private final Map<UUID, Long> combatTag = new HashMap<>();
-    private final Map<UUID, UUID> lastAttacker = new HashMap<>();
+    private final Map<UUID, Long> combatTag = new HashMap<UUID, Long>();
+    private final Map<UUID, UUID> lastAttacker = new HashMap<UUID, UUID>();
 
     public boolean isInCombat(UUID uuid) {
-        Long expiry = combatTag.get(uuid);
+        Long expiry = this.combatTag.get(uuid);
         return expiry != null && expiry > System.currentTimeMillis();
     }
 
@@ -34,59 +46,57 @@ public class CombatListener implements Listener {
     }
 
     public UUID getLastAttacker(UUID victim) {
-        return lastAttacker.get(victim);
+        return this.lastAttacker.get(victim);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=true)
     public void onCombat(EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof Player victim)) return;
-        
-        Player attacker = null;
-        if (event.getDamager() instanceof Player p) {
-            attacker = p;
-        } else if (event.getDamager() instanceof org.bukkit.entity.Projectile proj && proj.getShooter() instanceof Player p) {
-            attacker = p;
+        Entity entity = event.getEntity();
+        if (!(entity instanceof Player)) {
+            return;
         }
-
-        if (attacker == null || attacker.equals(victim)) return;
-
-        long tagDurationMs = plugin.getConfigManager().getCombatTagDuration() * 1000L;
+        Player victim = (Player)entity;
+        Player attacker = null;
+        Entity damager = event.getDamager();
+        if (damager instanceof Player) {
+            attacker = (Player)damager;
+        } else if (damager instanceof Projectile) {
+            Projectile proj = (Projectile)damager;
+            if (proj.getShooter() instanceof Player) {
+                attacker = (Player)proj.getShooter();
+            }
+        }
+        if (attacker == null || attacker.equals((Object)victim)) {
+            return;
+        }
+        long tagDurationMs = (long)this.plugin.getConfigManager().getCombatTagDuration() * 1000L;
         long now = System.currentTimeMillis();
-        combatTag.put(victim.getUniqueId(), now + tagDurationMs);
-        combatTag.put(attacker.getUniqueId(), now + tagDurationMs);
-        lastAttacker.put(victim.getUniqueId(), attacker.getUniqueId());
+        this.combatTag.put(victim.getUniqueId(), now + tagDurationMs);
+        this.combatTag.put(attacker.getUniqueId(), now + tagDurationMs);
+        this.lastAttacker.put(victim.getUniqueId(), attacker.getUniqueId());
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         UUID uuid = player.getUniqueId();
-
-        Long tagExpiry = combatTag.get(uuid);
+        Long tagExpiry = this.combatTag.get(uuid);
         if (tagExpiry != null && tagExpiry > System.currentTimeMillis()) {
-            // Combat log detected!
-            UUID attackerUUID = lastAttacker.get(uuid);
-            Player attacker = (attackerUUID != null) ? Bukkit.getPlayer(attackerUUID) : null;
-            
-            String attackerName = (attacker != null) ? attacker.getName() : "Unknown";
+            UUID attackerUUID = this.lastAttacker.get(uuid);
+            Player attacker = attackerUUID != null ? Bukkit.getPlayer((UUID)attackerUUID) : null;
+            String attackerName = attacker != null ? attacker.getName() : "Unknown";
             MessageUtil.broadcast("combat.penalty", "player", player.getName(), "killer", attackerName);
-
-            // PENALTY: Remove 1 strength instead of killing (keeps inventory safe)
-            boolean removed = plugin.getStrengthService().removeStrength(player, 1);
-            
-            // Drop physical item at logout location only if they actually lost strength
+            boolean removed = this.plugin.getStrengthService().removeStrength(player, 1);
             if (removed) {
-                player.getWorld().dropItemNaturally(player.getLocation(), com.floki.strengthsmp.util.ItemFactory.createStrengthItem(1));
+                player.getWorld().dropItemNaturally(player.getLocation(), ItemFactory.createStrengthItem(1));
             }
-            
-            // Record the "kill" for the attacker if they exist, but don't transfer items
             if (attackerUUID != null) {
-                plugin.getDataManager().recordKill(attackerUUID, uuid);
-                plugin.getDataManager().addKill(attackerUUID);
+                this.plugin.getDataManager().recordKill(attackerUUID, uuid);
+                this.plugin.getDataManager().addKill(attackerUUID);
             }
         }
-        
-        combatTag.remove(uuid);
-        lastAttacker.remove(uuid);
+        this.combatTag.remove(uuid);
+        this.lastAttacker.remove(uuid);
     }
 }
+

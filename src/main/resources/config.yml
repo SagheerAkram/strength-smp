@@ -191,13 +191,13 @@ resource-pack:
   
   # --- Hosting Options ---
   hosting:
-    mode: "INTERNAL"       # INTERNAL = plugin serves the pack / EXTERNAL = use url below
+    mode: "EXTERNAL"       # INTERNAL = plugin serves the pack / EXTERNAL = use url below
     internal-port: 8080
     public-ip: "127.0.0.1"     # AUTO = detect server's public IP automatically
   
   # --- External Link (used when mode is EXTERNAL) ---
-  url: "https://raw.githubusercontent.com/SagheerAkram/strength-smp/main/strengthsmp.zip"
-  hash: "61ab22141ba33db2964d287bab79ba4c311084db"
+  url: "https://download.mc-packs.net/pack/373f6b038da9d35301d65f930be4d1e09701f8e2.zip"
+  hash: "373f6b038da9d35301d65f930be4d1e09701f8e2"
   
   force: true
   prompt-message: "&6&lStrengthSMP &7requires a custom resource pack for the best experience. &fWould you like to install it?"
