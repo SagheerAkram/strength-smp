@@ -12,6 +12,7 @@ package com.floki.strengthsmp.commands;
 
 import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.commands.BaseCommand;
+import com.floki.strengthsmp.util.MessageUtil;
 import java.util.Date;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -46,7 +47,7 @@ extends BaseCommand {
         this.plugin.getDataManager().setPunishment(target.getUniqueId(), expiry);
         this.plugin.getDataManager().savePlayer(target.getUniqueId());
         this.sendSuccess(sender, "Punished <#f1c40f>" + target.getName() + "</#f1c40f> for <white>24 hours</white>. They will now lose <red>2 STR</red> on death.");
-        this.sendMessage((CommandSender)target, "<#e74c3c><b>[PUNISH]</b></#e74c3c> <gray>You have been punished by an admin. For the next</gray> <white>24 hours</white><gray>, you will lose</gray> <red><b>2 STR</b></red> <gray>on each death.</gray>");
+        MessageUtil.sendWithDefault(target, "commands.punish-message", "<#e74c3c><b>[PUNISH]</b></#e74c3c> <gray>You have been punished by an admin. For the next</gray> <white>24 hours</white><gray>, you will lose</gray> <red><b>2 STR</b></red> <gray>on each death.</gray>");
         this.plugin.getLogger().info("[Punish] " + sender.getName() + " punished " + target.getName() + " until " + String.valueOf(new Date(expiry)));
         return true;
     }

@@ -1,5 +1,5 @@
-# StrengthSMP World Events & Seasons
-# Scheduled events and seasonal modifiers.
+# StrengthSMP Мировые События и Сезоны
+# Запланированные события и сезонные модификаторы.
 
 seasons:
   enabled: false
@@ -14,10 +14,10 @@ events:
     enabled: false
     refresh-time: "00:00"
     pool:
-      - "Kill 5 players"
-      - "Claim a bounty"
-      - "Reach 5 strength"
-      - "Win a duel"
+      - "Убить 5 игроков"
+      - "Забрать награду за голову"
+      - "Достичь 5 силы"
+      - "Победить в дуэли"
 
   titans-rift:
     enabled: true
@@ -30,7 +30,7 @@ events:
 
   monarch:
     enabled: false
-    death-tax: 0.1 # 10% tax on all strength lost goes to Monarch? 
+    death-tax: 0.1
     glow-color: "GOLD"
     effects:
       - "INCREASE_DAMAGE:1"

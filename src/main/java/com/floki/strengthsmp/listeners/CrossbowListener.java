@@ -25,6 +25,7 @@ package com.floki.strengthsmp.listeners;
 import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.data.WeaponType;
 import com.floki.strengthsmp.util.CompatUtil;
+import com.floki.strengthsmp.util.MessageUtil;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
@@ -100,7 +101,7 @@ implements Listener {
     }
 
     private void triggerBurst(final Player shooter, final LivingEntity victim) {
-        shooter.sendMessage("\u00a7b\u00a7lRAPID FIRE \u00a7r\u00a77\u2014 Unleashing burst volley!");
+        MessageUtil.sendWithDefault(shooter, "abilities.rapid-fire", "§b§lRAPID FIRE §r§7— Unleashing burst volley!");
         shooter.playSound(shooter.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 1.0f, 2.0f);
         new BukkitRunnable(){
             int count = 0;

@@ -71,6 +71,15 @@ implements Listener {
             return;
         }
         event.setCancelled(true);
+        if (ItemFactory.isStarterRerollBook(item)) {
+            String ownerUuidStr = ItemFactory.getStarterRerollBookOwner(item);
+            if (ownerUuidStr != null && !ownerUuidStr.equals(player.getUniqueId().toString())) {
+                String ownerName = org.bukkit.Bukkit.getOfflinePlayer(java.util.UUID.fromString(ownerUuidStr)).getName();
+                MessageUtil.send(player, "items.starter-book-not-owner", "owner", ownerName != null ? ownerName : "another player");
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+                return;
+            }
+        }
         int strength = this.plugin.getDataManager().getStrength(player.getUniqueId());
         WeaponType current = this.plugin.getDataManager().getWeapon(player.getUniqueId());
         if (current != null && strength < 1) {
@@ -81,7 +90,7 @@ implements Listener {
         ArrayList<WeaponType> available = new ArrayList<WeaponType>(Arrays.asList(WeaponType.values()));
         available.remove((Object)current);
         if (available.isEmpty()) {
-            player.sendMessage("\u00a7cNo other weapon types available!");
+            MessageUtil.sendWithDefault(player, "abilities.no-weapons-available", "§cNo other weapon types available!");
             return;
         }
         if (current != null) {
@@ -123,9 +132,7 @@ implements Listener {
         Item itemEntity = event.getEntity();
         ItemStack stack = itemEntity.getItemStack();
         if (ItemFactory.isRerollItem(stack) || ItemFactory.isStrengthItem(stack)) {
-            itemEntity.setUnlimitedLifetime(true);
-            itemEntity.setInvulnerable(true);
-            itemEntity.setPersistent(true);
+            ItemInteractionListener.keepForever(itemEntity);
         }
     }
 
@@ -154,13 +161,19 @@ implements Listener {
         Item entity = event.getEntity();
         ItemStack stack = target.getItemStack();
         if (ItemFactory.isRerollItem(stack) || ItemFactory.isStrengthItem(stack)) {
-            target.setUnlimitedLifetime(true);
-            target.setInvulnerable(true);
-            target.setPersistent(true);
-            entity.setUnlimitedLifetime(true);
-            entity.setInvulnerable(true);
-            entity.setPersistent(true);
+            ItemInteractionListener.keepForever(target);
+            ItemInteractionListener.keepForever(entity);
         }
     }
-}
 
+    private static void keepForever(Item item) {
+        try {
+            item.setUnlimitedLifetime(true);
+        }
+        catch (NoSuchMethodError noSuchMethodError) {
+            // 1.16: no such method; onItemDespawn cancels the despawn instead
+        }
+        item.setInvulnerable(true);
+        item.setPersistent(true);
+    }
+}

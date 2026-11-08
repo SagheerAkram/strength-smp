@@ -6,6 +6,7 @@
  *  org.bukkit.Particle
  *  org.bukkit.Sound
  *  org.bukkit.World
+ *  org.bukkit.attribute.Attribute
  *  org.bukkit.entity.Player
  */
 package com.floki.strengthsmp.util;
@@ -16,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
 public class CompatUtil {
@@ -23,26 +25,26 @@ public class CompatUtil {
     private static final Map<String, String> MODERN_TO_LEGACY = new HashMap<String, String>();
 
     private static Particle resolveParticle(String name) {
+        if (name == null) return null;
         try {
-            return Particle.valueOf((String)name);
+            java.lang.reflect.Method m = Particle.class.getMethod("valueOf", String.class);
+            return (Particle) m.invoke(null, name);
         }
-        catch (IllegalArgumentException e) {
+        catch (Throwable t) {
             String translated = LEGACY_TO_MODERN.get(name);
             if (translated != null) {
                 try {
-                    return Particle.valueOf((String)translated);
+                    java.lang.reflect.Method m = Particle.class.getMethod("valueOf", String.class);
+                    return (Particle) m.invoke(null, translated);
                 }
-                catch (IllegalArgumentException illegalArgumentException) {
-                    // empty catch block
-                }
+                catch (Throwable ignored) {}
             }
             if ((translated = MODERN_TO_LEGACY.get(name)) != null) {
                 try {
-                    return Particle.valueOf((String)translated);
+                    java.lang.reflect.Method m = Particle.class.getMethod("valueOf", String.class);
+                    return (Particle) m.invoke(null, translated);
                 }
-                catch (IllegalArgumentException illegalArgumentException) {
-                    // empty catch block
-                }
+                catch (Throwable ignored) {}
             }
             return null;
         }
@@ -57,7 +59,7 @@ public class CompatUtil {
                 CompatUtil.fallbackParticle(world, particleName, loc, count, ox, oy, oz, extra);
             }
         }
-        catch (Exception e) {
+        catch (Throwable t) {
             CompatUtil.fallbackParticle(world, particleName, loc, count, ox, oy, oz, extra);
         }
     }
@@ -72,106 +74,120 @@ public class CompatUtil {
             if (particle != null) {
                 world.spawnParticle(particle, loc, count, ox, oy, oz, extra, data);
             } else {
-                world.spawnParticle(Particle.valueOf((String)"FALLING_DUST"), loc, count, ox, oy, oz, extra, data);
+                CompatUtil.fallbackParticle(world, particleName, loc, count, ox, oy, oz, extra);
             }
         }
-        catch (Exception e) {
-            try {
-                world.spawnParticle(Particle.valueOf((String)"FALLING_DUST"), loc, count, ox, oy, oz, extra, data);
-            }
-            catch (Exception exception) {
-                // empty catch block
-            }
+        catch (Throwable t) {
+            CompatUtil.fallbackParticle(world, particleName, loc, count, ox, oy, oz, extra);
         }
     }
 
     private static void fallbackParticle(World world, String name, Location loc, int count, double ox, double oy, double oz, double extra) {
         try {
-            if (name.equals("SCULK_CHARGE_POP") || name.equals("SCULK_SOUL")) {
-                world.spawnParticle(Particle.valueOf((String)"SOUL"), loc, count, ox, oy, oz, extra);
-            } else if (name.equals("SONIC_BOOM")) {
-                world.spawnParticle(Particle.valueOf((String)"EXPLOSION_LARGE"), loc, count, ox, oy, oz, extra);
-            } else if (name.equals("ELECTRIC_SPARK") || name.equals("WAX_OFF")) {
-                Particle fw = CompatUtil.resolveParticle("FIREWORKS_SPARK");
-                if (fw != null) {
-                    world.spawnParticle(fw, loc, count, ox, oy, oz, extra);
-                } else {
-                    world.spawnParticle(Particle.valueOf((String)"PORTAL"), loc, count, ox, oy, oz, extra);
-                }
-            } else {
-                world.spawnParticle(Particle.valueOf((String)"PORTAL"), loc, count, ox, oy, oz, extra);
+            Particle portal = CompatUtil.resolveParticle("PORTAL");
+            if (portal != null) {
+                world.spawnParticle(portal, loc, count, ox, oy, oz, extra);
             }
         }
-        catch (Exception ignored) {
-            try {
-                world.spawnParticle(Particle.valueOf((String)"PORTAL"), loc, count, ox, oy, oz, extra);
-            }
-            catch (Exception exception) {
-                // empty catch block
-            }
-        }
+        catch (Throwable ignored) {}
     }
 
     public static void playSound(World world, Location loc, String soundName, float volume, float pitch) {
+        if (world == null || loc == null || soundName == null) return;
         try {
-            Sound sound = Sound.valueOf((String)soundName);
-            world.playSound(loc, sound, volume, pitch);
-        }
-        catch (IllegalArgumentException e) {
-            CompatUtil.fallbackSoundWorld(world, loc, soundName, volume, pitch);
-        }
+            java.lang.reflect.Method m = Sound.class.getMethod("valueOf", String.class);
+            Sound sound = (Sound) m.invoke(null, soundName);
+            if (sound != null) {
+                world.playSound(loc, sound, volume, pitch);
+                return;
+            }
+        } catch (Throwable ignored) {}
+        try {
+            String mcSound = soundName.toLowerCase().replace('_', '.');
+            world.playSound(loc, mcSound, volume, pitch);
+        } catch (Throwable ignored) {}
     }
 
     public static void playSound(Player player, Location loc, String soundName, float volume, float pitch) {
+        if (player == null || loc == null || soundName == null) return;
         try {
-            Sound sound = Sound.valueOf((String)soundName);
-            player.playSound(loc, sound, volume, pitch);
-        }
-        catch (IllegalArgumentException e) {
-            CompatUtil.fallbackSoundPlayer(player, loc, soundName, volume, pitch);
-        }
+            java.lang.reflect.Method m = Sound.class.getMethod("valueOf", String.class);
+            Sound sound = (Sound) m.invoke(null, soundName);
+            if (sound != null) {
+                player.playSound(loc, sound, volume, pitch);
+                return;
+            }
+        } catch (Throwable ignored) {}
+        try {
+            String mcSound = soundName.toLowerCase().replace('_', '.');
+            player.playSound(loc, mcSound, volume, pitch);
+        } catch (Throwable ignored) {}
     }
 
-    private static void fallbackSoundWorld(World world, Location loc, String name, float vol, float pitch) {
-        try {
-            if (name.equals("ENTITY_WARDEN_SONIC_BOOM")) {
-                world.playSound(loc, Sound.valueOf((String)"ENTITY_ENDER_DRAGON_GROWL"), vol, pitch);
-            } else if (name.equals("BLOCK_AMETHYST_BLOCK_CHIME")) {
-                try {
-                    world.playSound(loc, Sound.valueOf((String)"BLOCK_NOTE_BLOCK_CHIME"), vol, pitch);
-                }
-                catch (IllegalArgumentException e) {
-                    world.playSound(loc, Sound.valueOf((String)"BLOCK_NOTE_BLOCK_PLING"), vol, pitch);
-                }
+    /**
+     * Resolves an Attribute by name, trying alternate names for cross-version compat.
+     * e.g. GENERIC_MAX_HEALTH (pre-1.21.1) vs MAX_HEALTH (1.21.1+)
+     */
+    public static Attribute resolveAttribute(String... names) {
+        for (String name : names) {
+            try {
+                return Attribute.valueOf(name);
+            } catch (IllegalArgumentException ignored) {
+                // try next name
             }
         }
-        catch (Exception exception) {
-            // empty catch block
-        }
+        return null;
     }
 
-    private static void fallbackSoundPlayer(Player player, Location loc, String name, float vol, float pitch) {
-        try {
-            if (name.equals("ENTITY_WARDEN_SONIC_BOOM")) {
-                player.playSound(loc, Sound.valueOf((String)"ENTITY_ENDER_DRAGON_GROWL"), vol, pitch);
-            } else if (name.equals("BLOCK_AMETHYST_BLOCK_CHIME")) {
-                try {
-                    player.playSound(loc, Sound.valueOf((String)"BLOCK_NOTE_BLOCK_CHIME"), vol, pitch);
+    /**
+     * Resolves a PotionEffectType by its static field name via reflection,
+     * trying each name in order — handles renames across MC versions:
+     *   SLOW → SLOWNESS (1.21.x)
+     *   JUMP → JUMP_BOOST (1.21.x)
+     *   DAMAGE_RESISTANCE → RESISTANCE (1.21.x)
+     *   INCREASE_DAMAGE → STRENGTH (1.21.x)
+     */
+    public static org.bukkit.potion.PotionEffectType resolvePotionEffect(String... fieldNames) {
+        for (String name : fieldNames) {
+            try {
+                java.lang.reflect.Field f = org.bukkit.potion.PotionEffectType.class.getField(name);
+                Object val = f.get(null);
+                if (val instanceof org.bukkit.potion.PotionEffectType) {
+                    return (org.bukkit.potion.PotionEffectType) val;
                 }
-                catch (IllegalArgumentException e) {
-                    player.playSound(loc, Sound.valueOf((String)"BLOCK_NOTE_BLOCK_PLING"), vol, pitch);
-                }
+            } catch (Exception ignored) {
+                // try next name
             }
         }
-        catch (Exception exception) {
-            // empty catch block
+        return null;
+    }
+
+    /**
+     * Resolves an Enchantment by its static field name via reflection,
+     * trying each name in order — handles renames across MC versions:
+     *   DURABILITY → UNBREAKING (1.21.x)
+     */
+    public static org.bukkit.enchantments.Enchantment resolveEnchantment(String... fieldNames) {
+        for (String name : fieldNames) {
+            try {
+                java.lang.reflect.Field f = org.bukkit.enchantments.Enchantment.class.getField(name);
+                Object val = f.get(null);
+                if (val instanceof org.bukkit.enchantments.Enchantment) {
+                    return (org.bukkit.enchantments.Enchantment) val;
+                }
+            } catch (Exception ignored) {
+                // try next name
+            }
         }
+        return null;
     }
 
     static {
         LEGACY_TO_MODERN.put("SPELL_WITCH", "WITCH");
         LEGACY_TO_MODERN.put("SPELL_INSTANT", "INSTANT_EFFECT");
         LEGACY_TO_MODERN.put("EXPLOSION_HUGE", "EXPLOSION_EMITTER");
+        // EXPLOSION_LARGE (medium) was renamed to EXPLOSION in 1.21.4
+        LEGACY_TO_MODERN.put("EXPLOSION_LARGE", "EXPLOSION");
         LEGACY_TO_MODERN.put("SMOKE_NORMAL", "SMOKE");
         LEGACY_TO_MODERN.put("ENCHANTMENT_TABLE", "ENCHANT");
         LEGACY_TO_MODERN.put("BLOCK_CRACK", "BLOCK");
@@ -180,6 +196,11 @@ public class CompatUtil {
         LEGACY_TO_MODERN.put("WATER_WAKE", "FISHING");
         LEGACY_TO_MODERN.put("CRIT_MAGIC", "ENCHANTED_HIT");
         LEGACY_TO_MODERN.put("FIREWORKS_SPARK", "FIREWORK");
+        // TOTEM was renamed to TOTEM_OF_UNDYING in 1.21.4
+        LEGACY_TO_MODERN.put("TOTEM", "TOTEM_OF_UNDYING");
+        LEGACY_TO_MODERN.put("SMOKE_LARGE", "LARGE_SMOKE");
+        LEGACY_TO_MODERN.put("VILLAGER_HAPPY", "HAPPY_VILLAGER");
+        LEGACY_TO_MODERN.put("VILLAGER_ANGRY", "ANGRY_VILLAGER");
         for (Map.Entry<String, String> entry : LEGACY_TO_MODERN.entrySet()) {
             MODERN_TO_LEGACY.put(entry.getValue(), entry.getKey());
         }

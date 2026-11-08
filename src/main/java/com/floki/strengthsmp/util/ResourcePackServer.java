@@ -14,10 +14,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.file.Files;
 import java.security.MessageDigest;
+import org.bukkit.entity.Player;
 
 public class ResourcePackServer {
     private final StrengthSMP plugin;
@@ -54,7 +56,11 @@ public class ResourcePackServer {
             int port = this.plugin.getConfigManager().getResourcePackPort();
             this.server = HttpServer.create(new InetSocketAddress(port), 0);
             this.server.createContext("/strengthsmp.zip", new FileHandler());
-            this.server.setExecutor(null);
+            this.server.setExecutor(java.util.concurrent.Executors.newFixedThreadPool(4, r -> {
+                Thread t = new Thread(r, "StrengthSMP-PackServer");
+                t.setDaemon(true);
+                return t;
+            }));
             this.server.start();
             this.plugin.getLogger().info("\ud83c\udf10 Internal Resource Pack Server started on port " + port);
             this.plugin.getLogger().info("\ud83d\udd17 Serving pack at: http://" + this.publicIp + ":" + port + "/strengthsmp.zip");
@@ -111,7 +117,10 @@ public class ResourcePackServer {
         }
         try {
             URL url = new URL("https://checkip.amazonaws.com");
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+            java.net.URLConnection conn = url.openConnection();
+            conn.setConnectTimeout(3000);
+            conn.setReadTimeout(3000);
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             this.publicIp = in.readLine().trim();
             in.close();
         }
@@ -121,11 +130,42 @@ public class ResourcePackServer {
         }
     }
 
-    public String getPackUrl() {
-        if (this.plugin.getConfigManager().getResourcePackMode().equalsIgnoreCase("INTERNAL")) {
-            return "http://" + this.publicIp + ":" + this.plugin.getConfigManager().getResourcePackPort() + "/strengthsmp.zip?v=" + this.getPackHash();
+    public String getPackUrl(Player player) {
+        if (!this.plugin.getConfigManager().getResourcePackMode().equalsIgnoreCase("INTERNAL")) {
+            return this.plugin.getConfigManager().getResourcePackUrl();
         }
-        return this.plugin.getConfigManager().getResourcePackUrl();
+        String host = this.publicIp;
+        if (player != null && player.getAddress() != null) {
+            InetAddress addr = player.getAddress().getAddress();
+            if (addr != null) {
+                if (addr.isLoopbackAddress()) {
+                    host = "127.0.0.1";
+                } else if (addr.isSiteLocalAddress() && this.plugin.getConfigManager().getResourcePackPublicIp().equalsIgnoreCase("AUTO")) {
+                    try {
+                        host = InetAddress.getLocalHost().getHostAddress();
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+        }
+        return "http://" + host + ":" + this.plugin.getConfigManager().getResourcePackPort() + "/strengthsmp.zip?v=" + this.getPackHash();
+    }
+
+    public String getPackUrl() {
+        return this.getPackUrl(null);
+    }
+
+    private byte[] cachedPack;
+    private long cachedPackModified = -1L;
+
+    /** The pack only changes on reload, so read it once instead of on every download. */
+    private synchronized byte[] packBytes() throws IOException {
+        long modified = this.packFile.lastModified();
+        if (this.cachedPack == null || modified != this.cachedPackModified) {
+            this.cachedPack = Files.readAllBytes(this.packFile.toPath());
+            this.cachedPackModified = modified;
+        }
+        return this.cachedPack;
     }
 
     private class FileHandler
@@ -137,9 +177,10 @@ public class ResourcePackServer {
         public void handle(HttpExchange exchange) throws IOException {
             if (!ResourcePackServer.this.packFile.exists()) {
                 exchange.sendResponseHeaders(404, -1L);
+                exchange.close();
                 return;
             }
-            byte[] bytes = Files.readAllBytes(ResourcePackServer.this.packFile.toPath());
+            byte[] bytes = ResourcePackServer.this.packBytes();
             String requestMethod = exchange.getRequestMethod();
             if (requestMethod.equalsIgnoreCase("HEAD")) {
                 exchange.getResponseHeaders().set("Content-Length", String.valueOf(bytes.length));

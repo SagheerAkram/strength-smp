@@ -75,7 +75,7 @@ implements Listener {
             long newbieExpiry = System.currentTimeMillis() + durationHours * 60L * 60L * 1000L;
             this.dataManager.setNewbieProtection(player.getUniqueId(), newbieExpiry);
             this.dataManager.savePlayer(player.getUniqueId());
-            Bukkit.getScheduler().runTaskLater((Plugin)this.plugin, () -> MessageUtil.send((CommandSender)player, "strength.newbie-protection-start", new String[0]), 2L);
+            Bukkit.getScheduler().runTaskLater((Plugin)this.plugin, () -> MessageUtil.send((CommandSender)player, "strength.newbie-protection-start", "hours", String.valueOf(durationHours)), 2L);
         } else if (!player.hasPlayedBefore()) {
             MessageUtil.send((CommandSender)player, "monarch.broadcast", "player", player.getName());
         }
@@ -92,7 +92,7 @@ implements Listener {
         }
         this.dataManager.setReceivedFreeReroll(uuid, true);
         this.dataManager.savePlayer(uuid);
-        ItemStack sealedDestiny = ItemFactory.createSealedDestiny((Plugin)this.plugin);
+        ItemStack sealedDestiny = ItemFactory.createSealedDestiny((Plugin)this.plugin, player);
         Map<Integer, ItemStack> leftover = player.getInventory().addItem(new ItemStack[]{sealedDestiny});
         if (!leftover.isEmpty()) {
             for (ItemStack item : leftover.values()) {
@@ -212,17 +212,92 @@ implements Listener {
         return MessageUtil.color(rankName) + MessageUtil.color(" &8[" + strength + "]");
     }
 
+    private final java.util.Map<UUID, java.util.List<ItemStack>> starterBooksToRestore = new java.util.HashMap<>();
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPlayerDropStarterBook(org.bukkit.event.player.PlayerDropItemEvent event) {
+        ItemStack item = event.getItemDrop().getItemStack();
+        if (ItemFactory.isStarterRerollBook(item)) {
+            event.setCancelled(true);
+            MessageUtil.send(event.getPlayer(), "items.starter-book-no-drop");
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerDeathStarterBook(org.bukkit.event.entity.PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        java.util.List<ItemStack> toRestore = new java.util.ArrayList<>();
+        java.util.Iterator<ItemStack> iterator = event.getDrops().iterator();
+        while (iterator.hasNext()) {
+            ItemStack item = iterator.next();
+            if (ItemFactory.isStarterRerollBook(item)) {
+                toRestore.add(item.clone());
+                iterator.remove();
+            }
+        }
+        if (!toRestore.isEmpty()) {
+            this.starterBooksToRestore.put(player.getUniqueId(), toRestore);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerRespawnStarterBook(org.bukkit.event.player.PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        java.util.List<ItemStack> items = this.starterBooksToRestore.remove(player.getUniqueId());
+        if (items != null && !items.isEmpty()) {
+            for (ItemStack item : items) {
+                player.getInventory().addItem(item);
+            }
+        }
+    }
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) {
             return;
         }
         Player player = (Player)event.getWhoClicked();
+
+        if (event.getClickedInventory() != null && !(event.getClickedInventory().getHolder() instanceof Player)) {
+            ItemStack current = event.getCurrentItem();
+            ItemStack cursor = event.getCursor();
+            if (ItemFactory.isStarterRerollBook(current) || ItemFactory.isStarterRerollBook(cursor)) {
+                event.setCancelled(true);
+                MessageUtil.send(player, "items.starter-book-no-container");
+                return;
+            }
+        }
+        if (event.isShiftClick() && event.getClickedInventory() != null && event.getClickedInventory().getHolder() instanceof Player) {
+            ItemStack current = event.getCurrentItem();
+            if (ItemFactory.isStarterRerollBook(current)) {
+                if (event.getInventory() != null && !(event.getInventory().getHolder() instanceof Player)) {
+                    event.setCancelled(true);
+                    MessageUtil.send(player, "items.starter-book-no-container");
+                    return;
+                }
+            }
+        }
+
         Bukkit.getScheduler().runTask((Plugin)this.plugin, () -> {
             if (player.isOnline()) {
                 ItemFactory.upgradeInventoryItems(player);
             }
         });
+    }
+
+    @EventHandler
+    public void onInventoryDrag(org.bukkit.event.inventory.InventoryDragEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) return;
+        Player player = (Player) event.getWhoClicked();
+        if (ItemFactory.isStarterRerollBook(event.getOldCursor())) {
+            for (int slot : event.getRawSlots()) {
+                if (slot < event.getInventory().getSize() && !(event.getInventory().getHolder() instanceof Player)) {
+                    event.setCancelled(true);
+                    MessageUtil.send(player, "items.starter-book-no-container");
+                    return;
+                }
+            }
+        }
     }
 }
 

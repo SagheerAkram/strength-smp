@@ -40,6 +40,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -61,7 +62,7 @@ implements Listener {
     public WeaponShuffleGUI(StrengthSMP plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
-        this.inventory = Bukkit.createInventory(null, (int)27, (String)MessageUtil.color("&0&lDestiny Awakening..."));
+        this.inventory = Bukkit.createInventory(null, (int)27, (String)MessageUtil.get("gui.shuffle-title", "&0&lDestiny Awakening..."));
         this.maxSteps = 30 + new Random().nextInt(15);
         this.setupRollList();
         this.setupBorders();
@@ -80,7 +81,7 @@ implements Listener {
                     pool.add(type);
                 }
                 if (pool.isEmpty()) {
-                    pool.addAll(List.of(WeaponType.values()));
+                    pool.addAll(java.util.Arrays.asList(WeaponType.values()));
                 }
                 if (last != null && pool.contains((Object)last) && pool.size() > 1) {
                     pool.remove((Object)last);
@@ -90,7 +91,7 @@ implements Listener {
                 last = win;
                 continue;
             }
-            ArrayList<WeaponType> available = new ArrayList<WeaponType>(List.of(WeaponType.values()));
+            ArrayList<WeaponType> available = new ArrayList<WeaponType>(java.util.Arrays.asList(WeaponType.values()));
             if (last != null) {
                 available.remove((Object)last);
             }
@@ -189,7 +190,7 @@ implements Listener {
                 pool.add(type);
             }
             if (pool.isEmpty()) {
-                pool.addAll(List.of(WeaponType.values()));
+                pool.addAll(java.util.Arrays.asList(WeaponType.values()));
             }
             this.finalResult = (WeaponType)((Object)pool.get(new Random().nextInt(pool.size())));
         }
@@ -245,7 +246,7 @@ implements Listener {
                     CompatUtil.spawnParticle(WeaponShuffleGUI.this.player.getWorld(), "CRIT_MAGIC", ringPt, 1, 0.0, 0.0, 0.0, 0.01);
                 }
                 if (this.time % 5 == 0) {
-                    WeaponShuffleGUI.this.player.getWorld().playSound(base, Sound.BLOCK_AMETHYST_BLOCK_CHIME, 0.6f, 1.0f + (float)this.time * 0.006f);
+                    com.floki.strengthsmp.util.CompatUtil.playSound(WeaponShuffleGUI.this.player.getWorld(), base, "BLOCK_AMETHYST_BLOCK_CHIME", 0.6f, 1.0f + (float)this.time * 0.006f);
                 }
                 ++this.time;
             }
@@ -262,15 +263,17 @@ implements Listener {
     }
 
     private ItemStack getIcon(WeaponType type) {
-        return this.createNamedItem(switch (type) {
-            case SWORD -> Material.NETHERITE_SWORD;
-            case AXE -> Material.NETHERITE_AXE;
-            case TRIDENT -> Material.TRIDENT;
-            case SHIELD -> Material.SHIELD;
-            case BOW -> Material.BOW;
-            case CROSSBOW -> Material.CROSSBOW;
-            default -> Material.PAPER;
-        }, "&f" + type.getDisplayName());
+        Material icon;
+        switch (type) {
+            case SWORD: icon = Material.NETHERITE_SWORD; break;
+            case AXE: icon = Material.NETHERITE_AXE; break;
+            case TRIDENT: icon = Material.TRIDENT; break;
+            case SHIELD: icon = Material.SHIELD; break;
+            case BOW: icon = Material.BOW; break;
+            case CROSSBOW: icon = Material.CROSSBOW; break;
+            default: icon = Material.PAPER; break;
+        }
+        return this.createNamedItem(icon, "&f" + type.getDisplayName());
     }
 
     private ItemStack createNamedItem(Material mat, String name) {
@@ -286,6 +289,13 @@ implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent event) {
+        if (event.getInventory().equals((Object)this.inventory)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onDrag(InventoryDragEvent event) {
         if (event.getInventory().equals((Object)this.inventory)) {
             event.setCancelled(true);
         }

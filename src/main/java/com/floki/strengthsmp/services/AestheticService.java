@@ -1,31 +1,10 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  org.bukkit.Bukkit
- *  org.bukkit.ChatColor
- *  org.bukkit.Location
- *  org.bukkit.Material
- *  org.bukkit.Particle
- *  org.bukkit.Sound
- *  org.bukkit.World
- *  org.bukkit.entity.Item
- *  org.bukkit.entity.Player
- *  org.bukkit.inventory.ItemStack
- *  org.bukkit.inventory.meta.BookMeta
- *  org.bukkit.inventory.meta.ItemMeta
- *  org.bukkit.plugin.Plugin
- *  org.bukkit.scoreboard.Scoreboard
- *  org.bukkit.scoreboard.Team
- *  org.bukkit.scoreboard.Team$Option
- *  org.bukkit.scoreboard.Team$OptionStatus
- */
 package com.floki.strengthsmp.services;
 
 import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.data.WeaponType;
 import com.floki.strengthsmp.util.CompatUtil;
 import com.floki.strengthsmp.util.ItemFactory;
+import com.floki.strengthsmp.util.MessageUtil;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -114,7 +93,7 @@ public class AestheticService {
     }
 
     private void playSoulAura(Player p) {
-        p.getWorld().spawnParticle(Particle.SOUL, p.getLocation().add(0.0, 1.2, 0.0), 1, 0.2, 0.2, 0.2, 0.02);
+        CompatUtil.spawnParticle(p.getWorld(), "SOUL", p.getLocation().add(0.0, 1.2, 0.0), 1, 0.2, 0.2, 0.2, 0.02);
     }
 
     private void playMonarchAura(Player p) {
@@ -145,26 +124,37 @@ public class AestheticService {
         int kills = this.plugin.getDataManager().getKills(uuid);
         int deaths = this.plugin.getDataManager().getDeaths(uuid);
         int bounty = this.plugin.getDataManager().getBounty(uuid);
-        String className = type != null ? type.getDisplayName() : "Neutral";
+        String className = type != null ? type.getDisplayName() : "Unassigned";
         String classIcon = type != null ? type.getIcon() : "\u26aa";
+        
+        String title = MessageUtil.get("ledger.title", "  LEDGER OF LEGENDS");
+        String header = MessageUtil.get("ledger.header", "-------------------");
+        String warriorLabel = MessageUtil.get("ledger.warrior", "Warrior: ");
+        String strLabel = MessageUtil.get("ledger.strength", "Strength: ");
+        String classLabel = MessageUtil.get("ledger.class", "Class: ");
+        String bountyLabel = MessageUtil.get("ledger.bounty", "Bounty: ");
+        String killsLabel = MessageUtil.get("ledger.kills", "Kills: ");
+        String deathsLabel = MessageUtil.get("ledger.deaths", "Deaths: ");
+        String kdLabel = MessageUtil.get("ledger.kd", "K/D: ");
+        String footer = MessageUtil.get("ledger.footer", "Destiny is forged in blood.");
+
         StringBuilder page = new StringBuilder();
-        page.append(String.valueOf(ChatColor.DARK_RED) + String.valueOf(ChatColor.BOLD) + "  LEDGER OF LEGENDS\n");
-        page.append(String.valueOf(ChatColor.BLACK) + "-------------------\n");
-        page.append(String.valueOf(ChatColor.DARK_GRAY) + "Warrior: " + String.valueOf(ChatColor.BLUE) + target.getName() + "\n\n");
-        page.append(String.valueOf(ChatColor.BLACK) + "Strength: " + String.valueOf(ChatColor.DARK_RED) + strength + " STR\n");
-        page.append(String.valueOf(ChatColor.BLACK) + "Class: " + classIcon + " " + String.valueOf(ChatColor.DARK_PURPLE) + className + "\n");
-        page.append(String.valueOf(ChatColor.BLACK) + "Bounty: " + String.valueOf(ChatColor.GOLD) + bounty + " STR\n\n");
-        page.append(String.valueOf(ChatColor.BLACK) + "Kills: " + String.valueOf(ChatColor.DARK_GREEN) + kills + "\n");
-        page.append(String.valueOf(ChatColor.BLACK) + "Deaths: " + String.valueOf(ChatColor.RED) + deaths + "\n");
-        page.append(String.valueOf(ChatColor.BLACK) + "K/D: " + String.valueOf(ChatColor.DARK_GRAY) + String.valueOf(deaths == 0 ? Integer.valueOf(kills) : String.format("%.2f", (double)kills / (double)deaths)) + "\n");
-        page.append(String.valueOf(ChatColor.BLACK) + "-------------------\n");
-        page.append(String.valueOf(ChatColor.ITALIC) + "Destiny is forged in blood.");
+        page.append(ChatColor.DARK_RED).append(ChatColor.BOLD).append(title).append("\n");
+        page.append(ChatColor.BLACK).append(header).append("\n");
+        page.append(ChatColor.DARK_GRAY).append(warriorLabel).append(ChatColor.BLUE).append(target.getName()).append("\n\n");
+        page.append(ChatColor.BLACK).append(strLabel).append(ChatColor.DARK_RED).append(strength).append(" STR\n");
+        page.append(ChatColor.BLACK).append(classLabel).append(classIcon).append(" ").append(ChatColor.DARK_PURPLE).append(className).append("\n");
+        page.append(ChatColor.BLACK).append(bountyLabel).append(ChatColor.GOLD).append(bounty).append(" STR\n\n");
+        page.append(ChatColor.BLACK).append(killsLabel).append(ChatColor.DARK_GREEN).append(kills).append("\n");
+        page.append(ChatColor.BLACK).append(deathsLabel).append(ChatColor.RED).append(deaths).append("\n");
+        page.append(ChatColor.BLACK).append(kdLabel).append(ChatColor.DARK_GRAY).append(deaths == 0 ? kills : String.format("%.2f", (double)kills / (double)deaths)).append("\n");
+        page.append(ChatColor.BLACK).append(header).append("\n");
+        page.append(ChatColor.ITALIC).append(footer);
         meta.setPages(new String[]{page.toString()});
-        meta.setTitle("Ledger of Legends");
+        meta.setTitle(ChatColor.stripColor(title).trim());
         meta.setAuthor("Strength SMP");
         book.setItemMeta((ItemMeta)meta);
         viewer.openBook(book);
         viewer.playSound(viewer.getLocation(), Sound.ITEM_BOOK_PAGE_TURN, 1.0f, 1.0f);
     }
 }
-

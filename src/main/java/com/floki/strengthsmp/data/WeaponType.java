@@ -32,21 +32,24 @@ public enum WeaponType {
     }
 
     public String getDisplayName() {
-        return this.displayName;
+        return com.floki.strengthsmp.util.MessageUtil.get("weapons." + this.name().toLowerCase() + ".name", this.displayName);
     }
 
     public String getDescription() {
-        return this.description;
+        return com.floki.strengthsmp.util.MessageUtil.get("weapons." + this.name().toLowerCase() + ".desc", this.description);
     }
 
     public boolean isValidMaterial(Material material) {
+        if (material == null) {
+            return false;
+        }
         String name = material.name();
         switch (this) {
             case SWORD: {
                 return name.contains("SWORD");
             }
             case AXE: {
-                return name.contains("_AXE");
+                return name.contains("_AXE") || name.equals("AXE");
             }
             case BOW: {
                 return name.equals("BOW");

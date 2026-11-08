@@ -13,6 +13,7 @@ package com.floki.strengthsmp.services;
 
 import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.data.DataManager;
+import com.floki.strengthsmp.util.CompatUtil;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
@@ -46,7 +47,7 @@ public class ExperimentalManager {
                 }
                 UUID monarchId = ExperimentalManager.this.dataManager.getMonarch();
                 if (monarchId != null && (monarch = Bukkit.getPlayer((UUID)monarchId)) != null && monarch.isOnline()) {
-                    monarch.getWorld().spawnParticle(Particle.TOTEM, monarch.getLocation().add(0.0, 1.0, 0.0), 3, 0.5, 0.5, 0.5, 0.05);
+                    CompatUtil.spawnParticle(monarch.getWorld(), "TOTEM", monarch.getLocation().add(0.0, 1.0, 0.0), 3, 0.5, 0.5, 0.5, 0.05);
                     if (!monarch.getPlayerListName().contains("Monarch")) {
                         monarch.setPlayerListName("\u00a7e[\ud83d\udc51 Monarch] \u00a7r" + monarch.getName());
                     }
@@ -55,7 +56,7 @@ public class ExperimentalManager {
                     int bounty = ExperimentalManager.this.dataManager.getBounty(player.getUniqueId());
                     if (bounty < 2 || !(Math.random() < 0.3)) continue;
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASEDRUM, 1.0f, 0.5f);
-                    player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, player.getLocation().add(0.0, 1.0, 0.0), 5, 0.3, 0.3, 0.3, 0.02);
+                    CompatUtil.spawnParticle(player.getWorld(), "SMOKE_NORMAL", player.getLocation().add(0.0, 1.0, 0.0), 5, 0.3, 0.3, 0.3, 0.02);
                 }
                 if (Bukkit.getWorld((String)"world") != null) {
                     long time = Bukkit.getWorld((String)"world").getTime();

@@ -12,6 +12,7 @@ package com.floki.strengthsmp.commands;
 
 import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.commands.BaseCommand;
+import com.floki.strengthsmp.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -46,7 +47,7 @@ extends BaseCommand {
         this.plugin.getDataManager().clearNewbieProtection(target.getUniqueId());
         this.plugin.getDataManager().savePlayer(target.getUniqueId());
         this.sendSuccess(sender, "Removed newbie protection from <#f1c40f>" + target.getName() + "</#f1c40f>. They are now in the normal strength economy.");
-        this.sendMessage((CommandSender)target, "<#e74c3c><b>[ADMIN]</b></#e74c3c> <gray>Your newbie protection has been removed. You are now fully in the strength economy.</gray>");
+        MessageUtil.sendWithDefault(target, "commands.no-newbie-message", "<#e74c3c><b>[ADMIN]</b></#e74c3c> <gray>Your newbie protection has been removed. You are now fully in the strength economy.</gray>");
         this.plugin.getLogger().info("[NoNewbie] " + sender.getName() + " removed newbie protection from " + target.getName());
         return true;
     }

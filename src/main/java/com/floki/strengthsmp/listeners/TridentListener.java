@@ -25,6 +25,7 @@ package com.floki.strengthsmp.listeners;
 import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.data.WeaponType;
 import com.floki.strengthsmp.util.CompatUtil;
+import com.floki.strengthsmp.util.MessageUtil;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
@@ -65,7 +66,7 @@ implements Listener {
         }
         Player player = (Player)projectileSource;
         event.setCancelled(true);
-        player.sendMessage("\u00a7c\u00a7lYou cannot throw tridents! \u00a77Use it as a melee weapon.");
+        MessageUtil.sendWithDefault(player, "abilities.trident-no-throw", "§c§lYou cannot throw tridents! §7Use it as a melee weapon.");
         player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.8f, 1.0f);
     }
 
@@ -85,7 +86,7 @@ implements Listener {
         long now = System.currentTimeMillis();
         if (now - (lastUse = this.plugin.getDataManager().getAbilityCooldown(player.getUniqueId(), "trident_riptide")) < 15000L) {
             long remaining = (15000L - (now - lastUse)) / 1000L;
-            player.sendMessage("\u00a7cAbility on cooldown! (" + remaining + "s)");
+            MessageUtil.sendWithDefault(player, "abilities.ability-cooldown", "§cAbility on cooldown! (" + remaining + "s)", "remaining", String.valueOf(remaining));
             return;
         }
         this.triggerRiptide(player);

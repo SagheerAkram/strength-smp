@@ -3,6 +3,27 @@
 # All values are hot-reloadable with /strengthsmp reload
 # ═══════════════════════════════════════════════════════════════════════
 
+# Language configuration (Supported out-of-the-box: "en", "ru", "es", "de", "fr", "pt", "hi", "ur", "he")
+# Hot-switch runtime language using /strengthsmp lang <language>
+language: "en"
+
+# ─── Database Storage ───────────────────────────────────────────────────
+# Storage backend for player strength, weapons, kills, and Monarch status.
+# SQLITE and MYSQL are StrengthSMP Pro features; the free edition always uses YAML.
+# Options:
+#   "SQLITE" : Fast, local file database (database.db). Zero lag, immune to file corruption. (Recommended)
+#   "MYSQL"  : Synchronizes strength, stats, and Monarch across multiple servers (Bungee/Velocity networks).
+#   "YAML"   : Legacy playerdata.yml flatfile.
+database:
+  type: SQLITE
+  mysql:
+    host: "localhost"
+    port: 3306
+    database: "strengthsmp"
+    username: "root"
+    password: ""
+    table-prefix: "ssmp_"
+
 # ─── Core Strength Settings ─────────────────────────────────────────────
 strength:
   min: -10         # Minimum strength a player can reach
@@ -23,6 +44,10 @@ strength:
   # "DROP"   = Dropped as physical Strength Shard items on the ground at the victim's death location.
   # If not specified, it will fall back to the kill-transfer-style.
   bounty-transfer-style: DIRECT
+
+  # Lowest strength /withdraw may leave you at. Keeping this at 0 or above stops players
+  # dumping their strength into shards and then getting themselves eliminated on purpose.
+  withdraw-floor: 0
 
   # Underdog rule: negative-strength player killing a high-strength player gains more
   underdog-multiplier: 2  # multiplied strength gain
@@ -171,6 +196,9 @@ monarch:
   enabled: true
   glowing: true
   announcements: true
+  # The crown is re-checked daily at 05:00 in this timezone (e.g. "America/New_York", "Europe/London").
+  # Leave empty to use the server's own timezone.
+  daily-reset-timezone: ""
 
 # ─── Protection Settings ────────────────────────────────────────────────
 # Controls temporary immunity periods for players.
@@ -193,11 +221,11 @@ resource-pack:
   hosting:
     mode: "EXTERNAL"       # INTERNAL = plugin serves the pack / EXTERNAL = use url below
     internal-port: 8080
-    public-ip: "127.0.0.1"     # AUTO = detect server's public IP automatically
+    public-ip: "AUTO"     # AUTO = detect server's public IP automatically
   
   # --- External Link (used when mode is EXTERNAL) ---
-  url: "https://download.mc-packs.net/pack/373f6b038da9d35301d65f930be4d1e09701f8e2.zip"
-  hash: "373f6b038da9d35301d65f930be4d1e09701f8e2"
+  url: "https://download.mc-packs.net/pack/d3f983a4ceb7d2ae93ae470c87aca643569c9f33.zip"
+  hash: "d3f983a4ceb7d2ae93ae470c87aca643569c9f33"
   
   force: true
   prompt-message: "&6&lStrengthSMP &7requires a custom resource pack for the best experience. &fWould you like to install it?"
@@ -251,6 +279,13 @@ bind-system:
 # ─── Crafting Recipes Configuration ──────────────────────────────────────
 # You can customize the shape and ingredients for the custom recipes.
 # Material names must match Bukkit Material enum names (e.g. NETHERITE_INGOT).
+#
+# Rules:
+#   • "shape" takes 1-3 rows, all of the same length (1-3 characters each).
+#   • Use a space to leave a slot empty.
+#   • Every non-space character in the shape must appear under "ingredients".
+# If anything here is invalid, the plugin logs the reason and falls back to
+# its built-in recipe, so a typo can never break crafting.
 recipes:
   strength-item:
     shape:
@@ -259,9 +294,9 @@ recipes:
       - "DND"
     ingredients:
       D: DIAMOND_BLOCK
-      P: DIAMOND_PICKAXE
+      P: NETHERITE_PICKAXE
       E: ENDER_EYE
-      S: NETHERITE_INGOT
+      S: NETHERITE_SCRAP
       N: NETHER_STAR
   reroll-weapon:
     shape:
@@ -271,7 +306,7 @@ recipes:
     ingredients:
       D: DIAMOND
       H: TRIPWIRE_HOOK
-      S: PRISMARINE_CRYSTALS
+      S: PRISMARINE_SHARD
       W: WITHER_SKELETON_SKULL
       N: NETHER_STAR
 
@@ -281,3 +316,50 @@ recipes:
 metrics:
   enabled: true
   plugin-id: 31813
+
+# ─── Fair-Play Radar & Tracking ──────────────────────────────────────────
+# Compass and BossBar tracking for Monarch and Bounty targets.
+# Prevents coordinate sniffing: reveals ONLY direction, never distance.
+tracking:
+  enabled: true
+  # Duration in seconds the temporary soulbound compass and bossbar stay active (default: 5)
+  duration-seconds: 5
+  # Cooldown between tracking usages in seconds (3600 = 1 hour)
+  cooldown-seconds: 3600
+  # If true, server operators bypass cooldown. Set false so admins test with cooldown enabled.
+  op-bypass: false
+  # Bossbar settings
+  bossbar:
+    color: "RED"          # RED, YELLOW, BLUE, GREEN, PINK, PURPLE, WHITE
+    style: "SOLID"        # SOLID, SEGMENTED_6, SEGMENTED_10, SEGMENTED_12, SEGMENTED_20
+    # Placeholders: %target%, %direction%, %time_left%
+    monarch-title: "&6&l👑 TRACKING MONARCH: &e%target% &8| &b%direction% &8| &c%time_left%s"
+    bounty-title: "&c&l🎯 TRACKING BOUNTY: &e%target% &8| &b%direction% &8| &c%time_left%s"
+  # Compass display names & lore
+  compass:
+    monarch-name: "&6&l👑 ROYAL TRACKER &7(%time_left%s)"
+    bounty-name: "&c&l🎯 BOUNTY RADAR &7(%time_left%s)"
+    lore:
+      - "&8&m─────────────────────────"
+      - "&7Target: &e&l%target%"
+      - "&7Radar: &b%direction%"
+      - "&c⌛ Auto-vanishes in %time_left% seconds"
+      - "&4✖ Soulbound: Cannot be dropped, stored, or looted"
+      - "&8&m─────────────────────────"
+  # Direction labels displayed on the BossBar and Compass
+  directions:
+    ahead: "⬆ AHEAD"
+    right-ahead: "↗ RIGHT-AHEAD"
+    right: "➡ RIGHT"
+    right-behind: "↘ RIGHT-BEHIND"
+    left-ahead: "↖ LEFT-AHEAD"
+    left: "⬅ LEFT"
+    left-behind: "↙ LEFT-BEHIND"
+    behind: "⬇ BEHIND"
+    other-dimension: "🌀 OTHER DIMENSION"
+  # Messages
+  messages:
+    cooldown: "&c✖ Tracking is on cooldown! Please wait &e%time% &cbefore tracking again."
+    expired: "&8[&cTracker&8] &7The tracking signal has faded. Compass vanished!"
+    cannot-drop: "&c✖ Soulbound tracker cannot be dropped!"
+    cannot-store: "&c✖ Soulbound tracker cannot be placed in containers!"

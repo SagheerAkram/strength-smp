@@ -29,7 +29,7 @@ extends BaseCommand {
             return true;
         }
         Player player = (Player)sender;
-        this.plugin.getAestheticService().openStatsLedger(player, player);
+        new com.floki.strengthsmp.gui.StrengthHubGUI(this.plugin).open(player);
         return true;
     }
 }

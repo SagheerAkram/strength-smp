@@ -1,6 +1,6 @@
 name: StrengthSMP
-version: 1.1.6
-description: "Professional Strength PvP system for Minecraft Servers"
+version: "${plugin.version}"
+description: "Strength PvP & SMP system (${edition.name} edition)"
 main: com.floki.strengthsmp.StrengthSMP
 api-version: "1.13"
 authors:
@@ -43,7 +43,7 @@ commands:
     permission: strengthsmp.admin
 
   notimer:
-    description: Remove a player's 4-hour death protection
+    description: Remove a player's death and newbie protection timers
     usage: "/notimer <player>"
     permission: strengthsmp.admin
 
@@ -65,7 +65,14 @@ commands:
     description: Bind your class weapon to unlock its true power
     usage: "/bind"
 
+  hollow:
+    description: Your journal of trials in the Hollow
+    usage: "/hollow"
+
 permissions:
   strengthsmp.admin:
     description: Admin access to all strength commands
     default: op
+  strengthsmp.tracking.bypass:
+    description: Bypass radar tracking cooldown
+    default: false

@@ -24,7 +24,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 public class CombatCommandListener
 implements Listener {
     private final StrengthSMP plugin;
-    private static final Set<String> ALLOWED_COMMANDS = Set.of("whisper", "w", "msg", "tell", "message", "strength", "str", "power", "mimictest", "identity", "mimic");
+    private static final Set<String> ALLOWED_COMMANDS = new java.util.HashSet<String>(java.util.Arrays.asList("whisper", "w", "msg", "tell", "message", "strength", "str", "power", "mimictest", "identity", "mimic"));
 
     public CombatCommandListener(StrengthSMP plugin) {
         this.plugin = plugin;

@@ -28,6 +28,8 @@ import org.bukkit.inventory.ItemStack;
 public class StrengthService {
     private final StrengthSMP plugin;
     private final DataManager dataManager;
+    // attacker+victim -> times of recent rewarded kills, for anti-farm.max-kills-same-player
+    private final java.util.Map<String, java.util.ArrayDeque<Long>> recentKills = new HashMap<String, java.util.ArrayDeque<Long>>();
 
     public StrengthService(StrengthSMP plugin) {
         this.plugin = plugin;
@@ -67,7 +69,7 @@ public class StrengthService {
         int next = current + added;
         MessageUtil.send((CommandSender)player, "strength.gain", "strength", String.valueOf(next));
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.2f);
-        player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 1.5f);
+        CompatUtil.playSound(player, player.getLocation(), "BLOCK_AMETHYST_BLOCK_CHIME", 1.0f, 1.5f);
         CompatUtil.spawnParticle(player.getWorld(), "TOTEM", player.getLocation().add(0.0, 1.0, 0.0), 40, 0.5, 0.5, 0.5, 0.15);
         CompatUtil.spawnParticle(player.getWorld(), "VILLAGER_HAPPY", player.getLocation().add(0.0, 1.0, 0.0), 20, 0.5, 0.5, 0.5, 0.1);
         this.plugin.updateDisplay(player);
@@ -126,11 +128,21 @@ public class StrengthService {
         }
         boolean isFarm = false;
         if (!victimProtected) {
-            long lastKill = this.dataManager.getLastKillTime(attackerUUID, victimUUID);
             long windowMs = (long)(this.plugin.getConfigManager().getAntiFarmWindowMinutes() * 60) * 1000L;
-            if (lastKill > 0L && System.currentTimeMillis() - lastKill < windowMs) {
+            int maxKills = Math.max(1, this.plugin.getConfigManager().getMaxKillsSamePlayer());
+            long now = System.currentTimeMillis();
+            java.util.ArrayDeque<Long> times = this.recentKills.computeIfAbsent(attackerUUID + ":" + victimUUID, k -> new java.util.ArrayDeque<Long>());
+            while (!times.isEmpty() && now - times.peekFirst() >= windowMs) {
+                times.pollFirst();
+            }
+            if (times.size() >= maxKills) {
                 MessageUtil.send((CommandSender)attacker, "strength.anti-farm", new String[0]);
                 isFarm = true;
+            } else {
+                times.addLast(now);
+            }
+            if (this.recentKills.size() > 2000) {
+                this.recentKills.values().removeIf(d -> d.isEmpty() || now - d.peekLast() >= windowMs);
             }
         }
         boolean victimAtMin = false;
@@ -143,7 +155,13 @@ public class StrengthService {
         }
         if (!(victimProtected || isFarm || victimAtMin)) {
             int penalty = this.plugin.getConfigManager().getDeathPenalty();
-            this.removeStrength(victim, penalty);
+            if (this.removeStrength(victim, penalty) && this.plugin.getConfigManager().isDeathProtectionEnabled()) {
+                int hours = this.plugin.getConfigManager().getDeathProtectionHours();
+                if (hours > 0) {
+                    this.dataManager.setDeathProtection(victimUUID, System.currentTimeMillis() + (long)hours * 3600000L);
+                    MessageUtil.send((CommandSender)victim, "strength.protection-granted", "hours", String.valueOf(hours));
+                }
+            }
             if (this.dataManager.isNewbieProtected(attackerUUID)) {
                 MessageUtil.send((CommandSender)attacker, "strength.newbie-no-gain", new String[0]);
             } else if (this.dataManager.hasDeathProtection(attackerUUID)) {
@@ -158,6 +176,11 @@ public class StrengthService {
                     MessageUtil.send((CommandSender)attacker, "strength.underdog-bonus", "multiplier", String.valueOf(mult));
                 }
 
+                if (this.plugin.getRiftService() != null && this.plugin.getRiftService().isBloodMoonActive()) {
+                    gain *= 2;
+                    MessageUtil.send((CommandSender)attacker, "&c&l[BLOOD MOON] &eDouble Strength Kill Bonus Active! (2x Gain)");
+                }
+
                 String transferStyle = this.plugin.getConfigManager().getC().getString("strength.kill-transfer-style", "DIRECT");
                 if ("DROP".equalsIgnoreCase(transferStyle)) {
                     ItemStack shard = ItemFactory.createStrengthItem(gain);
@@ -168,8 +191,31 @@ public class StrengthService {
                 }
             }
         }
+        if (!(victimProtected || isFarm)) {
+            this.claimBounty(attacker, victim);
+        }
         this.dataManager.recordKill(attackerUUID, victimUUID);
         this.dataManager.addKill(attackerUUID);
+    }
+
+    private void claimBounty(Player attacker, Player victim) {
+        int bounty = this.dataManager.getBounty(victim.getUniqueId());
+        if (bounty <= 0) {
+            return;
+        }
+        this.dataManager.removeBounty(victim.getUniqueId());
+        this.plugin.getAestheticService().updateBountyGlow(victim, 0);
+        String style = this.plugin.getConfigManager().getC().getString("strength.bounty-transfer-style",
+                this.plugin.getConfigManager().getC().getString("strength.kill-transfer-style", "DIRECT"));
+        if ("DROP".equalsIgnoreCase(style)) {
+            victim.getWorld().dropItemNaturally(victim.getLocation(), ItemFactory.createStrengthItem(bounty));
+        } else {
+            this.addStrength(attacker, bounty);
+        }
+        this.plugin.getContractService().progressContract(attacker, "BOUNTY", 1);
+        MessageUtil.broadcast("bounty.claim", "player", attacker.getName(), "amount", String.valueOf(bounty), "target", victim.getName());
+        this.plugin.updateDisplay(victim);
+        this.plugin.getDiscordManager().updateDashboard();
     }
 
     private void handleMaxStrengthReward(Player player, int amount) {

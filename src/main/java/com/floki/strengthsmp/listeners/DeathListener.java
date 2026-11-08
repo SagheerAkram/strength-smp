@@ -51,6 +51,12 @@ implements Listener {
         Player victim = event.getEntity();
         Player attacker = victim.getKiller();
         UUID vUid = victim.getUniqueId();
+        com.floki.strengthsmp.api.HollowHook hollow = this.plugin.getHollowHook();
+        if (hollow != null && hollow.isHollowWorld(victim.getWorld())) {
+            return; // deaths inside the Hollow never touch strength
+        }
+        int strengthBefore = this.dataManager.getStrength(vUid);
+        boolean wasProtected = this.dataManager.isNewbieProtected(vUid) || this.dataManager.hasDeathProtection(vUid);
         this.dataManager.addDeath(vUid);
 
         boolean systemActive = this.dataManager.isSystemEnabled();
@@ -61,9 +67,15 @@ implements Listener {
             MessageUtil.send((org.bukkit.command.CommandSender)victim, "strength.maintenance-keep-inventory", new String[0]);
             return;
         }
+        if (!systemActive) {
+            return; // maintenance: no strength changes, whether or not inventories are kept
+        }
 
         if (this.plugin.getDiscordManager() != null) {
             this.plugin.getDiscordManager().logKill(attacker, victim, attacker != null ? 1 : 0);
+        }
+        if (hollow != null && hollow.shouldEliminate(victim, attacker, strengthBefore, wasProtected)) {
+            hollow.eliminate(victim, attacker);
         }
         if (attacker == null || attacker.equals((Object)victim)) {
             return;

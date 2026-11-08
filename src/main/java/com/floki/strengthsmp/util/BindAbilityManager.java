@@ -221,7 +221,7 @@ implements Listener {
         final int duration = this.plugin.getConfigManager().getVoidSingularityDuration();
         loc.getWorld().playSound(loc, Sound.BLOCK_PORTAL_TRIGGER, 1.0f, 0.5f);
         this.bowRapidFirePlayers.add(owner.getUniqueId());
-        owner.sendMessage("\u00a7d\u00a7lSUPERCHARGE \u00a7r\u00a77\u2014 Your bow has instant pull velocity!");
+        MessageUtil.sendWithDefault(owner, "abilities.supercharge", "§d§lSUPERCHARGE §r§7— Your bow has instant pull velocity!");
         owner.playSound(owner.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 1.5f);
         new BukkitRunnable(){
             int ticks = 0;
@@ -281,7 +281,7 @@ implements Listener {
             bestDot = dot;
         }
         if (victim == null) {
-            player.sendMessage("\u00a7c\u26a1 Scorpion Hook missed!");
+            MessageUtil.sendWithDefault(player, "abilities.scorpion-miss", "§c⚡ Scorpion Hook missed!");
             player.playSound(player.getLocation(), Sound.ENTITY_FISHING_BOBBER_RETRIEVE, 1.0f, 0.5f);
             return;
         }
@@ -302,12 +302,12 @@ implements Listener {
         Vector pull = player.getLocation().toVector().subtract(target.getLocation().toVector()).normalize().multiply(1.35).setY(0.25);
         target.setVelocity(pull);
         CompatUtil.spawnParticle(player.getWorld(), "EXPLOSION_NORMAL", target.getLocation(), 10, 0.3, 0.2, 0.3, 0.05);
-        target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 24, 10, false, false, false));
-        target.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 24, 200, false, false, false));
+        target.addPotionEffect(new PotionEffect(CompatUtil.resolvePotionEffect("SLOWNESS", "SLOW"), 24, 10, false, false, false));
+        target.addPotionEffect(new PotionEffect(CompatUtil.resolvePotionEffect("JUMP_BOOST", "JUMP"), 24, 200, false, false, false));
         if (target instanceof Player) {
-            ((Player)target).sendMessage("\u00a7c\u26a1 You were pulled and stunned by " + player.getName() + "'s Scorpion Hook!");
+            MessageUtil.sendWithDefault((Player)target, "abilities.scorpion-hit-target", "§c⚡ You were pulled and stunned by " + player.getName() + "'s Scorpion Hook!", "player", player.getName());
         }
-        player.sendMessage("\u00a7a\u26a1 Scorpion Hook hit! Dragged " + target.getName() + " directly to you!");
+        MessageUtil.sendWithDefault(player, "abilities.scorpion-hit-player", "§a⚡ Scorpion Hook hit! Dragged " + target.getName() + " directly to you!", "target", target.getName());
     }
 
     private void triggerPoseidonsWrath(Player player) {
@@ -382,7 +382,7 @@ implements Listener {
                     if (!(entity instanceof LivingEntity) || entity.equals((Object)player) || entity instanceof ArmorStand || !hitList.add((target = (LivingEntity)entity).getUniqueId())) continue;
                     Vector push = target.getLocation().subtract(player.getLocation()).toVector().normalize().multiply(1.45).setY(0.45);
                     target.setVelocity(push);
-                    target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 60, 1));
+                    target.addPotionEffect(new PotionEffect(CompatUtil.resolvePotionEffect("SLOWNESS", "SLOW"), 60, 1));
                     CompatUtil.spawnParticle(target.getWorld(), "FLASH", target.getLocation().add(0.0, 1.0, 0.0), 1);
                 }
                 ++this.tick;
@@ -409,7 +409,7 @@ implements Listener {
         event.setCancelled(true);
         if (player.getGameMode() != GameMode.CREATIVE) {
             if (!this.hasArrow(player)) {
-                player.sendMessage("\u00a7cYou have no arrows!");
+                MessageUtil.sendWithDefault(player, "abilities.no-arrows", "§cYou have no arrows!");
                 return;
             }
             this.consumeArrow(player);

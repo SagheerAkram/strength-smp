@@ -33,11 +33,15 @@ implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
+        this.sendPack(event.getPlayer());
+    }
+
+    /** Sends the resource pack to one player (on join, or from /strengthsmp pack). */
+    public void sendPack(final Player player) {
         if (!this.plugin.getConfigManager().isResourcePackEnabled()) {
             return;
         }
-        final Player player = event.getPlayer();
-        final String url = this.plugin.getResourcePackServer().getPackUrl();
+        final String url = this.plugin.getResourcePackServer().getPackUrl(player);
         String rawHash = this.plugin.getResourcePackServer().getPackHash();
         if (rawHash == null || rawHash.isEmpty()) {
             rawHash = this.plugin.getConfigManager().getResourcePackHash();

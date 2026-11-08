@@ -82,6 +82,8 @@ implements Listener {
         }
     }
 
+    private final java.util.Map<java.util.UUID, Long> lastInteractTime = new java.util.concurrent.ConcurrentHashMap<>();
+
     @EventHandler
     public void onSwordInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -91,18 +93,26 @@ implements Listener {
         if (this.plugin.getDataManager().getWeaponType(player.getUniqueId()) != WeaponType.SWORD) {
             return;
         }
-        if (!WeaponType.SWORD.isValidMaterial(player.getInventory().getItemInMainHand().getType())) {
+        org.bukkit.inventory.ItemStack mainHand = player.getInventory().getItemInMainHand();
+        if (mainHand == null || !WeaponType.SWORD.isValidMaterial(mainHand.getType())) {
             return;
         }
         long now = System.currentTimeMillis();
+        long lastClick = this.lastInteractTime.getOrDefault(player.getUniqueId(), 0L);
+        if (now - lastClick < 300L) {
+            return;
+        }
         if (player.isSneaking()) {
-            long cooldownMs;
+            long cooldownMs = 60000L;
             long lastUse = this.plugin.getDataManager().getAbilityCooldown(player.getUniqueId(), "sword_berserk");
-            if (now - lastUse < (cooldownMs = 60000L)) {
+            if (now - lastUse < cooldownMs) {
                 long remaining = (cooldownMs - (now - lastUse)) / 1000L;
                 player.sendMessage("\u00a7cBerserk is on cooldown! (" + remaining + "s)");
+                this.lastInteractTime.put(player.getUniqueId(), now);
                 return;
             }
+            this.lastInteractTime.put(player.getUniqueId(), now);
+            event.setCancelled(true);
             this.triggerBerserk(player);
             this.plugin.getDataManager().setAbilityCooldown(player.getUniqueId(), "sword_berserk", now);
         } else {
@@ -110,8 +120,11 @@ implements Listener {
             if (now - lastUse < 30000L) {
                 long remaining = (30000L - (now - lastUse)) / 1000L;
                 player.sendMessage("\u00a7cBlink is on cooldown! (" + remaining + "s)");
+                this.lastInteractTime.put(player.getUniqueId(), now);
                 return;
             }
+            this.lastInteractTime.put(player.getUniqueId(), now);
+            event.setCancelled(true);
             this.triggerBlink(player);
             this.plugin.getDataManager().setAbilityCooldown(player.getUniqueId(), "sword_blink", now);
         }
@@ -133,38 +146,64 @@ implements Listener {
 
     private void triggerBlink(Player player) {
         Location start = player.getLocation();
-        Location destination = start.clone();
-        Location eyeLoc = player.getEyeLocation();
-        Vector direction = eyeLoc.getDirection().normalize();
-        for (double d = 0.5; d <= 5.0; d += 0.5) {
-            Location check = start.clone().add(direction.clone().multiply(d));
+        Vector look = player.getEyeLocation().getDirection().normalize();
+        
+        double dx = look.getX();
+        double dz = look.getZ();
+        double horizDist = Math.sqrt(dx * dx + dz * dz);
+        if (horizDist > 0.001) {
+            dx /= horizDist;
+            dz /= horizDist;
+        }
+        double dy = Math.max(0.0, look.getY());
+
+        Location bestLocation = start.clone();
+        for (double d = 1.0; d <= 6.0; d += 0.5) {
+            Location check = start.clone().add(dx * d, dy * d, dz * d);
             Block feetBlock = check.getBlock();
             Block headBlock = check.clone().add(0.0, 1.0, 0.0).getBlock();
-            if (feetBlock.getType().isSolid() || headBlock.getType().isSolid()) break;
-            destination = check;
+
+            if (feetBlock.getType().isSolid()) {
+                Location stepUp = check.clone().add(0.0, 1.0, 0.0);
+                Block stepFeet = stepUp.getBlock();
+                Block stepHead = stepUp.clone().add(0.0, 1.0, 0.0).getBlock();
+                if (!stepFeet.getType().isSolid() && !stepHead.getType().isSolid()) {
+                    bestLocation = stepUp;
+                    continue;
+                } else {
+                    break;
+                }
+            }
+
+            if (headBlock.getType().isSolid()) {
+                break;
+            }
+
+            bestLocation = check;
         }
-        for (int safetyCounter = 0; destination.getBlock().getType().isSolid() && safetyCounter < 5; ++safetyCounter) {
-            destination.add(0.0, 1.0, 0.0);
-        }
-        destination.setYaw(start.getYaw());
-        destination.setPitch(start.getPitch());
+
+        bestLocation.setYaw(start.getYaw());
+        bestLocation.setPitch(start.getPitch());
+
         Location origin = start.clone().add(0.0, 1.0, 0.0);
         player.getWorld().playSound(origin, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 0.9f);
-        for (int i = 0; i < 30; ++i) {
-            double rx = (Math.random() - 0.5) * 1.0;
-            double ry = (Math.random() - 0.5) * 1.8;
-            double rz = (Math.random() - 0.5) * 1.0;
+        for (int i = 0; i < 25; ++i) {
+            double rx = (Math.random() - 0.5) * 0.8;
+            double ry = (Math.random() - 0.5) * 1.6;
+            double rz = (Math.random() - 0.5) * 0.8;
             CompatUtil.spawnParticle(player.getWorld(), "PORTAL", origin.clone().add(rx, ry, rz), 1, 0.0, 0.0, 0.0, 0.15);
         }
         CompatUtil.spawnParticle(player.getWorld(), "SPELL_WITCH", origin, 15, 0.4, 0.8, 0.4, 0.05);
         CompatUtil.spawnParticle(player.getWorld(), "DRAGON_BREATH", origin, 10, 0.3, 0.6, 0.3, 0.02);
-        player.teleport(destination);
-        Location dest = destination.clone().add(0.0, 1.0, 0.0);
+
+        player.teleport(bestLocation);
+
+        Location dest = bestLocation.clone().add(0.0, 1.0, 0.0);
         player.getWorld().playSound(dest, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, 1.2f);
-        for (int i = 0; i < 35; ++i) {
-            double rx = (Math.random() - 0.5) * 1.0;
-            double ry = (Math.random() - 0.5) * 1.8;
-            double rz = (Math.random() - 0.5) * 1.0;
+        for (int i = 0; i < 25; ++i) {
+            double rx = (Math.random() - 0.5) * 0.8;
+            double ry = (Math.random() - 0.5) * 1.6;
+            double rz = (Math.random() - 0.5) * 0.8;
             CompatUtil.spawnParticle(player.getWorld(), "PORTAL", dest.clone().add(rx, ry, rz), 1, 0.0, 0.0, 0.0, 0.15);
         }
         CompatUtil.spawnParticle(player.getWorld(), "SPELL_WITCH", dest, 20, 0.4, 0.8, 0.4, 0.05);

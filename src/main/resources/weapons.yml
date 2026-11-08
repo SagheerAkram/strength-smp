@@ -1,8 +1,8 @@
-# StrengthSMP Weapon Balancing
-# All values can be tuned here without code changes.
+# StrengthSMP Балансировка Оружия
+# Все значения настраиваются здесь.
 
 sword:
-  cosmetic-name: "&b&lDuelist Sword"
+  cosmetic-name: "&b&lМеч Дуэлянта"
   rename-on-bind: true
   custom-model-data: 12348
   passive-combo-hits: 3
@@ -14,9 +14,9 @@ sword:
     cooldown: 15
 
 axe:
-  cosmetic-name: "&c&lHeirloom Axe"
+  cosmetic-name: "&b&lЛунный Секира"
   rename-on-bind: true
-  custom-model-data: 12349
+  custom-model-data: 13010
   passive-crit-hits: 5
   stun-duration-ticks: 20
   bleed:
@@ -24,7 +24,7 @@ axe:
     ticks: 40
 
 bow:
-  cosmetic-name: "&e&lRecurve Bow"
+  cosmetic-name: "&e&lИзогнутый Лук"
   rename-on-bind: true
   custom-model-data: 12350
   explosion:
@@ -34,27 +34,27 @@ bow:
     knockback-v: 0.6
 
 crossbow:
-  cosmetic-name: "&6&lHeavy Crossbow"
+  cosmetic-name: "&b&lЛунный Арбалет"
   rename-on-bind: true
-  custom-model-data: 12351
+  custom-model-data: 13040
   pull-strength: 1.5
   chain:
     radius: 5.0
     pull-strength: 1.2
 
 trident:
-  cosmetic-name: "&3&lRoyal Trident"
+  cosmetic-name: "&a&lНезеритовая Коса"
   rename-on-bind: true
-  custom-model-data: 12352
+  custom-model-data: 12356
   lightning-hits: 4
   lightning-damage: 2.0
   speed-level: 1
   speed-ticks: 100
 
 shield:
-  cosmetic-name: "&f&lBulwark Shield"
+  cosmetic-name: "&b&lЛунный Эгис"
   rename-on-bind: true
-  custom-model-data: 12353
+  custom-model-data: 13020
   speed-level: 1
   speed-ticks: 100
   counter:

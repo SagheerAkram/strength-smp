@@ -47,6 +47,7 @@ import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.data.WeaponType;
 import com.floki.strengthsmp.util.BindAbilityManager;
 import com.floki.strengthsmp.util.CompatUtil;
+import com.floki.strengthsmp.util.ItemFactory;
 import com.floki.strengthsmp.util.MessageUtil;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -80,7 +81,9 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -162,6 +165,72 @@ implements Listener {
         }
     }
 
+    /** Runs after every other plugin: if the inventory is being kept, the weapon never left, so don't send a copy back. */
+    @EventHandler(priority=EventPriority.MONITOR)
+    public void onPlayerDeathFinal(PlayerDeathEvent event) {
+        UUID uuid = event.getEntity().getUniqueId();
+        List<ItemStack> queued = this.boundItemsToRestore.get(uuid);
+        if (queued == null) {
+            return;
+        }
+        if (event.getKeepInventory()) {
+            this.boundItemsToRestore.remove(uuid);
+            this.deathLocations.remove(uuid);
+            return;
+        }
+        this.plugin.getDataManager().setPendingBoundItems(uuid, queued);
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        final Player player = event.getPlayer();
+        if (this.plugin.getDataManager().getPendingBoundItems(player.getUniqueId()).isEmpty()) {
+            return;
+        }
+        Bukkit.getScheduler().runTaskLater((Plugin)this.plugin, () -> {
+            if (player.isOnline() && !player.isDead()) {
+                this.deliverPending(player);
+            }
+        }, 40L);
+    }
+
+    /** Hands back every bound weapon still owed to this player. */
+    private void deliverPending(Player player) {
+        List<ItemStack> pending = this.plugin.getDataManager().getPendingBoundItems(player.getUniqueId());
+        if (pending.isEmpty()) {
+            return;
+        }
+        this.plugin.getDataManager().setPendingBoundItems(player.getUniqueId(), null);
+        if (this.sealedByHollow(player, pending)) {
+            return;
+        }
+        for (ItemStack item : pending) {
+            this.giveOrDrop(player, item);
+        }
+        MessageUtil.sendWithDefault(player, "items.void-return", "&d&l⚡ &fYour bound weapon returned from the void. &d&l⚡");
+    }
+
+    private void giveOrDrop(Player player, ItemStack item) {
+        for (ItemStack left : player.getInventory().addItem(new ItemStack[]{item}).values()) {
+            player.getWorld().dropItem(player.getLocation(), left);
+        }
+    }
+
+    /** Marks one returned weapon as delivered. */
+    private void markDelivered(Player player, ItemStack item) {
+        List<ItemStack> pending = this.plugin.getDataManager().getPendingBoundItems(player.getUniqueId());
+        if (pending.isEmpty()) {
+            return;
+        }
+        for (int i = 0; i < pending.size(); ++i) {
+            if (pending.get(i).isSimilar(item)) {
+                pending.remove(i);
+                break;
+            }
+        }
+        this.plugin.getDataManager().setPendingBoundItems(player.getUniqueId(), pending);
+    }
+
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         if (!this.plugin.getConfigManager().isBindSystemEnabled()) {
@@ -171,6 +240,16 @@ implements Listener {
         List<ItemStack> items = this.boundItemsToRestore.remove(player.getUniqueId());
         Location deathLoc = this.deathLocations.remove(player.getUniqueId());
         if (items == null || deathLoc == null) {
+            // Nothing in memory (restart or rejoin while dead): hand back anything still owed from disk.
+            Bukkit.getScheduler().runTaskLater((Plugin)this.plugin, () -> {
+                if (player.isOnline() && !player.isDead()) {
+                    this.deliverPending(player);
+                }
+            }, 2L);
+            return;
+        }
+        if (this.sealedByHollow(player, items)) {
+            this.plugin.getDataManager().setPendingBoundItems(player.getUniqueId(), null);
             return;
         }
         for (ItemStack item : items) {
@@ -181,13 +260,20 @@ implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        List<ItemStack> items = this.boundItemsToRestore.remove(player.getUniqueId());
-        if (items != null) {
-            for (ItemStack item : items) {
-                player.getInventory().addItem(new ItemStack[]{item});
-            }
-        }
+        // Anything still owed stays in the pending list on disk and is handed back on the next join.
+        this.boundItemsToRestore.remove(player.getUniqueId());
         this.deathLocations.remove(player.getUniqueId());
+        this.abilityCooldowns.remove(player.getUniqueId());
+    }
+
+    /** A bound weapon never follows its owner into the Hollow; it is held until they escape. */
+    private boolean sealedByHollow(Player player, List<ItemStack> items) {
+        com.floki.strengthsmp.api.HollowHook hollow = this.plugin.getHollowHook();
+        if (hollow == null || !hollow.isPrisoner(player.getUniqueId()) || !hollow.sealsBoundWeapons()) {
+            return false;
+        }
+        hollow.sealIntoCustody(player.getUniqueId(), items);
+        return true;
     }
 
     @EventHandler
@@ -197,15 +283,13 @@ implements Listener {
         }
         Player player = event.getPlayer();
         ItemStack item = event.getItemDrop().getItemStack();
-        this.plugin.getLogger().info("[DEBUG] onPlayerDropItem fired for " + player.getName() + " with " + String.valueOf(item != null ? item.getType() : "null"));
         if (this.isOwnActiveBoundItem(item, player.getUniqueId())) {
-            this.plugin.getLogger().info("[DEBUG] onPlayerDropItem: isOwnActiveBoundItem = true! Triggering ability...");
             event.setCancelled(true);
             WeaponType type = WeaponType.fromMaterial(item.getType());
             if (type != WeaponType.SHIELD) {
                 this.handleBoundAbilityTrigger(player, item);
             } else {
-                player.sendMessage(MessageUtil.parse("&d&l\u26a1 &7Use your Swap Item key (F) to use the Shield ability!"));
+                MessageUtil.sendWithDefault(player, "items.swap-key-hint", "&d&l⚡ &7Use your Swap Item key (F) to use the Shield ability!");
             }
         }
     }
@@ -252,7 +336,7 @@ implements Listener {
             if (remainingSec <= 0L) {
                 remainingSec = 1L;
             }
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText((String)MessageUtil.parse("&e&l\u26a1 &7Bound Ability on cooldown! &c(" + remainingSec + "s)")));
+            MessageUtil.sendActionBar(player, "items.actionbar-cooldown", "&e&l⚡ &7Bound Ability on cooldown! &c(%remaining%s)", "remaining", String.valueOf(remainingSec));
             return;
         }
         this.abilityCooldowns.put(player.getUniqueId(), now);
@@ -291,24 +375,38 @@ implements Listener {
         }
         if (this.isSomeoneElsesActiveBoundItem(clickedItem, event.getWhoClicked().getUniqueId())) {
             event.setCancelled(true);
-            event.getWhoClicked().sendMessage(MessageUtil.parse("&d&l\u26a1 &7This weapon is bound to another soul!"));
+            MessageUtil.sendWithDefault(event.getWhoClicked(), "items.bound-to-another", "&d&l⚡ &7This weapon is bound to another soul!");
             return;
         }
         if (this.isSomeoneElsesActiveBoundItem(cursorItem, event.getWhoClicked().getUniqueId())) {
             event.setCancelled(true);
-            event.getWhoClicked().sendMessage(MessageUtil.parse("&d&l\u26a1 &7This weapon is bound to another soul!"));
+            MessageUtil.sendWithDefault(event.getWhoClicked(), "items.bound-to-another", "&d&l⚡ &7This weapon is bound to another soul!");
             return;
         }
         Inventory topInv = event.getView().getTopInventory();
+        if (topInv != null && this.isContainerInventory(event.getView(), topInv) && event.getClickedInventory() != null && event.getClickedInventory().equals((Object)topInv)) {
+            // Number keys and F move a hotbar/offhand item straight into the clicked slot.
+            ItemStack swapped = null;
+            if (event.getClick() == org.bukkit.event.inventory.ClickType.NUMBER_KEY && event.getHotbarButton() >= 0) {
+                swapped = event.getWhoClicked().getInventory().getItem(event.getHotbarButton());
+            } else if ("SWAP_OFFHAND".equals(event.getClick().name())) {
+                swapped = event.getWhoClicked().getInventory().getItemInOffHand();
+            }
+            if (this.isOwnActiveBoundItem(swapped, event.getWhoClicked().getUniqueId()) || this.isSomeoneElsesActiveBoundItem(swapped, event.getWhoClicked().getUniqueId())) {
+                event.setCancelled(true);
+                MessageUtil.sendWithDefault(event.getWhoClicked(), "items.cannot-store-container", "&d&l⚡ &7You cannot store your bound weapon in containers!");
+                return;
+            }
+        }
         if (topInv != null && this.isContainerInventory(event.getView(), topInv)) {
             if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY && this.isOwnActiveBoundItem(clickedItem, event.getWhoClicked().getUniqueId())) {
                 event.setCancelled(true);
-                event.getWhoClicked().sendMessage(MessageUtil.parse("&d&l\u26a1 &7You cannot store your bound weapon in containers!"));
+                MessageUtil.sendWithDefault(event.getWhoClicked(), "items.cannot-store-container", "&d&l⚡ &7You cannot store your bound weapon in containers!");
                 return;
             }
             if (event.getClickedInventory() != null && event.getClickedInventory().equals((Object)topInv) && (this.isOwnActiveBoundItem(cursorItem, event.getWhoClicked().getUniqueId()) || this.isOwnActiveBoundItem(clickedItem, event.getWhoClicked().getUniqueId()))) {
                 event.setCancelled(true);
-                event.getWhoClicked().sendMessage(MessageUtil.parse("&d&l\u26a1 &7You cannot store your bound weapon in containers!"));
+                MessageUtil.sendWithDefault(event.getWhoClicked(), "items.cannot-store-container", "&d&l⚡ &7You cannot store your bound weapon in containers!");
                 return;
             }
         }
@@ -327,13 +425,13 @@ implements Listener {
                 int slot = (Integer)iterator.next();
                 if (slot >= topInv.getSize()) continue;
                 event.setCancelled(true);
-                event.getWhoClicked().sendMessage(MessageUtil.parse("&d&l\u26a1 &7You cannot store your bound weapon in containers!"));
+                MessageUtil.sendWithDefault(event.getWhoClicked(), "items.cannot-store-container", "&d&l⚡ &7You cannot store your bound weapon in containers!");
                 return;
             }
         }
         if (this.isSomeoneElsesActiveBoundItem(item, event.getWhoClicked().getUniqueId())) {
             event.setCancelled(true);
-            event.getWhoClicked().sendMessage(MessageUtil.parse("&d&l\u26a1 &7This weapon is bound to another soul!"));
+            MessageUtil.sendWithDefault(event.getWhoClicked(), "items.bound-to-another", "&d&l⚡ &7This weapon is bound to another soul!");
         }
     }
 
@@ -344,10 +442,23 @@ implements Listener {
             return;
         }
         Player player = event.getPlayer();
-        ItemStack held = player.getInventory().getItemInMainHand();
+        ItemStack held = event.getHand() == org.bukkit.inventory.EquipmentSlot.OFF_HAND ? player.getInventory().getItemInOffHand() : player.getInventory().getItemInMainHand();
         if ((this.isOwnActiveBoundItem(held, player.getUniqueId()) || this.isSomeoneElsesActiveBoundItem(held, player.getUniqueId())) && ((clicked = event.getRightClicked()) instanceof ItemFrame || clicked instanceof ArmorStand)) {
             event.setCancelled(true);
-            player.sendMessage(MessageUtil.parse("&d&l\u26a1 &7You cannot place your bound weapon on this!"));
+            MessageUtil.sendWithDefault(player, "items.cannot-place-item", "&d&l⚡ &7You cannot place your bound weapon on this!");
+        }
+    }
+
+    @EventHandler(ignoreCancelled=true)
+    public void onArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
+        if (!this.plugin.getConfigManager().isBindSystemEnabled()) {
+            return;
+        }
+        Player player = event.getPlayer();
+        ItemStack given = event.getPlayerItem();
+        if (this.isOwnActiveBoundItem(given, player.getUniqueId()) || this.isSomeoneElsesActiveBoundItem(given, player.getUniqueId())) {
+            event.setCancelled(true);
+            MessageUtil.sendWithDefault(player, "items.cannot-place-item", "&d&l⚡ &7You cannot place your bound weapon on this!");
         }
     }
 
@@ -518,8 +629,9 @@ implements Listener {
                 ++this.ticks;
                 if (!player.isOnline() || flyingItem.isDead() || this.ticks > maxDuration) {
                     if (player.isOnline()) {
-                        player.getInventory().addItem(new ItemStack[]{itemStack});
-                        player.sendMessage(MessageUtil.parse("&d&l\u26a1 &fYour bound weapon returned from the void. &d&l\u26a1"));
+                        BindListener.this.giveOrDrop(player, itemStack);
+                        BindListener.this.markDelivered(player, itemStack);
+                        MessageUtil.sendWithDefault(player, "items.void-return", "&d&l⚡ &fYour bound weapon returned from the void. &d&l⚡");
                     }
                     flyingItem.remove();
                     this.cancel();
@@ -528,9 +640,10 @@ implements Listener {
                 Location target = player.getEyeLocation().subtract(0.0, 0.5, 0.0);
                 double distance = currentPos.distance(target);
                 if (distance < 1.5) {
-                    player.getInventory().addItem(new ItemStack[]{itemStack});
+                    BindListener.this.giveOrDrop(player, itemStack);
+                    BindListener.this.markDelivered(player, itemStack);
                     player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_RETURN, 1.0f, 1.0f);
-                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText((String)MessageUtil.parse("&d&l\u26a1 Bound Weapon Returned! \u26a1")));
+                    MessageUtil.sendActionBar(player, "items.actionbar-returned", "&d&l⚡ Bound Weapon Returned! ⚡");
                     flyingItem.remove();
                     this.cancel();
                     return;
@@ -555,7 +668,7 @@ implements Listener {
                     nearby.setVelocity(push);
                     if (nearby instanceof Player) {
                         Player targetPlayer = (Player)nearby;
-                        targetPlayer.sendMessage(MessageUtil.parse("&d&l\u26a1 &7You were knocked aside by a returning bound weapon!"));
+                        MessageUtil.sendWithDefault(targetPlayer, "items.return-knockback", "&d&l⚡ &7You were knocked aside by a returning bound weapon!");
                     }
                     currentPos.getWorld().playSound(nearby.getLocation(), Sound.ENTITY_PHANTOM_BITE, 1.0f, 0.5f);
                 }
@@ -591,41 +704,7 @@ implements Listener {
     }
 
     private void revertBoundItem(ItemStack item) {
-        if (item == null || !item.hasItemMeta()) {
-            return;
-        }
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) {
-            return;
-        }
-        meta.getPersistentDataContainer().remove(this.boundKey);
-        meta.getPersistentDataContainer().remove(this.itemIdKey);
-        NamespacedKey origCmdKey = new NamespacedKey((Plugin)this.plugin, "smp_original_cmd");
-        NamespacedKey origNameKey = new NamespacedKey((Plugin)this.plugin, "smp_original_name");
-        if (meta.getPersistentDataContainer().has(origCmdKey, PersistentDataType.INTEGER)) {
-            int origCmd = (Integer)meta.getPersistentDataContainer().get(origCmdKey, PersistentDataType.INTEGER);
-            meta.setCustomModelData(Integer.valueOf(origCmd));
-            meta.getPersistentDataContainer().remove(origCmdKey);
-        } else {
-            meta.setCustomModelData(null);
-        }
-        List<String> lore = meta.getLore();
-        if (lore != null) {
-            String prefix = MessageUtil.parse(this.plugin.getConfigManager().getBindLorePrefix());
-            lore.removeIf(line -> line.contains("BOUND WEAPON") || line.contains(prefix));
-            meta.setLore(lore);
-        }
-        if (meta.getPersistentDataContainer().has(origNameKey, PersistentDataType.STRING)) {
-            String origName = (String)meta.getPersistentDataContainer().get(origNameKey, PersistentDataType.STRING);
-            meta.setDisplayName(origName);
-            meta.getPersistentDataContainer().remove(origNameKey);
-        } else if (meta.hasDisplayName()) {
-            String displayName = meta.getDisplayName();
-            String strippedName = ChatColor.stripColor((String)displayName);
-            strippedName = strippedName.replace("\u26a1", "").trim();
-            meta.setDisplayName(MessageUtil.color("&f" + strippedName));
-        }
-        item.setItemMeta(meta);
+        ItemFactory.unbindItem(item);
     }
 }
 

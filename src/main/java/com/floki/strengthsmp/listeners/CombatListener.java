@@ -28,6 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class CombatListener
@@ -83,6 +84,12 @@ implements Listener {
         Long tagExpiry = this.combatTag.get(uuid);
         if (tagExpiry != null && tagExpiry > System.currentTimeMillis()) {
             UUID attackerUUID = this.lastAttacker.get(uuid);
+            if (!this.penaltyAllowed(uuid, attackerUUID)) {
+                this.plugin.getLogger().info(player.getName() + " logged out in combat: no penalty (protection or anti-farm).");
+                this.combatTag.remove(uuid);
+                this.lastAttacker.remove(uuid);
+                return;
+            }
             Player attacker = attackerUUID != null ? Bukkit.getPlayer((UUID)attackerUUID) : null;
             String attackerName = attacker != null ? attacker.getName() : "Unknown";
             MessageUtil.broadcast("combat.penalty", "player", player.getName(), "killer", attackerName);
@@ -95,6 +102,33 @@ implements Listener {
                 this.plugin.getDataManager().addKill(attackerUUID);
             }
         }
+        this.combatTag.remove(uuid);
+        this.lastAttacker.remove(uuid);
+    }
+
+    /** Same rules as a real kill, so logging out can't be used to feed strength to an alt. */
+    private boolean penaltyAllowed(UUID victim, UUID attacker) {
+        com.floki.strengthsmp.data.DataManager dm = this.plugin.getDataManager();
+        if (dm.isNewbieProtected(victim) || dm.hasDeathProtection(victim)) {
+            return false;
+        }
+        if (attacker != null) {
+            if (dm.isNewbieProtected(attacker) || dm.hasDeathProtection(attacker)) {
+                return false;
+            }
+            long lastKill = dm.getLastKillTime(attacker, victim);
+            long windowMs = (long)(this.plugin.getConfigManager().getAntiFarmWindowMinutes() * 60) * 1000L;
+            if (lastKill > 0L && System.currentTimeMillis() - lastKill < windowMs) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** Dying ends combat, so quitting on the respawn screen isn't punished a second time. */
+    @EventHandler(priority=EventPriority.MONITOR)
+    public void onDeath(PlayerDeathEvent event) {
+        UUID uuid = event.getEntity().getUniqueId();
         this.combatTag.remove(uuid);
         this.lastAttacker.remove(uuid);
     }

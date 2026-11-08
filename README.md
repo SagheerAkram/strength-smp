@@ -2,11 +2,11 @@
   <img src="https://cdn.modrinth.com/data/cached_images/bed2b23cc62873fd95ae03c36db515e82b5b00b4.png" alt="StrengthSMP Banner" width="600"/>
 </p>
 
-<h1 align="center">⚔️ StrengthSMP (v1.1.6) ⚔️</h1>
+<h1 align="center">⚔️ StrengthSMP (v1.1.12) ⚔️</h1>
 
 <p align="center">
   <b>The Ultimate Competitive Strength PvP Overhaul for Minecraft Servers</b><br/>
-  <i>Ultra-Lightweight • Universally Compatible (1.16.5 - 1.21.4+) • Fully Customizable</i>
+  <i>Ultra-Lightweight • Universally Compatible (1.16 - 26.x) • Fully Customizable</i>
 </p>
 
 <p align="center">
@@ -18,21 +18,23 @@
 
 ---
 
-## 🌟 What's New in Version 1.1.6?
+## 🌟 What's New in Version 1.1.12?
 
-* **✨ Enhanced Administrative Controls:** Added full TabCompleter support for `/strengthsmp` and new commands like `/bountyrefund`, `/notimer`, `/nonewbie`, and `/killreset`.
-* **🎨 Visual & Particle Polish:** Fine-tuned particle rendering engine and model textures across modern client versions (1.20.x - 1.21.4+).
-* **🗡️ Weapon Soul-Binding (`/bind`):** Bind your weapon class to your soul for 1 Strength. Retain your bound weapon upon death with dynamic Loyalty return animations.
-* **📜 Grimoire Statistics Tracking:** Track Souls Harvested, Victims Log, Total Damage Dealt, Soul Sacrifices, and Ability Activation metrics directly inside `/bind` GUI.
-* **⚡ PlaceholderAPI 2.0 Integration:** Complete set of expansion placeholders for strength levels, rank titles, contracts, active bounties, monarch tracking, and combat statuses.
-* **🌐 Discord Webhook Expansion:** Integrated real-time Discord notifications for Monarch victories, Season resets, and admin announcements (`/announce`).
+* **🎯 Bounties pay out:** whoever kills the target now claims the bounty. Refunded bounties no longer come back after a restart.
+* **🗡️ Bound weapons are safe:** no more duplicates with keep-inventory, never lost on logout or restart, and they can't be slipped into chests or onto armor stands.
+* **⚔️ Fairer combat:** weapon damage keeps vanilla's attack cooldown, enchantments and crits. Combat-logging follows the same protection and anti-farm rules as a real kill.
+* **💾 Safer saving:** no overlapping writes, no half-written files after a crash, and the shutdown save always runs.
+* **🛡️ Protection that works:** death protection, `anti-farm.max-kills-same-player` and `combat.grace-period` now behave as configured.
+* **🌍 Runs on 1.16:** fixed crashes on 1.16 servers.
+
+Full notes are on the release pages.
 
 ---
 
 ## 🔗 Official Links
 - 🛒 **BuiltByBit (BBB):** [Official Resource Page](https://builtbybit.com/resources/strength-smp-by-floki.105677/)
 - 🌐 **SpigotMC:** [Spigot Resource](https://www.spigotmc.org/resources/strength-smp.134679/)
-- 🟢 **Modrinth:** [Modrinth Page](https://modrinth.com/plugin/strength-smp-)
+- 🟢 **Modrinth:** [Modrinth Page](https://modrinth.com/plugin/strength-smp-sagheerakram)
 - 🔥 **CurseForge:** [CurseForge Resource](https://www.curseforge.com/minecraft/bukkit-plugins/strength-smp)
 - 🐙 **GitHub Repo:** [SagheerAkram/strength-smp](https://github.com/SagheerAkram/strength-smp)
 

@@ -22,6 +22,7 @@ package com.floki.strengthsmp.listeners;
 import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.data.WeaponType;
 import com.floki.strengthsmp.util.CompatUtil;
+import com.floki.strengthsmp.util.MessageUtil;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -99,7 +100,7 @@ implements Listener {
         long now = System.currentTimeMillis();
         if (now - (lastUse = this.plugin.getDataManager().getAbilityCooldown(player.getUniqueId(), "shield_reflect")) < 40000L) {
             long remaining = (40000L - (now - lastUse)) / 1000L;
-            player.sendMessage("\u00a7cAbility on cooldown! (" + remaining + "s)");
+            MessageUtil.sendWithDefault(player, "abilities.ability-cooldown", "§cAbility on cooldown! (" + remaining + "s)", "remaining", String.valueOf(remaining));
             return;
         }
         this.triggerReflect(player);
@@ -108,14 +109,14 @@ implements Listener {
 
     private void triggerReflect(Player player) {
         this.reflecting.add(player.getUniqueId());
-        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 140, 1));
-        player.sendMessage("\u00a76\u00a7lSHIELD ACTIVE \u00a7r\u00a77\u2014 Reflecting all damage & Resistance II for 7s!");
+        player.addPotionEffect(new PotionEffect(CompatUtil.resolvePotionEffect("RESISTANCE", "DAMAGE_RESISTANCE"), 140, 1));
+        MessageUtil.sendWithDefault(player, "abilities.shield-active", "§6§lSHIELD ACTIVE §r§7— Reflecting all damage & Resistance II for 7s!");
         player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0f, 1.5f);
         CompatUtil.spawnParticle(player.getWorld(), "ENCHANTMENT_TABLE", player.getLocation(), 100, 0.5, 1.0, 0.5, 0.1);
         Bukkit.getScheduler().runTaskLater((Plugin)this.plugin, () -> {
             this.reflecting.remove(player.getUniqueId());
             if (player.isOnline()) {
-                player.sendMessage("\u00a7cReflect has worn off.");
+                MessageUtil.sendWithDefault(player, "abilities.shield-ended", "§cReflect has worn off.");
             }
         }, 140L);
     }

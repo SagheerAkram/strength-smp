@@ -22,6 +22,7 @@ package com.floki.strengthsmp.listeners;
 import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.data.WeaponType;
 import com.floki.strengthsmp.util.CompatUtil;
+import com.floki.strengthsmp.util.MessageUtil;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
@@ -67,29 +68,30 @@ implements Listener {
         }
         int strength = this.plugin.getDataManager().getStrength(attacker.getUniqueId());
         if (strength >= 1 && (stunTicks = this.plugin.getConfigManager().getAxeStunTicks()) > 0) {
-            victim.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, stunTicks, 10, false, false, false));
-            victim.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, stunTicks, 200, false, false, false));
+            victim.addPotionEffect(new PotionEffect(CompatUtil.resolvePotionEffect("SLOWNESS", "SLOW"), stunTicks, 10, false, false, false));
+            victim.addPotionEffect(new PotionEffect(CompatUtil.resolvePotionEffect("JUMP_BOOST", "JUMP"), stunTicks, 200, false, false, false));
             CompatUtil.spawnParticle(victim.getWorld(), "CRIT", victim.getLocation().add(0.0, 1.0, 0.0), 10, 0.2, 0.2, 0.2, 0.05);
             victim.getWorld().playSound(victim.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1.0f, 0.5f);
             if (victim instanceof Player) {
                 Player playerVictim = (Player)victim;
-                playerVictim.sendMessage("\u00a7cYou have been stunned by an axe strike!");
+                MessageUtil.sendWithDefault(playerVictim, "abilities.axe-stunned", "§cYou have been stunned by an axe strike!");
             }
         }
         if (victim instanceof Player) {
             Player playerVictim = (Player)victim;
             if (Math.random() < 0.1) {
                 playerVictim.setCooldown(Material.SHIELD, 100);
-                playerVictim.sendMessage("\u00a7cYour shield has been disabled by an axe strike!");
+                MessageUtil.sendWithDefault(playerVictim, "abilities.axe-shield-disabled", "§cYour shield has been disabled by an axe strike!");
                 playerVictim.playSound(playerVictim.getLocation(), Sound.ITEM_SHIELD_BREAK, 1.0f, 1.0f);
                 attacker.playSound(attacker.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0f, 0.5f);
             }
         }
     }
 
+    private final java.util.Map<java.util.UUID, Long> lastAxeInteract = new java.util.concurrent.ConcurrentHashMap<>();
+
     @EventHandler
     public void onAxeInteract(PlayerInteractEvent event) {
-        long lastUse;
         Player player = event.getPlayer();
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
@@ -97,15 +99,24 @@ implements Listener {
         if (this.plugin.getDataManager().getWeaponType(player.getUniqueId()) != WeaponType.AXE) {
             return;
         }
-        if (!WeaponType.AXE.isValidMaterial(player.getInventory().getItemInMainHand().getType())) {
+        org.bukkit.inventory.ItemStack mainHand = player.getInventory().getItemInMainHand();
+        if (mainHand == null || !WeaponType.AXE.isValidMaterial(mainHand.getType())) {
             return;
         }
         long now = System.currentTimeMillis();
-        if (now - (lastUse = this.plugin.getDataManager().getAbilityCooldown(player.getUniqueId(), "axe_pound")) < 25000L) {
-            long remaining = (25000L - (now - lastUse)) / 1000L;
-            player.sendMessage("\u00a7cAbility on cooldown! (" + remaining + "s)");
+        long lastClick = this.lastAxeInteract.getOrDefault(player.getUniqueId(), 0L);
+        if (now - lastClick < 300L) {
             return;
         }
+        long lastUse = this.plugin.getDataManager().getAbilityCooldown(player.getUniqueId(), "axe_pound");
+        if (now - lastUse < 25000L) {
+            long remaining = (25000L - (now - lastUse)) / 1000L;
+            MessageUtil.sendWithDefault(player, "abilities.ability-cooldown", "§cAbility on cooldown! (" + remaining + "s)", "remaining", String.valueOf(remaining));
+            this.lastAxeInteract.put(player.getUniqueId(), now);
+            return;
+        }
+        this.lastAxeInteract.put(player.getUniqueId(), now);
+        event.setCancelled(true);
         this.triggerGroundPound(player);
         this.plugin.getDataManager().setAbilityCooldown(player.getUniqueId(), "axe_pound", now);
     }

@@ -20,9 +20,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.Serializable;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -37,14 +34,12 @@ import org.bukkit.plugin.Plugin;
 
 public class DiscordManager {
     private final StrengthSMP plugin;
-    private final HttpClient httpClient;
     private final LinkedList<String> killFeed = new LinkedList();
     private final AtomicBoolean isUpdating = new AtomicBoolean(false);
     private long lastUpdate = 0L;
 
     public DiscordManager(StrengthSMP plugin, String unused) {
         this.plugin = plugin;
-        this.httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
     }
 
     public void connect() {
@@ -94,22 +89,21 @@ public class DiscordManager {
                 } else {
                     finalUrl = webhookUrl + "?wait=true";
                 }
-                HttpRequest request = HttpRequest.newBuilder().uri(URI.create((String)finalUrl)).header("Content-Type", "application/json").method(method, HttpRequest.BodyPublishers.ofString(payload.toString())).build();
-                HttpResponse<String> response = this.httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-                if (response.statusCode() == 404 && method.equals("PATCH")) {
+                WebhookHttp.Response response = WebhookHttp.send(method, (String)finalUrl, payload.toString());
+                if (response.status == 404 && method.equals("PATCH")) {
                     this.plugin.getDataManager().setLeaderboardMessageId(null);
                     this.isUpdating.set(false);
                     this.updateDashboard();
                     return;
                 }
-                if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                if (response.status >= 200 && response.status < 300) {
                     JsonObject responseJson;
-                    if (method.equals("POST") && (responseJson = JsonParser.parseString((String)response.body()).getAsJsonObject()).has("id")) {
+                    if (method.equals("POST") && (responseJson = new JsonParser().parse(response.body).getAsJsonObject()).has("id")) {
                         String newId = responseJson.get("id").getAsString();
                         this.plugin.getDataManager().setLeaderboardMessageId(newId);
                     }
                 } else {
-                    this.plugin.getLogger().warning("Discord Webhook error: " + response.statusCode() + " - " + response.body());
+                    this.plugin.getLogger().warning("Discord Webhook error: " + response.status + " - " + response.body);
                 }
             }
             catch (Exception e) {
@@ -243,19 +237,32 @@ public class DiscordManager {
         if (url == null || url.isEmpty() || url.equals("YOUR_WEBHOOK_URL_HERE")) {
             return;
         }
-        Bukkit.getScheduler().runTaskAsynchronously((Plugin)this.plugin, () -> {
+        Runnable task = () -> {
             try {
                 JsonObject payload = new JsonObject();
                 JsonArray embeds = new JsonArray();
                 embeds.add((JsonElement)embed);
                 payload.add("embeds", (JsonElement)embeds);
-                HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(payload.toString())).build();
-                this.httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                WebhookHttp.send("POST", url, payload.toString());
             }
             catch (Exception e) {
                 this.plugin.getLogger().warning("Failed to send Discord webhook: " + e.getMessage());
             }
-        });
+        };
+        if (!this.plugin.isEnabled()) {
+            // Shutting down: the scheduler refuses new tasks, so send on a short-lived thread instead.
+            Thread thread = new Thread(task, "StrengthSMP-Webhook");
+            thread.setDaemon(true);
+            thread.start();
+            try {
+                thread.join(3000L);
+            }
+            catch (InterruptedException interruptedException) {
+                Thread.currentThread().interrupt();
+            }
+            return;
+        }
+        Bukkit.getScheduler().runTaskAsynchronously((Plugin)this.plugin, task);
     }
 
     public boolean isConnected() {

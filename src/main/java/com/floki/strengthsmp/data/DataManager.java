@@ -24,6 +24,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -59,9 +62,18 @@ public class DataManager {
     private String leaderboardMessageId = null;
     private String monarchMessageId = null;
     private boolean systemEnabled = true;
+    private final DatabaseManager databaseManager;
+    // One background thread writes playerdata.yml, so writes never overlap and stay in order.
+    private final ExecutorService fileWriter = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "StrengthSMP-DataWriter");
+        t.setDaemon(true);
+        return t;
+    });
+    private final Object fileLock = new Object();
 
     public DataManager(StrengthSMP plugin) {
         this.plugin = plugin;
+        this.databaseManager = new DatabaseManager(plugin);
         this.dataFile = new File(plugin.getDataFolder(), "playerdata.yml");
         this.loadData();
     }
@@ -181,6 +193,9 @@ public class DataManager {
             this.monarchStartTime = System.currentTimeMillis() + 3600000L;
             this.data.set("system.monarch_start_time", (Object)this.monarchStartTime);
         }
+        if (this.databaseManager != null && this.databaseManager.getType() != DatabaseManager.DatabaseType.YAML) {
+            this.databaseManager.loadAll(this);
+        }
         this.printDistributionReport();
     }
 
@@ -198,11 +213,28 @@ public class DataManager {
     }
 
     public void saveAll() {
+        this.saveAll(true);
+    }
+
+    /** Autosave: snapshots on the main thread, writes the file and database in the background. */
+    public void saveAllAsync() {
+        this.saveAll(false);
+    }
+
+    private void saveAll(boolean sync) {
+        if (!Bukkit.isPrimaryThread()) {
+            // The YAML tree is only touched on the main thread; hop over instead of racing it.
+            if (this.plugin.isEnabled()) {
+                Bukkit.getScheduler().runTask((org.bukkit.plugin.Plugin)this.plugin, () -> this.saveAll(false));
+            }
+            return;
+        }
         HashSet<UUID> allUuids = new HashSet<UUID>();
         allUuids.addAll(this.strengthCache.keySet());
         allUuids.addAll(this.receivedFreeRerollCache.keySet());
         allUuids.addAll(this.weaponCache.keySet());
         allUuids.addAll(this.playerContractsCache.keySet());
+        allUuids.addAll(this.bountyCache.keySet());
         for (UUID uuid : allUuids) {
             this.savePlayerToConfig(uuid);
         }
@@ -215,12 +247,56 @@ public class DataManager {
         this.data.set("system.last_monarch_update", (Object)this.lastMonarchUpdate);
         this.data.set("system.monarch_start_time", (Object)this.monarchStartTime);
         this.data.set("system.monarch_uuid", this.monarchUUID != null ? this.monarchUUID.toString() : null);
-        this.saveConfigToDisk();
+        if (sync) {
+            this.flushWrites();
+            this.writeYaml(this.data.saveToString());
+            this.saveDatabase();
+        } else {
+            String snapshot = this.data.saveToString();
+            this.fileWriter.execute(() -> {
+                this.writeYaml(snapshot);
+                this.saveDatabase();
+            });
+        }
+    }
+
+    private void saveDatabase() {
+        if (this.databaseManager != null) {
+            this.databaseManager.saveAllSync(this);
+            this.databaseManager.saveSystemVariable("monarch_uuid", this.monarchUUID != null ? this.monarchUUID.toString() : "");
+            this.databaseManager.saveSystemVariable("last_monarch_update", String.valueOf(this.lastMonarchUpdate));
+            this.databaseManager.saveSystemVariable("monarch_start_time", String.valueOf(this.monarchStartTime));
+            this.databaseManager.saveSystemVariable("system_enabled", String.valueOf(this.systemEnabled));
+        }
+    }
+
+    /** Waits for queued background writes, then stops the writer. Call once on shutdown. */
+    public void shutdown() {
+        this.saveAll(true);
+        this.fileWriter.shutdown();
+    }
+
+    private void flushWrites() {
+        try {
+            this.fileWriter.submit(() -> {}).get(10L, TimeUnit.SECONDS);
+        }
+        catch (Exception exception) {
+            // writer already stopped or stuck; the sync write below still goes through
+        }
     }
 
     public void savePlayer(UUID uuid) {
+        if (!Bukkit.isPrimaryThread()) {
+            if (this.plugin.isEnabled()) {
+                Bukkit.getScheduler().runTask((org.bukkit.plugin.Plugin)this.plugin, () -> this.savePlayer(uuid));
+            }
+            return;
+        }
         this.savePlayerToConfig(uuid);
         this.saveConfigToDisk();
+        if (this.databaseManager != null) {
+            this.databaseManager.savePlayerAsync(uuid, this);
+        }
     }
 
     private void savePlayerToConfig(UUID uuid) {
@@ -248,6 +324,10 @@ public class DataManager {
         this.data.set(path + ".death_protection_expiry", (Object)(dpExp != null ? dpExp : 0L));
         Long nbExp = this.newbieProtectionExpiryCache.get(uuid);
         this.data.set(path + ".newbie_protection_expiry", (Object)(nbExp != null ? nbExp : 0L));
+        // Clear map-shaped sections first, or removed entries survive in the file and come back on restart.
+        this.data.set(path + ".bounties", null);
+        this.data.set(path + ".contract_progress", null);
+        this.data.set(path + ".ability_cooldowns", null);
         Map<UUID, Integer> bounties = this.bountyCache.get(uuid);
         if (bounties != null && !bounties.isEmpty()) {
             for (Map.Entry<UUID, Integer> e : bounties.entrySet()) {
@@ -275,16 +355,29 @@ public class DataManager {
     }
 
     private void saveConfigToDisk() {
-        try {
-            File tempFile = new File(this.plugin.getDataFolder(), "playerdata.yml.tmp");
-            this.data.save(tempFile);
-            if (this.dataFile.exists()) {
-                this.dataFile.delete();
-            }
-            tempFile.renameTo(this.dataFile);
+        if (!this.plugin.isEnabled() || this.fileWriter.isShutdown()) {
+            this.writeYaml(this.data.saveToString());
+            return;
         }
-        catch (IOException e) {
-            this.plugin.getLogger().severe("Failed to save data safely: " + e.getMessage());
+        String snapshot = this.data.saveToString();
+        this.fileWriter.execute(() -> this.writeYaml(snapshot));
+    }
+
+    private void writeYaml(String yaml) {
+        synchronized (this.fileLock) {
+            try {
+                File tempFile = new File(this.plugin.getDataFolder(), "playerdata.yml.tmp");
+                java.nio.file.Files.write(tempFile.toPath(), yaml.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                try {
+                    java.nio.file.Files.move(tempFile.toPath(), this.dataFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+                }
+                catch (java.nio.file.AtomicMoveNotSupportedException e) {
+                    java.nio.file.Files.move(tempFile.toPath(), this.dataFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+            catch (IOException e) {
+                this.plugin.getLogger().severe("Failed to save data safely: " + e.getMessage());
+            }
         }
     }
 
@@ -557,6 +650,12 @@ public class DataManager {
         return this.monarchUUID;
     }
 
+    public void setMonarch(UUID uuid) {
+        this.monarchUUID = uuid;
+        this.monarchStartTime = System.currentTimeMillis();
+        this.saveAll();
+    }
+
     public long getMonarchStartTime() {
         return this.monarchStartTime;
     }
@@ -706,9 +805,7 @@ public class DataManager {
     }
 
     public void initializePlayer(UUID uuid) {
-        if (!this.weaponCache.containsKey(uuid)) {
-            this.weaponCache.put(uuid, WeaponType.getRandomWeapon());
-        }
+        // New players start with no weapon assigned until they use their free starter reroll book
         if (!this.strengthCache.containsKey(uuid)) {
             this.strengthCache.put(uuid, this.plugin.getConfigManager().getDefaultStrength());
         }
@@ -738,23 +835,23 @@ public class DataManager {
     }
 
     public Map<UUID, Integer> getStrengthCache() {
-        return new HashMap<UUID, Integer>(this.strengthCache);
+        return this.strengthCache;
     }
 
     public Map<UUID, Integer> getKillsCache() {
-        return new HashMap<UUID, Integer>(this.killsCache);
+        return this.killsCache;
     }
 
     public Map<UUID, Integer> getDeathsCache() {
-        return new HashMap<UUID, Integer>(this.deathsCache);
+        return this.deathsCache;
     }
 
     public Map<UUID, WeaponType> getWeaponCache() {
-        return new HashMap<UUID, WeaponType>(this.weaponCache);
+        return this.weaponCache;
     }
 
     public Map<UUID, Map<UUID, Integer>> getBountyCache() {
-        return new HashMap<UUID, Map<UUID, Integer>>(this.bountyCache);
+        return this.bountyCache;
     }
 
     public String getDashboardMessageId() {
@@ -790,6 +887,26 @@ public class DataManager {
 
     public void setSystemEnabled(boolean e) {
         this.systemEnabled = e;
+        this.saveAll();
+    }
+
+    /** Bound weapons waiting to be handed back after a death, kept on disk so a quit or crash can't eat them. */
+    public List<org.bukkit.inventory.ItemStack> getPendingBoundItems(UUID uuid) {
+        List<?> raw = this.data.getList("players." + String.valueOf(uuid) + ".pending_bound", null);
+        ArrayList<org.bukkit.inventory.ItemStack> items = new ArrayList<org.bukkit.inventory.ItemStack>();
+        if (raw != null) {
+            for (Object o : raw) {
+                if (o instanceof org.bukkit.inventory.ItemStack) {
+                    items.add((org.bukkit.inventory.ItemStack)o);
+                }
+            }
+        }
+        return items;
+    }
+
+    public void setPendingBoundItems(UUID uuid, List<org.bukkit.inventory.ItemStack> items) {
+        this.data.set("players." + String.valueOf(uuid) + ".pending_bound", items == null || items.isEmpty() ? null : new ArrayList<org.bukkit.inventory.ItemStack>(items));
+        this.saveConfigToDisk();
     }
 
     public String getBoundWeaponId(UUID uuid) {
@@ -867,5 +984,29 @@ public class DataManager {
         this.data.set(path, (Object)(count + 1));
         this.incrementBoundStat(uuid, "kills");
     }
+
+    public void setSystemVariableFromDb(String k, String v) {
+        if ("monarch_uuid".equalsIgnoreCase(k)) {
+            try { this.monarchUUID = UUID.fromString(v); } catch (Exception ignored) {}
+        } else if ("last_monarch_update".equalsIgnoreCase(k)) {
+            try { this.lastMonarchUpdate = Long.parseLong(v); } catch (Exception ignored) {}
+        } else if ("monarch_start_time".equalsIgnoreCase(k)) {
+            try { this.monarchStartTime = Long.parseLong(v); } catch (Exception ignored) {}
+        } else if ("system_enabled".equalsIgnoreCase(k)) {
+            this.systemEnabled = Boolean.parseBoolean(v);
+        }
+    }
+
+    public Map<UUID, Boolean> getReceivedFreeRerollCache() { return this.receivedFreeRerollCache; }
+    public Map<UUID, Long> getPunishmentExpiryCache() { return this.punishmentExpiryCache; }
+    public Map<UUID, Long> getDeathProtectionExpiryCache() { return this.deathProtectionExpiryCache; }
+    public Map<UUID, Long> getNewbieProtectionExpiryCache() { return this.newbieProtectionExpiryCache; }
+    public Map<UUID, List<String>> getPlayerContractsCache() { return this.playerContractsCache; }
+    public Map<UUID, Map<String, Integer>> getContractProgressCache() { return this.contractProgressCache; }
+    public Map<UUID, Set<String>> getPlayerSkillsCache() { return this.playerSkillsCache; }
+    public Map<UUID, Map<String, Long>> getAbilityCooldownCache() { return this.abilityCooldownCache; }
+    public Map<UUID, Map<UUID, Long>> getKillHistoryCache() { return this.killHistoryCache; }
+    public DatabaseManager getDatabaseManager() { return this.databaseManager; }
+    public FileConfiguration getData() { return this.data; }
 }
 

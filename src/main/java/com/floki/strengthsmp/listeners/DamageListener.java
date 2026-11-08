@@ -48,7 +48,11 @@ implements Listener {
             return;
         }
         Player victim = (Player)event.getEntity();
-        if (victim.getTicksLived() < 100) {
+        String cause = event.getCause().name();
+        if ("VOID".equals(cause) || "SUICIDE".equals(cause) || "KILL".equals(cause) || "WORLD_BORDER".equals(cause)) {
+            return;
+        }
+        if (victim.getTicksLived() < this.plugin.getConfigManager().getGracePeriod() * 20) {
             event.setCancelled(true);
         }
     }
@@ -122,20 +126,15 @@ implements Listener {
         }
 
         if (itemType != null) {
-            baseDamage = switch (itemType) {
-                case SWORD -> 7.0;
-                case AXE -> 9.0;
-                case TRIDENT -> {
-                    if (event.getDamager() instanceof Trident) {
-                        yield 13.5;
-                    }
-                    yield 9.0;
-                }
-                case SHIELD -> 3.0;
-                case BOW -> event.getDamage();
-                case CROSSBOW -> event.getDamager().hasMetadata("crossbow_burst") ? 8.0 : event.getDamage();
-                default -> event.getDamage();
-            };
+            switch (itemType) {
+                // Melee keeps vanilla's damage (attack cooldown, weapon tier, enchantments, crits) and only scales it.
+                case SWORD: baseDamage = event.getDamage(); break;
+                case AXE: baseDamage = event.getDamage(); break;
+                case TRIDENT: baseDamage = event.getDamager() instanceof Trident ? 13.5 : event.getDamage(); break;
+                case SHIELD: baseDamage = 3.0; break;
+                case CROSSBOW: baseDamage = event.getDamager().hasMetadata("crossbow_burst") ? 8.0 : event.getDamage(); break;
+                default: baseDamage = event.getDamage(); break; // bow
+            }
         }
 
         double finalDamage = baseDamage * strengthMultiplier;
@@ -159,15 +158,15 @@ implements Listener {
         if (perStr > 0.0) {
             return 1.0 + (strength * perStr);
         }
-        return switch (strength) {
-            case 0 -> 0.85;
-            case 1 -> 0.95;
-            case 2 -> 1.0;
-            case 3 -> 1.1;
-            case 4 -> 1.18;
-            case 5 -> 1.25;
-            default -> strength > 5 ? (1.0 + (strength * 0.05)) : 0.85;
-        };
+        switch (strength) {
+            case 0: return 0.85;
+            case 1: return 0.95;
+            case 2: return 1.0;
+            case 3: return 1.1;
+            case 4: return 1.18;
+            case 5: return 1.25;
+            default: return strength > 5 ? (1.0 + (strength * 0.05)) : 0.85;
+        }
     }
 }
 

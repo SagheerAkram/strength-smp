@@ -8,7 +8,6 @@
  *  org.bukkit.Material
  *  org.bukkit.NamespacedKey
  *  org.bukkit.Sound
- *  org.bukkit.enchantments.Enchantment
  *  org.bukkit.entity.Entity
  *  org.bukkit.entity.Item
  *  org.bukkit.entity.Player
@@ -31,10 +30,11 @@ package com.floki.strengthsmp.gui;
 import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.data.WeaponType;
 import com.floki.strengthsmp.util.CompatUtil;
+import com.floki.strengthsmp.util.ItemFactory;
 import com.floki.strengthsmp.util.MessageUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -43,7 +43,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -61,361 +60,132 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class BindGUI
-implements Listener {
+public class BindGUI implements Listener {
+
+    public static class WeaponSkin {
+        private final int cmd;
+        private final String name;
+        private final String description;
+
+        public WeaponSkin(int cmd, String name, String description) {
+            this.cmd = cmd;
+            this.name = name;
+            this.description = description;
+        }
+
+        public int getCmd() {
+            return this.cmd;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public String getDescription() {
+            return this.description;
+        }
+    }
+
     private final StrengthSMP plugin;
     private final Player player;
-    private final Inventory inventory;
+    private final Inventory mainInventory;
+    private final Inventory selectInventory;
+    private ItemStack weaponInSlot;
     private int selectedModelData;
+    private boolean isSwitchingView = false;
 
     public BindGUI(StrengthSMP plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
-        this.inventory = Bukkit.createInventory(null, (int)27, (String)MessageUtil.color("&d&l\u26a1 Weapon Binding \u26a1"));
+        this.mainInventory = Bukkit.createInventory(null, 27, MessageUtil.get("gui.bind-title", "&d&l⚡ Weapon Binding ⚡"));
+        this.selectInventory = Bukkit.createInventory(null, 27, MessageUtil.get("gui.bind-select-title", "&d&l⚡ Choose Weapon Model ⚡"));
+        
         WeaponType playerClass = plugin.getDataManager().getWeaponType(player.getUniqueId());
-        this.selectedModelData = this.getChosenSkinForClass(playerClass);
-        this.setupBorders();
+        this.selectedModelData = this.getDefaultSkinForClass(playerClass);
+        
+        this.setupMainBorders();
         this.updateSlots();
-        Bukkit.getPluginManager().registerEvents((Listener)this, (Plugin)plugin);
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    private void setupBorders() {
-        ItemStack border = this.createItem(Material.PURPLE_STAINED_GLASS_PANE, "&8 ");
-        for (int i = 0; i < 27; ++i) {
-            if (i == 2 || i == 3 || i == 4 || i == 5 || i == 6 || i == 7 || i == 11 || i == 13 || i == 15) continue;
-            this.inventory.setItem(i, border);
-        }
-    }
-
-    private void setupSkinSelection() {
-        WeaponType playerClass = this.plugin.getDataManager().getWeaponType(this.player.getUniqueId());
-        ItemStack border = this.createItem(Material.PURPLE_STAINED_GLASS_PANE, "&8 ");
-        for (int i = 18; i < 27; ++i) {
-            this.inventory.setItem(i, border);
-        }
-        if (playerClass == null) {
-            return;
-        }
-        switch (playerClass) {
-            case SWORD: {
-                this.addSkinItem(22, Material.NETHERITE_SWORD, 13501, "&c&lInferno Sword", "&7A blazing blade forged in the depths of the Nether.");
-                break;
-            }
-            case TRIDENT: {
-                this.addSkinItem(22, Material.TRIDENT, 13250, "&7&lNecros Trident", "&7A soul-infused weapon forged from deep sea graves.");
-                break;
-            }
-            case AXE: {
-                this.addSkinItem(22, Material.NETHERITE_AXE, 13210, "&7&lNecros Axe", "&7A soul-harvesting weapon fueled by dark magic.");
-                break;
-            }
-            case BOW: {
-                this.addSkinItem(22, Material.BOW, 13030, "&b&lLunar Bow", "&7A celestial recurve bow reflecting moonlight.");
-                break;
-            }
-            case CROSSBOW: {
-                this.addSkinItem(22, Material.CROSSBOW, 13240, "&7&lNecros Crossbow", "&7A heavy repeating arbalest powered by nether energy.");
-                break;
-            }
-            case SHIELD: {
-                this.addSkinItem(22, Material.SHIELD, 13520, "&c&lInferno Shield", "&7A protective aegis forged in active volcanos.");
-            }
-        }
-    }
-
-    private void addSkinItem(int slot, Material material, int cmd, String name, String desc) {
-        ItemStack item = new ItemStack(material);
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(MessageUtil.color(name));
-            meta.setCustomModelData(Integer.valueOf(cmd));
-            NamespacedKey skinCmdKey = new NamespacedKey((Plugin)this.plugin, "gui_skin_cmd");
-            meta.getPersistentDataContainer().set(skinCmdKey, PersistentDataType.INTEGER, cmd);
-            ArrayList<String> lore = new ArrayList<String>();
-            lore.add(MessageUtil.color(desc));
-            lore.add("");
-            if (this.selectedModelData == cmd) {
-                lore.add(MessageUtil.color("&7Status: &a&lSELECTED"));
-                lore.add(MessageUtil.color("&eThis skin will be applied on binding."));
-                meta.addEnchant(Enchantment.DURABILITY, 1, true);
-                meta.addItemFlags(new ItemFlag[]{ItemFlag.HIDE_ENCHANTS});
-            } else {
-                lore.add(MessageUtil.color("&7Status: &cNot Selected"));
-                lore.add("");
-                lore.add(MessageUtil.color("&eClick to select this skin!"));
-            }
-            meta.setLore(lore);
-            item.setItemMeta(meta);
-        }
-        this.inventory.setItem(slot, item);
-    }
-
-    private int getChosenSkinForClass(WeaponType type) {
+    public static List<WeaponSkin> getSkinsForClass(WeaponType type) {
+        List<WeaponSkin> list = new ArrayList<WeaponSkin>();
         if (type == null) {
-            return 0;
+            return list;
         }
         switch (type) {
             case SWORD: {
-                return 13501;
-            }
-            case TRIDENT: {
-                return 13250;
+                list.add(new WeaponSkin(12348, "&b&lDuelist Katana", "&7Razor-sharp katana of the swift duelist."));
+                list.add(new WeaponSkin(13001, "&b&lCrescent Moonblade", "&7Luminous celestial blade infused with moonlight."));
+                list.add(new WeaponSkin(13501, "&c&lHellfire Blade", "&7Blazing infernal blade forged in the depths of the Nether."));
+                break;
             }
             case AXE: {
-                return 13210;
+                list.add(new WeaponSkin(13010, "&b&lLunar Cleaver", "&7Massive glowing crescent battleaxe of starlight."));
+                list.add(new WeaponSkin(13410, "&6&lDragon Waraxe", "&7Ancient dragonbone greataxe that shatters defenses."));
+                list.add(new WeaponSkin(13510, "&c&lDemon's Hatchet", "&7Smoldering infernal hatchet that rends armor."));
+                break;
             }
             case BOW: {
-                return 13030;
+                list.add(new WeaponSkin(12350, "&e&lRecurve Bow", "&7A finely crafted recurve bow with smooth tension."));
+                list.add(new WeaponSkin(13030, "&b&lLunar Longbow", "&7Radiant recurve bow that channels starry constellations."));
+                list.add(new WeaponSkin(13530, "&c&lHellfire Bow", "&7Volcanic bow unleashing devastating searing barrages."));
+                break;
             }
             case CROSSBOW: {
-                return 13240;
+                list.add(new WeaponSkin(13040, "&b&lLunar Arbalest", "&7Celestial heavy arbalest firing star-infused bolts."));
+                list.add(new WeaponSkin(13440, "&6&lDragon Ballista", "&7Devastating siege ballista carved from dragon bone."));
+                list.add(new WeaponSkin(13540, "&c&lHellfire Launcher", "&7Launches searing bolts of explosive hellfire."));
+                break;
+            }
+            case TRIDENT: {
+                list.add(new WeaponSkin(12356, "&a&lNetherite Scythe", "&7Lethal curved executioner scythe of harvesting."));
+                list.add(new WeaponSkin(13050, "&b&lLunar Trident", "&7Forged from stellar iron to harness the cosmic tides."));
+                list.add(new WeaponSkin(13550, "&c&lInfernal Trident", "&7Forged in magma to command waves of nether flame."));
+                break;
             }
             case SHIELD: {
-                return 13220;
+                list.add(new WeaponSkin(13020, "&b&lLunar Aegis", "&7Celestial barrier protecting against all mortal assault."));
+                list.add(new WeaponSkin(13420, "&6&lDragon Scale Bulwark", "&7Impenetrable shield forged from ancient dragon scales."));
+                list.add(new WeaponSkin(13520, "&c&lDemon's Bulwark", "&7Protective aegis forged in active magma vents."));
+                break;
             }
+        }
+        return list;
+    }
+
+    private int getDefaultSkinForClass(WeaponType type) {
+        List<WeaponSkin> skins = getSkinsForClass(type);
+        if (!skins.isEmpty()) {
+            return skins.get(0).getCmd();
         }
         return 0;
     }
 
-    private boolean isValidSkinForClass(WeaponType type, int cmd) {
-        if (type == null) {
-            return false;
+    private void setupMainBorders() {
+        ItemStack border = this.createItem(Material.PURPLE_STAINED_GLASS_PANE, "&8 ");
+        for (int i = 0; i < 27; ++i) {
+            if (i == 2 || i == 3 || i == 4 || i == 5 || i == 6 || i == 11 || i == 13 || i == 15 || i == 22) continue;
+            this.mainInventory.setItem(i, border);
         }
-        switch (type) {
-            case SWORD: {
-                return cmd == 12348 || cmd == 12354 || cmd == 12355 || cmd == 12360 || cmd == 12361 || cmd == 12362 || cmd == 13501 || cmd == 13201 || cmd == 13301;
-            }
-            case AXE: {
-                return cmd == 12349 || cmd == 12363 || cmd == 12364 || cmd == 12365 || cmd == 13210 || cmd == 13510 || cmd == 13310;
-            }
-            case BOW: {
-                return cmd == 12350 || cmd == 12369 || cmd == 12370 || cmd == 12371 || cmd == 13030 || cmd == 13330 || cmd == 13530;
-            }
-            case CROSSBOW: {
-                return cmd == 12351 || cmd == 12372 || cmd == 12373 || cmd == 12374 || cmd == 13240 || cmd == 13340 || cmd == 13540;
-            }
-            case TRIDENT: {
-                return cmd == 12352 || cmd == 12356 || cmd == 12375 || cmd == 12376 || cmd == 12377 || cmd == 13250 || cmd == 13050 || cmd == 13350;
-            }
-            case SHIELD: {
-                return cmd == 12353 || cmd == 12366 || cmd == 12367 || cmd == 12368 || cmd == 13520 || cmd == 13220 || cmd == 13320;
-            }
+        ItemStack infoGuide = this.createItem(Material.ENDER_EYE, MessageUtil.get("gui.bind-guide-title", "&d&l⚡ How It Works ⚡"));
+        ItemMeta meta = infoGuide.getItemMeta();
+        if (meta != null) {
+            ArrayList<String> lore = new ArrayList<String>();
+            lore.add(MessageUtil.get("gui.bind-guide-step1", "&71. Place your class weapon in &eSlot 14&7."));
+            lore.add(MessageUtil.get("gui.bind-guide-step2", "&72. Click &d&lBind Weapon &7to view &e3 custom models&7."));
+            lore.add(MessageUtil.get("gui.bind-guide-step3", "&73. Select your favorite model and click &a&lConfirm&7!"));
+            meta.setLore(lore);
+            infoGuide.setItemMeta(meta);
         }
-        return false;
-    }
-
-    private String getSkinDisplayName(int customModelData) {
-        switch (customModelData) {
-            case 12348: {
-                return "&b&lDuelist Katana";
-            }
-            case 12354: {
-                return "&5&lNetherite Claymore";
-            }
-            case 12355: {
-                return "&b&lNetherite Twinblade";
-            }
-            case 12352: {
-                return "&3&lRoyal Spear";
-            }
-            case 12356: {
-                return "&a&lNetherite Scythe";
-            }
-            case 12349: {
-                return "&c&lHeirloom Axe";
-            }
-            case 12350: {
-                return "&e&lRecurve Bow";
-            }
-            case 12351: {
-                return "&6&lHeavy Crossbow";
-            }
-            case 12353: {
-                return "&f&lBulwark Shield";
-            }
-            case 12360: {
-                return "&c&lInferno Blade";
-            }
-            case 12361: {
-                return "&b&lFrost Fang";
-            }
-            case 12362: {
-                return "&5&lVoid Reaper";
-            }
-            case 12363: {
-                return "&2&lWarden's Cleaver";
-            }
-            case 12364: {
-                return "&6&lEmber Hatchet";
-            }
-            case 12365: {
-                return "&d&lCrystal Vanguard";
-            }
-            case 12366: {
-                return "&c&lDragon's Aegis";
-            }
-            case 12367: {
-                return "&7&lSentinel's Wall";
-            }
-            case 12368: {
-                return "&e&lThorned Bulwark";
-            }
-            case 12369: {
-                return "&6&lPhoenix Wing";
-            }
-            case 12370: {
-                return "&8&lShadow Stalker";
-            }
-            case 12371: {
-                return "&e&lCelestial Arc";
-            }
-            case 12372: {
-                return "&4&lSiege Breaker";
-            }
-            case 12373: {
-                return "&1&lNightfall Repeater";
-            }
-            case 12374: {
-                return "&6&lRadiant Arbalest";
-            }
-            case 12375: {
-                return "&b&lPoseidon's Wrath";
-            }
-            case 12376: {
-                return "&9&lAbyssal Spike";
-            }
-            case 12377: {
-                return "&e&lSolar Lance";
-            }
-            case 13501: {
-                return "&c&lHellfire Blade";
-            }
-            case 13201: {
-                return "&8&lDeathbringer";
-            }
-            case 13301: {
-                return "&a&lSylvan Edge";
-            }
-            case 13250: {
-                return "&8&lSoul Piercer";
-            }
-            case 13050: {
-                return "&b&lCrescent Spear";
-            }
-            case 13350: {
-                return "&a&lNature's Wrath";
-            }
-            case 13210: {
-                return "&8&lAbyssal Cleaver";
-            }
-            case 13510: {
-                return "&c&lDemon's Hatchet";
-            }
-            case 13310: {
-                return "&a&lForest's Bite";
-            }
-            case 13030: {
-                return "&b&lMoonlight Arc";
-            }
-            case 13330: {
-                return "&a&lWhispering Bow";
-            }
-            case 13530: {
-                return "&c&lBlaze String";
-            }
-            case 13240: {
-                return "&8&lDeath's Arbalest";
-            }
-            case 13340: {
-                return "&a&lPixie Shooter";
-            }
-            case 13540: {
-                return "&c&lHellfire Launcher";
-            }
-            case 13520: {
-                return "&c&lDemon's Bulwark";
-            }
-            case 13220: {
-                return "&8&lAegis of the Damned";
-            }
-            case 13320: {
-                return "&a&lEnchanted Ward";
-            }
-        }
-        return null;
-    }
-
-    private String getSkinLore(int customModelData) {
-        switch (customModelData) {
-            case 13501: {
-                return "&7Forged in the deepest pits of the nether.\n&7Its blade sears the souls of its victims.";
-            }
-            case 13201: {
-                return "&7An ancient blade wielded by the forgotten king.\n&7It hums with a dark, necrotic energy.";
-            }
-            case 13301: {
-                return "&7A shimmering sword blessed by forest spirits.\n&7It strikes with the swiftness of the wind.";
-            }
-            case 13250: {
-                return "&7A sinister trident that pierces through armor\n&7and drains the essence of your foes.";
-            }
-            case 13050: {
-                return "&7Bathed in moonlight, this elegant spear\n&7commands the tides of battle.";
-            }
-            case 13350: {
-                return "&7Thorns intertwine around this trident,\n&7unleashing the wild wrath of nature.";
-            }
-            case 13210: {
-                return "&7A heavy, brutal cleaver that shatters\n&7defenses and leaves only destruction.";
-            }
-            case 13510: {
-                return "&7Screams echo from the molten edge of this axe\n&7as it rends flesh and bone.";
-            }
-            case 13310: {
-                return "&7Carved from an ancient, enchanted oak.\n&7It strikes with the force of a falling redwood.";
-            }
-            case 13030: {
-                return "&7A majestic bow that fires arrows composed\n&7of pure, condensed starlight.";
-            }
-            case 13330: {
-                return "&7Delicate yet deadly. Its arrows whisper\n&7through the air before finding their mark.";
-            }
-            case 13530: {
-                return "&7The string of this bow burns the fingers of\n&7the unworthy, firing bolts of pure fire.";
-            }
-            case 13240: {
-                return "&7A mechanical terror that launches\n&7heavy bolts dripping with dark magic.";
-            }
-            case 13340: {
-                return "&7A whimsical crossbow that shoots\n&7deadly, shimmering magical flares.";
-            }
-            case 13540: {
-                return "&7A volatile siege weapon designed to\n&7rain destruction upon the battlefield.";
-            }
-            case 13520: {
-                return "&7A massive, burning shield that reflects\n&7both damage and fear back at attackers.";
-            }
-            case 13220: {
-                return "&7An impenetrable wall forged from the\n&7souls of fallen warriors.";
-            }
-            case 13320: {
-                return "&7A beautiful but sturdy shield that blooms\n&7with magical protection when struck.";
-            }
-        }
-        return "&7A legendary artifact of immense power.";
+        this.mainInventory.setItem(22, infoGuide);
     }
 
     private void updateSlots() {
-        int cmd;
-        ItemMeta targetMeta;
-        WeaponType playerClass = this.plugin.getDataManager().getWeaponType(this.player.getUniqueId());
-        ItemStack target = this.inventory.getItem(13);
-        this.selectedModelData = target != null && !target.getType().isAir() && playerClass != null && playerClass.isValidMaterial(target.getType()) ? ((targetMeta = target.getItemMeta()) != null && targetMeta.hasCustomModelData() ? (this.isValidSkinForClass(playerClass, cmd = targetMeta.getCustomModelData()) ? cmd : this.getChosenSkinForClass(playerClass)) : this.getChosenSkinForClass(playerClass)) : this.getChosenSkinForClass(playerClass);
         this.setupBindItem();
         this.setupStatusItem();
         this.setupUnbindItem();
         this.setupStatsBooks();
-        this.setupSkinSelection();
     }
 
     private void setupStatusItem() {
@@ -423,42 +193,37 @@ implements Listener {
         ItemMeta meta;
         WeaponType playerClass = this.plugin.getDataManager().getWeaponType(this.player.getUniqueId());
         String classStr = playerClass != null ? playerClass.getDisplayName() : "&cNone";
-        Object boundStatus = "&cInactive";
+        String boundStatus = "&cInactive";
         String currentBoundId = this.plugin.getDataManager().getBoundWeaponId(this.player.getUniqueId());
         if (currentBoundId != null) {
-            boundStatus = "&aActive &7(" + currentBoundId.substring(0, 8) + "...)";
+            boundStatus = "&aActive &7(" + currentBoundId.substring(0, Math.min(8, currentBoundId.length())) + "...)";
         }
         if ((meta = (statusItem = new ItemStack(Material.NETHER_STAR)).getItemMeta()) != null) {
-            meta.setDisplayName(MessageUtil.color("&b&lBinding Status & Perks"));
+            meta.setDisplayName(MessageUtil.get("gui.bind-status-title", "&b&lBinding Status & Perks"));
             ArrayList<String> lore = new ArrayList<String>();
-            lore.add(MessageUtil.color("&7Your Class: " + classStr));
-            lore.add(MessageUtil.color("&7Bound Weapon: " + (String)boundStatus));
+            lore.add(MessageUtil.get("gui.bind-status-class", "&7Your Class: %class%", "class", classStr));
+            lore.add(MessageUtil.get("gui.bind-status-bound", "&7Bound Weapon: %status%", "status", boundStatus));
             lore.add("");
-            lore.add(MessageUtil.color("&eBinding Perks:"));
-            lore.add(MessageUtil.color("&d- Keep on Death: &7Bound weapon is never dropped on death"));
-            lore.add(MessageUtil.color("&d- Loyalty Flight: &7Flies back to you on respawn, knocking back players"));
-            lore.add(MessageUtil.color("&d- Soulbound: &7Emits active magic particles while held"));
+            lore.add(MessageUtil.get("gui.bind-status-perks", "&eBinding Perks:"));
+            lore.add(MessageUtil.get("gui.bind-status-perk-death", "&d- Keep on Death: &7Bound weapon is never dropped on death"));
+            lore.add(MessageUtil.get("gui.bind-status-perk-loyalty", "&d- Loyalty Flight: &7Flies back to you on respawn, knocking back enemies"));
+            lore.add(MessageUtil.get("gui.bind-status-perk-soulbound", "&d- Soulbound Aura: &7Emits custom class magic particles while wielded"));
             meta.setLore(lore);
             statusItem.setItemMeta(meta);
         }
-        this.inventory.setItem(4, statusItem);
+        this.mainInventory.setItem(4, statusItem);
     }
 
     private void setupBindItem() {
         ItemStack bindItem;
         ItemMeta meta;
-        ItemStack target = this.inventory.getItem(13);
+        ItemStack target = this.mainInventory.getItem(13);
         WeaponType playerClass = this.plugin.getDataManager().getWeaponType(this.player.getUniqueId());
-        boolean canBind = false;
-        Object statusMessage = "&cPlease place a weapon in the slot.";
+        boolean canAction = false;
+        boolean isChangeSkin = false;
+        String statusMessage = "&cPlease place a weapon in Slot 14.";
         int cost = this.plugin.getConfigManager().getBindCostStrength();
-        boolean isFree = this.plugin.getDataManager().isFreeBindAvailable(this.player.getUniqueId());
-        boolean alreadyHasBound = this.plugin.getDataManager().hasBoundWeapon(this.player.getUniqueId());
-        if (isFree) {
-            cost = 0;
-        } else if (alreadyHasBound) {
-            cost = 1;
-        }
+        
         if (target != null && !target.getType().isAir()) {
             if (playerClass == null) {
                 statusMessage = "&cYou do not have a weapon class!";
@@ -469,38 +234,61 @@ implements Listener {
                 if (targetMeta != null) {
                     NamespacedKey boundKey = new NamespacedKey((Plugin)this.plugin, "bound_player_uuid");
                     if (targetMeta.getPersistentDataContainer().has(boundKey, PersistentDataType.STRING)) {
-                        statusMessage = "&cThis weapon is already bound!";
+                        String ownerUuidStr = (String)targetMeta.getPersistentDataContainer().get(boundKey, PersistentDataType.STRING);
+                        if (this.player.getUniqueId().toString().equals(ownerUuidStr)) {
+                            isChangeSkin = true;
+                            canAction = true;
+                            cost = 1;
+                            statusMessage = "&aClick to choose a new model!";
+                        } else {
+                            statusMessage = "&cBound to a different player!";
+                        }
                     } else {
-                        canBind = true;
-                        statusMessage = "&aReady to Bind!";
+                        cost = this.plugin.getConfigManager().getBindCostStrength();
+                        canAction = true;
+                        statusMessage = "&aReady to choose your model!";
                     }
                 }
             }
         }
-        if ((meta = (bindItem = new ItemStack(canBind ? Material.ANVIL : Material.BARRIER)).getItemMeta()) != null) {
-            meta.setDisplayName(MessageUtil.color("&d&l\u26a1 Confirm Bind \u26a1"));
+        
+        Material iconMat = canAction ? (isChangeSkin ? Material.NETHER_STAR : Material.ANVIL) : Material.BARRIER;
+        if ((meta = (bindItem = new ItemStack(iconMat)).getItemMeta()) != null) {
             ArrayList<String> lore = new ArrayList<String>();
-            lore.add(MessageUtil.color("&7Bind the class weapon placed in Slot 13."));
-            lore.add("");
-            lore.add(MessageUtil.color("&7Cost: &e" + (String)(isFree ? "FREE (Soul Sacrifice)" : cost + " Strength")));
-            lore.add(MessageUtil.color("&7Status: " + (String)statusMessage));
-            if (canBind) {
+            if (isChangeSkin) {
+                meta.setDisplayName(MessageUtil.color(canAction ? "&a&l✨ Change Model (1 Strength) ✨" : "&c&l✨ Cannot Change Model"));
+                lore.add(MessageUtil.color("&7Change the 3D model of your bound weapon."));
                 lore.add("");
-                lore.add(MessageUtil.color("&eClick to bind this weapon!"));
+                lore.add(MessageUtil.color("&7Cost: &e1 Strength"));
+                lore.add(MessageUtil.color("&7Status: " + statusMessage));
+                if (canAction) {
+                    lore.add("");
+                    lore.add(MessageUtil.color("&eClick to choose from 3 models!"));
+                }
+            } else {
+                meta.setDisplayName(MessageUtil.color(canAction ? "&d&l⚡ Bind Weapon ⚡" : "&c&l⚡ Place Weapon to Bind"));
+                lore.add(MessageUtil.color("&7Bind your class weapon to your soul."));
+                lore.add("");
+                lore.add(MessageUtil.color("&7Cost: &e" + cost + " Strength"));
+                lore.add(MessageUtil.color("&7Status: " + statusMessage));
+                if (canAction) {
+                    lore.add("");
+                    lore.add(MessageUtil.color("&eClick to choose from 3 models!"));
+                }
             }
             meta.setLore(lore);
             bindItem.setItemMeta(meta);
         }
-        this.inventory.setItem(11, bindItem);
+        this.mainInventory.setItem(11, bindItem);
     }
 
     private void setupUnbindItem() {
         ItemStack unbindItem;
         ItemMeta meta;
         ItemMeta targetMeta;
-        ItemStack target = this.inventory.getItem(13);
+        ItemStack target = this.mainInventory.getItem(13);
         boolean canUnbind = false;
-        String statusMessage = "&cPlease place a bound weapon in Slot 13.";
+        String statusMessage = "&cPlace your bound weapon in Slot 14.";
         if (target != null && !target.getType().isAir() && (targetMeta = target.getItemMeta()) != null) {
             NamespacedKey boundKey = new NamespacedKey((Plugin)this.plugin, "bound_player_uuid");
             if (targetMeta.getPersistentDataContainer().has(boundKey, PersistentDataType.STRING)) {
@@ -516,9 +304,9 @@ implements Listener {
             }
         }
         if ((meta = (unbindItem = new ItemStack(canUnbind ? Material.GRINDSTONE : Material.BARRIER)).getItemMeta()) != null) {
-            meta.setDisplayName(MessageUtil.color("&c&l\u274c Confirm Unbind"));
+            meta.setDisplayName(MessageUtil.color(canUnbind ? "&c&l❌ Confirm Unbind" : "&c&l❌ Cannot Unbind"));
             ArrayList<String> lore = new ArrayList<String>();
-            lore.add(MessageUtil.color("&7Removes the binding from the weapon in Slot 13."));
+            lore.add(MessageUtil.color("&7Removes the soul binding from the weapon in Slot 14."));
             lore.add("");
             lore.add(MessageUtil.color("&7Cost: &eFree"));
             lore.add(MessageUtil.color("&7Status: " + statusMessage));
@@ -529,16 +317,17 @@ implements Listener {
             meta.setLore(lore);
             unbindItem.setItemMeta(meta);
         }
-        this.inventory.setItem(15, unbindItem);
+        this.mainInventory.setItem(15, unbindItem);
     }
 
     private void setupStatsBooks() {
         UUID uuid = this.player.getUniqueId();
         boolean hasActive = this.plugin.getDataManager().hasBoundWeapon(uuid);
+        
         ItemStack killsBook = new ItemStack(Material.WRITTEN_BOOK);
         ItemMeta kMeta = killsBook.getItemMeta();
         if (kMeta != null) {
-            kMeta.setDisplayName(MessageUtil.color("&d&l\u26a1 Souls Harvested"));
+            kMeta.setDisplayName(MessageUtil.color("&d&l⚡ Souls Harvested"));
             ArrayList<String> lore = new ArrayList<String>();
             lore.add(MessageUtil.color("&7Tracks players killed using your bound weapon."));
             lore.add("");
@@ -553,18 +342,19 @@ implements Listener {
                 int limit = 0;
                 for (Map.Entry<String, Integer> entry : breakdown.entrySet()) {
                     if (limit >= 5) break;
-                    lore.add(MessageUtil.color("&d- " + entry.getKey() + ": &f" + String.valueOf(entry.getValue()) + "x"));
+                    lore.add(MessageUtil.color("&d- " + entry.getKey() + ": &f" + entry.getValue() + "x"));
                     ++limit;
                 }
             }
             kMeta.setLore(lore);
             killsBook.setItemMeta(kMeta);
         }
-        this.inventory.setItem(2, killsBook);
+        this.mainInventory.setItem(2, killsBook);
+
         ItemStack dmgBook = new ItemStack(Material.WRITTEN_BOOK);
         ItemMeta dMeta = dmgBook.getItemMeta();
         if (dMeta != null) {
-            dMeta.setDisplayName(MessageUtil.color("&d&l\ud83d\udca5 Damage Dealt"));
+            dMeta.setDisplayName(MessageUtil.color("&d&l💥 Damage Dealt"));
             ArrayList<String> lore = new ArrayList<String>();
             lore.add(MessageUtil.color("&7Tracks final damage dealt with your bound weapon."));
             lore.add("");
@@ -573,24 +363,12 @@ implements Listener {
             dMeta.setLore(lore);
             dmgBook.setItemMeta(dMeta);
         }
-        this.inventory.setItem(3, dmgBook);
-        ItemStack savesBook = new ItemStack(Material.WRITTEN_BOOK);
-        ItemMeta sMeta = savesBook.getItemMeta();
-        if (sMeta != null) {
-            sMeta.setDisplayName(MessageUtil.color("&d&l\ud83d\udee1\ufe0f Soul Sacrifices"));
-            ArrayList<String> lore = new ArrayList<String>();
-            lore.add(MessageUtil.color("&7Tracks death saves triggered by your bound weapon."));
-            lore.add("");
-            int saves = this.plugin.getDataManager().getBoundStat(uuid, "sacrifices");
-            lore.add(MessageUtil.color("&7Total Saves: &f&l" + saves));
-            sMeta.setLore(lore);
-            savesBook.setItemMeta(sMeta);
-        }
-        this.inventory.setItem(5, savesBook);
+        this.mainInventory.setItem(3, dmgBook);
+
         ItemStack timeBook = new ItemStack(Material.WRITTEN_BOOK);
         ItemMeta tMeta = timeBook.getItemMeta();
         if (tMeta != null) {
-            tMeta.setDisplayName(MessageUtil.color("&d&l\u23f3 Duration Bound"));
+            tMeta.setDisplayName(MessageUtil.color("&d&l⌛ Duration Bound"));
             ArrayList<String> lore = new ArrayList<String>();
             lore.add(MessageUtil.color("&7Tracks elapsed time since you bound your current weapon."));
             lore.add("");
@@ -604,11 +382,12 @@ implements Listener {
             tMeta.setLore(lore);
             timeBook.setItemMeta(tMeta);
         }
-        this.inventory.setItem(6, timeBook);
+        this.mainInventory.setItem(5, timeBook);
+
         ItemStack abilityBook = new ItemStack(Material.WRITTEN_BOOK);
         ItemMeta aMeta = abilityBook.getItemMeta();
         if (aMeta != null) {
-            aMeta.setDisplayName(MessageUtil.color("&d&l\u2728 Ability Triggers"));
+            aMeta.setDisplayName(MessageUtil.color("&d&l✨ Ability Triggers"));
             ArrayList<String> lore = new ArrayList<String>();
             lore.add(MessageUtil.color("&7Tracks weapon ability uses while bound."));
             lore.add("");
@@ -617,7 +396,189 @@ implements Listener {
             aMeta.setLore(lore);
             abilityBook.setItemMeta(aMeta);
         }
-        this.inventory.setItem(7, abilityBook);
+        this.mainInventory.setItem(6, abilityBook);
+    }
+
+    private void openModelSelection() {
+        WeaponType playerClass = this.plugin.getDataManager().getWeaponType(this.player.getUniqueId());
+        if (playerClass == null || this.weaponInSlot == null) {
+            return;
+        }
+
+        ItemStack border = this.createItem(Material.MAGENTA_STAINED_GLASS_PANE, "&8 ");
+        for (int i = 0; i < 27; ++i) {
+            this.selectInventory.setItem(i, border);
+        }
+
+        // Header showing weapon being bound
+        ItemStack previewItem = this.weaponInSlot.clone();
+        ItemMeta pMeta = previewItem.getItemMeta();
+        if (pMeta != null) {
+            pMeta.setDisplayName(MessageUtil.get("gui.bind-target-preview", "&e&lBinding Target: &f%item%", "item", this.weaponInSlot.getType().name()));
+            ArrayList<String> pLore = new ArrayList<String>();
+            pLore.add(MessageUtil.get("gui.bind-target-preview-lore", "&7Select 1 of the 3 exclusive 3D models below."));
+            pMeta.setLore(pLore);
+            previewItem.setItemMeta(pMeta);
+        }
+        this.selectInventory.setItem(4, previewItem);
+
+        // Populate 3 models
+        this.renderModelOptions();
+
+        // Back button (Slot 18)
+        ItemStack backBtn = this.createItem(Material.ARROW, MessageUtil.get("gui.bind-back-btn-title", "&c&l⬅ Back to Weapon Slot"));
+        ItemMeta bMeta = backBtn.getItemMeta();
+        if (bMeta != null) {
+            bMeta.setLore(Arrays.asList(MessageUtil.get("gui.bind-back-btn-lore", "&7Return to place or take back your weapon.")));
+            backBtn.setItemMeta(bMeta);
+        }
+        this.selectInventory.setItem(18, backBtn);
+
+        // Confirm button (Slot 22)
+        this.renderConfirmButton();
+
+        this.isSwitchingView = true;
+        this.player.openInventory(this.selectInventory);
+        this.isSwitchingView = false;
+        CompatUtil.playSound(this.player, this.player.getLocation(), "UI_BUTTON_CLICK", 1.0f, 1.2f);
+    }
+
+    private void renderModelOptions() {
+        WeaponType playerClass = this.plugin.getDataManager().getWeaponType(this.player.getUniqueId());
+        List<WeaponSkin> skins = getSkinsForClass(playerClass);
+        int[] slots = new int[]{11, 13, 15};
+        Material displayMat = this.weaponInSlot != null ? this.weaponInSlot.getType() : Material.NETHERITE_SWORD;
+
+        for (int i = 0; i < slots.length; ++i) {
+            if (i >= skins.size()) break;
+            WeaponSkin skin = skins.get(i);
+            int slot = slots[i];
+            
+            ItemStack item = new ItemStack(displayMat);
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null) {
+                meta.setDisplayName(MessageUtil.color(skin.getName()));
+                meta.setCustomModelData(Integer.valueOf(skin.getCmd()));
+                NamespacedKey skinCmdKey = new NamespacedKey((Plugin)this.plugin, "gui_skin_cmd");
+                meta.getPersistentDataContainer().set(skinCmdKey, PersistentDataType.INTEGER, skin.getCmd());
+
+                ArrayList<String> lore = new ArrayList<String>();
+                lore.add(MessageUtil.color(skin.getDescription()));
+                lore.add("");
+                if (this.selectedModelData == skin.getCmd()) {
+                    lore.add(MessageUtil.get("gui.bind-model-selected", "&7Status: &a&lSELECTED"));
+                    lore.add(MessageUtil.get("gui.bind-model-selected-lore", "&eThis model will be applied upon confirmation."));
+                    meta.addEnchant(CompatUtil.resolveEnchantment("UNBREAKING", "DURABILITY"), 1, true);
+                    meta.addItemFlags(new ItemFlag[]{ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES});
+                } else {
+                    lore.add(MessageUtil.get("gui.bind-model-not-selected", "&7Status: &cNot Selected"));
+                    lore.add("");
+                    lore.add(MessageUtil.get("gui.bind-model-click-to-select", "&eClick to select this model!"));
+                    meta.addItemFlags(new ItemFlag[]{ItemFlag.HIDE_ATTRIBUTES});
+                }
+                meta.setLore(lore);
+                item.setItemMeta(meta);
+            }
+            this.selectInventory.setItem(slot, item);
+        }
+    }
+
+    private void renderConfirmButton() {
+        boolean isChangeSkin = false;
+        if (this.weaponInSlot != null && this.weaponInSlot.hasItemMeta()) {
+            NamespacedKey boundKey = new NamespacedKey((Plugin)this.plugin, "bound_player_uuid");
+            if (this.weaponInSlot.getItemMeta().getPersistentDataContainer().has(boundKey, PersistentDataType.STRING)) {
+                isChangeSkin = true;
+            }
+        }
+        int cost = isChangeSkin ? 1 : this.plugin.getConfigManager().getBindCostStrength();
+        int currentStrength = this.plugin.getDataManager().getStrength(this.player.getUniqueId());
+        boolean hasEnough = currentStrength >= cost;
+
+        String selectedName = this.getSkinDisplayName(this.selectedModelData);
+        ItemStack confirmBtn = new ItemStack(hasEnough ? Material.EMERALD : Material.BARRIER);
+        ItemMeta meta = confirmBtn.getItemMeta();
+        if (meta != null) {
+            String confirmTitle;
+            if (!hasEnough) {
+                confirmTitle = MessageUtil.get("gui.bind-confirm-btn-not-enough", "&c&l❌ Not Enough Strength");
+            } else if (isChangeSkin) {
+                confirmTitle = MessageUtil.get("gui.bind-confirm-btn-change", "&a&l⚡ Confirm Model Change ⚡");
+            } else {
+                confirmTitle = MessageUtil.get("gui.bind-confirm-btn-bind", "&a&l⚡ Confirm Soul Binding ⚡");
+            }
+            meta.setDisplayName(confirmTitle);
+            ArrayList<String> lore = new ArrayList<String>();
+            lore.add(MessageUtil.get("gui.bind-confirm-selected", "&7Selected Model: &b%model%", "model", (selectedName != null ? selectedName : "Default")));
+            String costStr = MessageUtil.get("gui.bind-confirm-cost-str", "%cost% Strength", "cost", String.valueOf(cost));
+            lore.add(MessageUtil.get("gui.bind-confirm-cost-line", "&7Binding Cost: &e%cost%", "cost", costStr));
+            lore.add(MessageUtil.get("gui.bind-confirm-strength-line", "&7Your Strength: &f%strength%", "strength", String.valueOf(currentStrength)));
+            lore.add("");
+            if (hasEnough) {
+                lore.add(MessageUtil.get("gui.bind-confirm-click-action", "&eClick to bind your weapon with this model!"));
+            } else {
+                lore.add(MessageUtil.get("gui.bind-confirm-need-more", "&cYou need at least %cost% Strength to bind!", "cost", String.valueOf(cost)));
+            }
+            meta.setLore(lore);
+            confirmBtn.setItemMeta(meta);
+        }
+        this.selectInventory.setItem(22, confirmBtn);
+    }
+
+    private String getSkinDisplayName(int customModelData) {
+        WeaponType playerClass = this.plugin.getDataManager().getWeaponType(this.player.getUniqueId());
+        for (WeaponSkin skin : getSkinsForClass(playerClass)) {
+            if (skin.getCmd() == customModelData) {
+                return skin.getName();
+            }
+        }
+        switch (customModelData) {
+            case 12348: return "&b&lDuelist Katana";
+            case 13001: return "&b&lCrescent Moonblade";
+            case 13501: return "&c&lHellfire Blade";
+            case 12361: return "&b&lFrost Fang";
+
+            case 13010: return "&b&lLunar Cleaver";
+            case 13410: return "&6&lDragon Waraxe";
+            case 13510: return "&c&lDemon's Hatchet";
+            case 12349: return "&c&lHeirloom Axe";
+            case 12363: return "&2&lWarden's Cleaver";
+
+            case 12350: return "&e&lRecurve Bow";
+            case 13030: return "&b&lLunar Longbow";
+            case 13530: return "&c&lHellfire Bow";
+            case 12369: return "&6&lPhoenix Wing";
+            case 12370: return "&8&lShadow Stalker";
+
+            case 13040: return "&b&lLunar Arbalest";
+            case 13440: return "&6&lDragon Ballista";
+            case 13540: return "&c&lHellfire Launcher";
+            case 12351: return "&6&lHeavy Crossbow";
+            case 12374: return "&6&lRadiant Arbalest";
+
+            case 12356: return "&a&lNetherite Scythe";
+            case 13050: return "&b&lLunar Trident";
+            case 13550: return "&c&lInfernal Trident";
+            case 12352: return "&3&lRoyal Spear";
+            case 12375: return "&b&lPoseidon's Wrath";
+
+            case 13020: return "&b&lLunar Aegis";
+            case 13420: return "&6&lDragon Scale Bulwark";
+            case 13520: return "&c&lDemon's Bulwark";
+            case 12353: return "&f&lBulwark Shield";
+            case 12367: return "&7&lSentinel's Wall";
+        }
+        return "&d&lLegendary Weapon";
+    }
+
+    private String getSkinLore(int customModelData) {
+        WeaponType playerClass = this.plugin.getDataManager().getWeaponType(this.player.getUniqueId());
+        for (WeaponSkin skin : getSkinsForClass(playerClass)) {
+            if (skin.getCmd() == customModelData) {
+                return skin.getDescription();
+            }
+        }
+        return "&7A legendary soulbound weapon of immense power.";
     }
 
     private String formatDuration(long millis) {
@@ -638,113 +599,199 @@ implements Listener {
     }
 
     public void open() {
-        this.player.openInventory(this.inventory);
+        this.player.openInventory(this.mainInventory);
     }
 
     @EventHandler
     public void onClick(InventoryClickEvent event) {
-        ItemStack clickedItem;
-        if (!event.getInventory().equals((Object)this.inventory)) {
+        if (!event.getWhoClicked().equals(this.player)) {
             return;
         }
-        if (event.getClickedInventory() != null && event.getClickedInventory().equals((Object)this.player.getInventory())) {
-            this.refreshGUI();
+
+        Inventory topInv = event.getView().getTopInventory();
+        if (!topInv.equals(this.mainInventory) && !topInv.equals(this.selectInventory)) {
             return;
         }
-        int slot = event.getRawSlot();
-        if (slot == 13) {
-            this.refreshGUI();
-            return;
-        }
-        event.setCancelled(true);
-        if (slot == 11) {
-            this.handleBind();
-        } else if (slot == 15) {
-            this.handleUnbind();
-        } else if (slot >= 18 && slot <= 26 && (clickedItem = event.getCurrentItem()) != null && clickedItem.hasItemMeta()) {
-            ItemMeta clickedMeta = clickedItem.getItemMeta();
-            NamespacedKey skinCmdKey = new NamespacedKey((Plugin)this.plugin, "gui_skin_cmd");
-            if (clickedMeta.getPersistentDataContainer().has(skinCmdKey, PersistentDataType.INTEGER)) {
-                int cmd;
-                this.selectedModelData = cmd = ((Integer)clickedMeta.getPersistentDataContainer().get(skinCmdKey, PersistentDataType.INTEGER)).intValue();
-                this.player.playSound(this.player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
-                this.refreshGUI();
+
+        // Click in player inventory while in main GUI
+        if (topInv.equals(this.mainInventory)) {
+            if (event.getClickedInventory() != null && event.getClickedInventory().equals(this.player.getInventory())) {
+                this.refreshMainGUI();
+                return;
+            }
+            int slot = event.getRawSlot();
+            if (slot == 13) {
+                this.refreshMainGUI();
+                return;
+            }
+            event.setCancelled(true);
+
+            if (slot == 11) {
+                ItemStack target = this.mainInventory.getItem(13);
+                WeaponType playerClass = this.plugin.getDataManager().getWeaponType(this.player.getUniqueId());
+                if (target == null || target.getType().isAir()) {
+                    MessageUtil.sendWithDefault(this.player, "gui.place-weapon-first", "&cPlease place your class weapon in Slot 14 first!");
+                    this.player.playSound(this.player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+                    return;
+                }
+                if (playerClass == null || !playerClass.isValidMaterial(target.getType())) {
+                    MessageUtil.sendWithDefault(this.player, "gui.invalid-class-slot", "&cThis weapon does not match your weapon class!");
+                    this.player.playSound(this.player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+                    return;
+                }
+                ItemMeta meta = target.getItemMeta();
+                if (meta != null) {
+                    NamespacedKey boundKey = new NamespacedKey((Plugin)this.plugin, "bound_player_uuid");
+                    if (meta.getPersistentDataContainer().has(boundKey, PersistentDataType.STRING)) {
+                        String ownerUuid = (String)meta.getPersistentDataContainer().get(boundKey, PersistentDataType.STRING);
+                        if (!this.player.getUniqueId().toString().equals(ownerUuid)) {
+                            MessageUtil.sendWithDefault(this.player, "gui.not-your-weapon", "&cThis weapon is bound to another player!");
+                            this.player.playSound(this.player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+                            return;
+                        }
+                    }
+                }
+                // Transition to Model Selection screen
+                this.weaponInSlot = target.clone();
+                this.mainInventory.setItem(13, null);
+                if (meta != null && meta.hasCustomModelData()) {
+                    this.selectedModelData = meta.getCustomModelData();
+                } else {
+                    this.selectedModelData = this.getDefaultSkinForClass(playerClass);
+                }
+                this.openModelSelection();
+            } else if (slot == 15) {
+                this.handleUnbind();
+            }
+        } else if (topInv.equals(this.selectInventory)) {
+            event.setCancelled(true);
+            int slot = event.getRawSlot();
+
+            // Select Model (Slots 11, 13, 15)
+            if (slot == 11 || slot == 13 || slot == 15) {
+                ItemStack clickedItem = event.getCurrentItem();
+                if (clickedItem != null && clickedItem.hasItemMeta()) {
+                    NamespacedKey skinCmdKey = new NamespacedKey((Plugin)this.plugin, "gui_skin_cmd");
+                    if (clickedItem.getItemMeta().getPersistentDataContainer().has(skinCmdKey, PersistentDataType.INTEGER)) {
+                        this.selectedModelData = ((Integer)clickedItem.getItemMeta().getPersistentDataContainer().get(skinCmdKey, PersistentDataType.INTEGER)).intValue();
+                        CompatUtil.playSound(this.player, this.player.getLocation(), "UI_BUTTON_CLICK", 1.0f, 1.4f);
+                        this.renderModelOptions();
+                        this.renderConfirmButton();
+                    }
+                }
+            } else if (slot == 18) {
+                // Back button
+                this.isSwitchingView = true;
+                this.mainInventory.setItem(13, this.weaponInSlot);
+                this.weaponInSlot = null;
+                this.updateSlots();
+                this.player.openInventory(this.mainInventory);
+                this.isSwitchingView = false;
+                CompatUtil.playSound(this.player, this.player.getLocation(), "UI_BUTTON_CLICK", 1.0f, 0.9f);
+            } else if (slot == 22) {
+                // Confirm Bind button
+                this.handleConfirmBind();
             }
         }
     }
 
     @EventHandler
     public void onDrag(InventoryDragEvent event) {
-        if (event.getInventory().equals((Object)this.inventory)) {
-            event.setCancelled(true);
+        if (event.getWhoClicked().equals(this.player)) {
+            Inventory top = event.getView().getTopInventory();
+            if (top.equals(this.mainInventory) || top.equals(this.selectInventory)) {
+                if (top.equals(this.selectInventory)) {
+                    event.setCancelled(true);
+                } else if (event.getRawSlots().stream().anyMatch(s -> s != 13 && s < 27)) {
+                    event.setCancelled(true);
+                }
+            }
         }
     }
 
-    private void refreshGUI() {
+    private void refreshMainGUI() {
         Bukkit.getScheduler().runTask((Plugin)this.plugin, this::updateSlots);
     }
 
-    private void handleBind() {
-        String skinName;
-        ItemStack target = this.inventory.getItem(13);
-        WeaponType playerClass = this.plugin.getDataManager().getWeaponType(this.player.getUniqueId());
-        if (target == null || target.getType().isAir() || playerClass == null || !playerClass.isValidMaterial(target.getType())) {
-            this.player.sendMessage(MessageUtil.parse("&cInvalid class weapon in Slot 13!"));
-            this.player.playSound(this.player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+    private void handleConfirmBind() {
+        if (this.weaponInSlot == null || this.weaponInSlot.getType().isAir()) {
             return;
         }
-        ItemMeta meta = target.getItemMeta();
+        WeaponType playerClass = this.plugin.getDataManager().getWeaponType(this.player.getUniqueId());
+        if (playerClass == null || !playerClass.isValidMaterial(this.weaponInSlot.getType())) {
+            return;
+        }
+
+        ItemMeta meta = this.weaponInSlot.getItemMeta();
         if (meta == null) {
             return;
         }
+
         NamespacedKey boundKey = new NamespacedKey((Plugin)this.plugin, "bound_player_uuid");
         final NamespacedKey itemIdKey = new NamespacedKey((Plugin)this.plugin, "bound_item_id");
-        if (meta.getPersistentDataContainer().has(boundKey, PersistentDataType.STRING)) {
-            this.player.sendMessage(MessageUtil.parse("&cThis weapon is already bound!"));
-            this.player.playSound(this.player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
-            return;
-        }
-        boolean isFree = this.plugin.getDataManager().isFreeBindAvailable(this.player.getUniqueId());
-        boolean alreadyHasBound = this.plugin.getDataManager().hasBoundWeapon(this.player.getUniqueId());
-        int cost = isFree ? 0 : (alreadyHasBound ? 1 : this.plugin.getConfigManager().getBindCostStrength());
+        boolean isChangeSkin = meta.getPersistentDataContainer().has(boundKey, PersistentDataType.STRING);
+
+        int cost = isChangeSkin ? 1 : this.plugin.getConfigManager().getBindCostStrength();
         int currentStrength = this.plugin.getDataManager().getStrength(this.player.getUniqueId());
+
         if (currentStrength < cost) {
-            this.player.sendMessage(MessageUtil.parse("&cYou need at least " + cost + " strength to bind your weapon. You have " + currentStrength + "."));
+            MessageUtil.sendWithDefault(this.player, "gui.need-more-strength", "&cYou need at least %cost% strength to bind your weapon. You have %current%.", "cost", String.valueOf(cost), "current", String.valueOf(currentStrength));
             this.player.playSound(this.player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             return;
         }
+
+        // Deduct cost
         if (cost > 0) {
             this.plugin.getDataManager().subtractStrength(this.player.getUniqueId(), cost);
-            this.player.sendMessage(MessageUtil.parse("&aSpent &e" + cost + " strength &ato bind your class weapon!"));
-        } else {
-            this.player.sendMessage(MessageUtil.parse("&aYour weapon has been bound for &eFREE &aby the grace of your Soul Sacrifice!"));
-            this.plugin.getDataManager().setFreeBindAvailable(this.player.getUniqueId(), false);
+            if (isChangeSkin) {
+                MessageUtil.sendWithDefault(this.player, "gui.skin-changed-success", "&aSpent &e1 strength &ato change your weapon model!");
+            } else {
+                MessageUtil.sendWithDefault(this.player, "gui.bound-success", "&aSpent &e%cost% strength &ato bind your class weapon!", "cost", String.valueOf(cost));
+            }
         }
+
         this.plugin.updateDisplay(this.player);
         this.plugin.getMonarchService().calculateNewMonarch();
+
         final UUID boundWeaponId = UUID.randomUUID();
         this.plugin.getDataManager().setBoundWeaponId(this.player.getUniqueId(), boundWeaponId.toString());
         this.plugin.getDataManager().setHasBoundWeapon(this.player.getUniqueId(), true);
-        this.plugin.getDataManager().setBoundTimestamp(this.player.getUniqueId(), System.currentTimeMillis());
+        if (!isChangeSkin) {
+            ItemFactory.unbindAllPlayerItems(this.player);
+            this.plugin.getDataManager().setBoundTimestamp(this.player.getUniqueId(), System.currentTimeMillis());
+        }
+
         meta.getPersistentDataContainer().set(boundKey, PersistentDataType.STRING, this.player.getUniqueId().toString());
         meta.getPersistentDataContainer().set(itemIdKey, PersistentDataType.STRING, boundWeaponId.toString());
+
         NamespacedKey origCmdKey = new NamespacedKey((Plugin)this.plugin, "smp_original_cmd");
         NamespacedKey origNameKey = new NamespacedKey((Plugin)this.plugin, "smp_original_name");
         NamespacedKey origLoreKey = new NamespacedKey((Plugin)this.plugin, "smp_original_lore");
-        if (meta.hasCustomModelData()) {
-            meta.getPersistentDataContainer().set(origCmdKey, PersistentDataType.INTEGER, meta.getCustomModelData());
+
+        if (!isChangeSkin) {
+            if (meta.hasCustomModelData()) {
+                meta.getPersistentDataContainer().set(origCmdKey, PersistentDataType.INTEGER, meta.getCustomModelData());
+            }
+            if (meta.hasDisplayName()) {
+                meta.getPersistentDataContainer().set(origNameKey, PersistentDataType.STRING, meta.getDisplayName());
+            }
+            if (meta.hasLore()) {
+                meta.getPersistentDataContainer().set(origLoreKey, PersistentDataType.STRING, String.join("|||", meta.getLore()));
+            }
         }
-        if (meta.hasDisplayName()) {
-            meta.getPersistentDataContainer().set(origNameKey, PersistentDataType.STRING, meta.getDisplayName());
-        }
-        if (meta.hasLore()) {
-            meta.getPersistentDataContainer().set(origLoreKey, PersistentDataType.STRING, String.join((CharSequence)"|||", meta.getLore()));
-        }
+
+        int cmdToApply = this.selectedModelData > 0 ? this.selectedModelData : this.getDefaultSkinForClass(playerClass);
+        meta.setCustomModelData(Integer.valueOf(cmdToApply));
+
+        String skinName = this.getSkinDisplayName(cmdToApply);
+        String finalDisplayName = skinName != null ? ChatColor.stripColor(skinName) : playerClass.getDisplayName();
+        meta.setDisplayName(MessageUtil.parse("&d&l⚡ &5&l" + finalDisplayName + " &d&l⚡"));
+
         ArrayList<String> newLore = new ArrayList<String>();
         String prefix = MessageUtil.parse(this.plugin.getConfigManager().getBindLorePrefix());
         newLore.add(prefix);
-        String skinLore = this.getSkinLore(this.selectedModelData);
-        if (skinLore != null) {
+        String skinLore = this.getSkinLore(cmdToApply);
+        if (skinLore != null && !skinLore.isEmpty()) {
             newLore.add("");
             for (String line : skinLore.split("\n")) {
                 newLore.add(MessageUtil.parse(line));
@@ -752,25 +799,28 @@ implements Listener {
         }
         newLore.add("");
         newLore.add(MessageUtil.parse("&8Soulbound to: &7" + this.player.getName()));
-        if (meta.hasLore()) {
-            newLore.add("");
-            newLore.addAll(meta.getLore());
-        }
         meta.setLore(newLore);
-        target.setItemMeta(meta);
-        ItemStack finalItem = target.clone();
-        this.inventory.setItem(13, null);
+        this.weaponInSlot.setItemMeta(meta);
+
+        ItemStack finalItem = this.weaponInSlot.clone();
+        this.weaponInSlot = null;
+
+        // Close GUI cleanly
         this.player.closeInventory();
-        Map<Integer, ItemStack> leftover = this.player.getInventory().addItem(new ItemStack[]{finalItem});
+
+        // Safely add item to player inventory
+        Map<Integer, ItemStack> leftover = this.player.getInventory().addItem(finalItem);
         if (!leftover.isEmpty()) {
             for (ItemStack drop : leftover.values()) {
                 this.player.getWorld().dropItemNaturally(this.player.getLocation(), drop);
             }
         }
-        String displayName = this.plugin.getConfigManager().shouldRenameOnBind(playerClass) ? ((skinName = this.getSkinDisplayName(this.selectedModelData)) != null ? skinName : this.plugin.getConfigManager().getWeaponCosmeticName(playerClass)) : (meta.hasDisplayName() ? meta.getDisplayName() : playerClass.getDisplayName());
-        final String originalName = displayName;
-        final int finalSelectedModelData = this.selectedModelData;
-        new BukkitRunnable(){
+
+        final String broadcastName = finalDisplayName;
+        final int finalModelCmd = cmdToApply;
+
+        // Run the loyalty flight / binding particle animation
+        new BukkitRunnable() {
             int step = 0;
             final String[] colors = new String[]{"&d", "&5", "&b", "&a", "&e", "&6", "&c", "&4"};
             final String particle1;
@@ -778,31 +828,38 @@ implements Listener {
             final String tickSound;
             final String finalSound;
             final String finalParticle;
+
             {
-                if (finalSelectedModelData == 13501 || finalSelectedModelData == 13520 || finalSelectedModelData == 13510 || finalSelectedModelData == 13530 || finalSelectedModelData == 13540 || finalSelectedModelData == 12360) {
+                if (finalModelCmd >= 13500 && finalModelCmd <= 13599) {
                     this.particle1 = "FLAME";
                     this.particle2 = "LAVA";
                     this.tickSound = "BLOCK_FIRE_AMBIENT";
                     this.finalSound = "ENTITY_GENERIC_EXPLODE";
                     this.finalParticle = "EXPLOSION_EMITTER";
-                } else if (finalSelectedModelData == 13210 || finalSelectedModelData == 13240 || finalSelectedModelData == 13250 || finalSelectedModelData == 13201 || finalSelectedModelData == 13220) {
+                } else if (finalModelCmd >= 13000 && finalModelCmd <= 13099) {
+                    this.particle1 = "END_ROD";
+                    this.particle2 = "PORTAL";
+                    this.tickSound = "BLOCK_AMETHYST_BLOCK_CHIME";
+                    this.finalSound = "UI_TOAST_CHALLENGE_COMPLETE";
+                    this.finalParticle = "TOTEM_OF_UNDYING";
+                } else if (finalModelCmd >= 13400 && finalModelCmd <= 13499) {
+                    this.particle1 = "DRAGON_BREATH";
+                    this.particle2 = "ENCHANTED_HIT";
+                    this.tickSound = "ENTITY_ENDER_DRAGON_GROWL";
+                    this.finalSound = "ENTITY_ENDER_DRAGON_DEATH";
+                    this.finalParticle = "DRAGON_BREATH";
+                } else if (finalModelCmd == 12361 || finalModelCmd == 12363) {
                     this.particle1 = "SOUL_FIRE_FLAME";
                     this.particle2 = "SOUL";
                     this.tickSound = "BLOCK_SOUL_SAND_BREAK";
                     this.finalSound = "ENTITY_WITHER_SPAWN";
                     this.finalParticle = "SCULK_CHARGE_POP";
-                } else if (finalSelectedModelData == 13030 || finalSelectedModelData == 13050 || finalSelectedModelData == 13010 || finalSelectedModelData == 13040 || finalSelectedModelData == 13020) {
+                } else if (finalModelCmd == 12352 || finalModelCmd == 12375 || finalModelCmd == 12356) {
                     this.particle1 = "PORTAL";
                     this.particle2 = "END_ROD";
                     this.tickSound = "BLOCK_AMETHYST_BLOCK_CHIME";
                     this.finalSound = "UI_TOAST_CHALLENGE_COMPLETE";
                     this.finalParticle = "DRAGON_BREATH";
-                } else if (finalSelectedModelData == 13301 || finalSelectedModelData == 13310 || finalSelectedModelData == 13320 || finalSelectedModelData == 13330 || finalSelectedModelData == 13340 || finalSelectedModelData == 13350) {
-                    this.particle1 = "GLOW";
-                    this.particle2 = "HAPPY_VILLAGER";
-                    this.tickSound = "BLOCK_CHERRY_SAPLING_PLACE";
-                    this.finalSound = "ENTITY_PLAYER_LEVELUP";
-                    this.finalParticle = "INSTANT_EFFECT";
                 } else {
                     this.particle1 = "WITCH";
                     this.particle2 = "ENCHANTED_HIT";
@@ -813,8 +870,6 @@ implements Listener {
             }
 
             public void run() {
-                ItemStack offHand;
-                String id;
                 if (!BindGUI.this.player.isOnline()) {
                     this.cancel();
                     return;
@@ -822,26 +877,26 @@ implements Listener {
                 ItemStack targetItem = null;
                 boolean isGroundItem = false;
                 Item groundItemEntity = null;
-                for (ItemStack invItem : BindGUI.this.player.getInventory().getContents()) {
+                int targetSlot = -1;
+                boolean isOffHand = false;
+
+                for (int slot = 0; slot < BindGUI.this.player.getInventory().getSize(); ++slot) {
+                    ItemStack invItem = BindGUI.this.player.getInventory().getItem(slot);
                     if (invItem == null || !invItem.hasItemMeta()) continue;
-                    id = (String)invItem.getItemMeta().getPersistentDataContainer().get(itemIdKey, PersistentDataType.STRING);
+                    String id = (String)invItem.getItemMeta().getPersistentDataContainer().get(itemIdKey, PersistentDataType.STRING);
                     if (!boundWeaponId.toString().equals(id)) continue;
                     targetItem = invItem;
+                    targetSlot = slot;
                     break;
                 }
                 if (targetItem == null) {
-                    for (ItemStack invItem : BindGUI.this.player.getInventory().getArmorContents()) {
-                        if (invItem == null || !invItem.hasItemMeta()) continue;
-                        id = (String)invItem.getItemMeta().getPersistentDataContainer().get(itemIdKey, PersistentDataType.STRING);
-                        if (!boundWeaponId.toString().equals(id)) continue;
-                        targetItem = invItem;
-                        break;
-                    }
-                }
-                if (targetItem == null && (offHand = BindGUI.this.player.getInventory().getItemInOffHand()) != null && offHand.hasItemMeta()) {
-                    String id2 = (String)offHand.getItemMeta().getPersistentDataContainer().get(itemIdKey, PersistentDataType.STRING);
-                    if (boundWeaponId.toString().equals(id2)) {
-                        targetItem = offHand;
+                    ItemStack offHand = BindGUI.this.player.getInventory().getItemInOffHand();
+                    if (offHand != null && offHand.hasItemMeta()) {
+                        String id2 = (String)offHand.getItemMeta().getPersistentDataContainer().get(itemIdKey, PersistentDataType.STRING);
+                        if (boundWeaponId.toString().equals(id2)) {
+                            targetItem = offHand;
+                            isOffHand = true;
+                        }
                     }
                 }
                 if (targetItem == null) {
@@ -849,8 +904,8 @@ implements Listener {
                         Item gi;
                         ItemStack stack;
                         if (!(entity instanceof Item) || (stack = (gi = (Item)entity).getItemStack()) == null || !stack.hasItemMeta()) continue;
-                        id = (String)stack.getItemMeta().getPersistentDataContainer().get(itemIdKey, PersistentDataType.STRING);
-                        if (!boundWeaponId.toString().equals(id)) continue;
+                        String id3 = (String)stack.getItemMeta().getPersistentDataContainer().get(itemIdKey, PersistentDataType.STRING);
+                        if (!boundWeaponId.toString().equals(id3)) continue;
                         targetItem = stack;
                         isGroundItem = true;
                         groundItemEntity = gi;
@@ -861,23 +916,25 @@ implements Listener {
                     this.cancel();
                     return;
                 }
+
                 ItemMeta currentMeta = targetItem.getItemMeta();
                 if (currentMeta == null) {
                     return;
                 }
                 Location loc = BindGUI.this.player.getLocation();
+
                 if (this.step >= 8) {
-                    currentMeta.setDisplayName(MessageUtil.parse("&d&l\u26a1 &5&l" + ChatColor.stripColor((String)originalName) + " &d&l\u26a1"));
-                    if (finalSelectedModelData > 0) {
-                        currentMeta.setCustomModelData(Integer.valueOf(finalSelectedModelData));
-                    }
+                    currentMeta.setDisplayName(MessageUtil.parse("&d&l⚡ &5&l" + broadcastName + " &d&l⚡"));
                     targetItem.setItemMeta(currentMeta);
-                    if (isGroundItem && groundItemEntity != null) {
+                    if (targetSlot != -1) {
+                        BindGUI.this.player.getInventory().setItem(targetSlot, targetItem);
+                    } else if (isOffHand) {
+                        BindGUI.this.player.getInventory().setItemInOffHand(targetItem);
+                    } else if (isGroundItem && groundItemEntity != null) {
                         groundItemEntity.setItemStack(targetItem);
-                    } else {
-                        BindGUI.this.player.updateInventory();
                     }
-                    BindGUI.this.player.sendMessage(MessageUtil.parse("&d&l\u26a1 &f&lYOUR WEAPON HAS BEEN BOUND TO YOU! &d&l\u26a1"));
+                    BindGUI.this.player.updateInventory();
+                    MessageUtil.sendWithDefault(BindGUI.this.player, "gui.bound-broadcast", "&d&l⚡ &f&lYOUR WEAPON HAS BEEN BOUND TO YOU! &d&l⚡");
                     CompatUtil.playSound(BindGUI.this.player.getWorld(), loc, this.finalSound, 1.2f, 1.0f);
                     for (int i = 0; i < 360; i += 15) {
                         double angle = Math.toRadians(i);
@@ -889,13 +946,16 @@ implements Listener {
                     }
                     this.cancel();
                 } else {
-                    currentMeta.setDisplayName(MessageUtil.parse(this.colors[this.step % this.colors.length] + "\u26a1 " + ChatColor.stripColor((String)originalName) + " \u26a1"));
+                    currentMeta.setDisplayName(MessageUtil.parse(this.colors[this.step % this.colors.length] + "⚡ " + broadcastName + " ⚡"));
                     targetItem.setItemMeta(currentMeta);
-                    if (isGroundItem && groundItemEntity != null) {
+                    if (targetSlot != -1) {
+                        BindGUI.this.player.getInventory().setItem(targetSlot, targetItem);
+                    } else if (isOffHand) {
+                        BindGUI.this.player.getInventory().setItemInOffHand(targetItem);
+                    } else if (isGroundItem && groundItemEntity != null) {
                         groundItemEntity.setItemStack(targetItem);
-                    } else {
-                        BindGUI.this.player.updateInventory();
                     }
+                    BindGUI.this.player.updateInventory();
                     CompatUtil.playSound(BindGUI.this.player.getWorld(), loc, this.tickSound, 0.8f, 0.8f + (float)this.step * 0.1f);
                     double y = (double)this.step * 0.25;
                     double radius = 0.8;
@@ -914,7 +974,7 @@ implements Listener {
     }
 
     private void handleUnbind() {
-        ItemStack target = this.inventory.getItem(13);
+        ItemStack target = this.mainInventory.getItem(13);
         if (target == null || target.getType().isAir()) {
             return;
         }
@@ -929,62 +989,60 @@ implements Listener {
         }
         String ownerUuidStr = (String)meta.getPersistentDataContainer().get(boundKey, PersistentDataType.STRING);
         if (!this.player.getUniqueId().toString().equals(ownerUuidStr)) {
+            MessageUtil.sendWithDefault(this.player, "gui.not-your-weapon", "&cThis weapon is not bound to you!");
+            this.player.playSound(this.player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             return;
         }
+
         this.plugin.getDataManager().setBoundWeaponId(this.player.getUniqueId(), null);
         this.plugin.getDataManager().setHasBoundWeapon(this.player.getUniqueId(), false);
-        meta.getPersistentDataContainer().remove(boundKey);
-        meta.getPersistentDataContainer().remove(itemIdKey);
-        NamespacedKey origCmdKey = new NamespacedKey((Plugin)this.plugin, "smp_original_cmd");
-        NamespacedKey origNameKey = new NamespacedKey((Plugin)this.plugin, "smp_original_name");
-        if (meta.getPersistentDataContainer().has(origCmdKey, PersistentDataType.INTEGER)) {
-            int origCmd = (Integer)meta.getPersistentDataContainer().get(origCmdKey, PersistentDataType.INTEGER);
-            meta.setCustomModelData(Integer.valueOf(origCmd));
-            meta.getPersistentDataContainer().remove(origCmdKey);
-        } else {
-            meta.setCustomModelData(null);
-        }
-        NamespacedKey origLoreKey = new NamespacedKey((Plugin)this.plugin, "smp_original_lore");
-        if (meta.getPersistentDataContainer().has(origLoreKey, PersistentDataType.STRING)) {
-            String origLoreRaw = (String)meta.getPersistentDataContainer().get(origLoreKey, PersistentDataType.STRING);
-            meta.setLore(Arrays.asList(origLoreRaw.split("\\|\\|\\|")));
-            meta.getPersistentDataContainer().remove(origLoreKey);
-        } else {
-            meta.setLore(null);
-        }
-        if (meta.getPersistentDataContainer().has(origNameKey, PersistentDataType.STRING)) {
-            String origName = (String)meta.getPersistentDataContainer().get(origNameKey, PersistentDataType.STRING);
-            meta.setDisplayName(origName);
-            meta.getPersistentDataContainer().remove(origNameKey);
-        } else if (meta.hasDisplayName()) {
-            String strippedName = ChatColor.stripColor((String)meta.getDisplayName());
-            strippedName = strippedName.replace("\u26a1", "").trim();
-            meta.setDisplayName(MessageUtil.color("&f" + strippedName));
-        }
-        target.setItemMeta(meta);
+
+        ItemFactory.unbindItem(target);
         ItemStack finalItem = target.clone();
-        this.inventory.setItem(13, null);
+        this.mainInventory.setItem(13, null);
         this.player.closeInventory();
-        Map<Integer, ItemStack> leftover = this.player.getInventory().addItem(new ItemStack[]{finalItem});
+
+        Map<Integer, ItemStack> leftover = this.player.getInventory().addItem(finalItem);
         if (!leftover.isEmpty()) {
             for (ItemStack drop : leftover.values()) {
                 this.player.getWorld().dropItemNaturally(this.player.getLocation(), drop);
             }
         }
-        this.player.sendMessage(MessageUtil.parse("&aSuccessfully unbound your weapon."));
+        ItemFactory.unbindAllPlayerItems(this.player);
+        MessageUtil.sendWithDefault(this.player, "gui.unbound-success", "&aSuccessfully unbound your weapon.");
         this.player.playSound(this.player.getLocation(), Sound.BLOCK_ANVIL_USE, 1.0f, 1.0f);
     }
 
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
-        if (event.getInventory().equals((Object)this.inventory)) {
-            HandlerList.unregisterAll((Listener)this);
-            ItemStack leftoverItem = this.inventory.getItem(13);
-            if (leftoverItem != null && !leftoverItem.getType().isAir()) {
-                this.inventory.setItem(13, null);
-                Map<Integer, ItemStack> remaining = this.player.getInventory().addItem(new ItemStack[]{leftoverItem});
-                if (!remaining.isEmpty()) {
-                    for (ItemStack item : remaining.values()) {
+        if (!event.getPlayer().equals(this.player)) {
+            return;
+        }
+        Inventory closed = event.getInventory();
+        if (closed.equals(this.mainInventory) || closed.equals(this.selectInventory)) {
+            if (this.isSwitchingView) {
+                return;
+            }
+            HandlerList.unregisterAll(this);
+
+            // Safe return of any weapon currently held in slot or model selector
+            if (this.weaponInSlot != null && !this.weaponInSlot.getType().isAir()) {
+                ItemStack returning = this.weaponInSlot.clone();
+                this.weaponInSlot = null;
+                Map<Integer, ItemStack> left = this.player.getInventory().addItem(returning);
+                if (!left.isEmpty()) {
+                    for (ItemStack item : left.values()) {
+                        this.player.getWorld().dropItemNaturally(this.player.getLocation(), item);
+                    }
+                }
+            }
+
+            ItemStack leftoverMain = this.mainInventory.getItem(13);
+            if (leftoverMain != null && !leftoverMain.getType().isAir()) {
+                this.mainInventory.setItem(13, null);
+                Map<Integer, ItemStack> left2 = this.player.getInventory().addItem(leftoverMain);
+                if (!left2.isEmpty()) {
+                    for (ItemStack item : left2.values()) {
                         this.player.getWorld().dropItemNaturally(this.player.getLocation(), item);
                     }
                 }
@@ -1002,4 +1060,3 @@ implements Listener {
         return item;
     }
 }
-

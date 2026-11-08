@@ -23,6 +23,8 @@
 package com.floki.strengthsmp.listeners;
 
 import com.floki.strengthsmp.StrengthSMP;
+import com.floki.strengthsmp.util.CompatUtil;
+import com.floki.strengthsmp.util.MessageUtil;
 import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -56,7 +58,7 @@ implements Listener {
         ItemStack item = event.getItem();
         if (this.isStrengthSource(item)) {
             event.setCancelled(true);
-            event.getPlayer().sendMessage("\u00a7c\u26a0 Strength potions are disabled.");
+            MessageUtil.sendWithDefault(event.getPlayer(), "abilities.potion-disabled", "§c⚠ Strength potions are disabled.");
         }
     }
 
@@ -68,7 +70,7 @@ implements Listener {
         if (this.isStrengthSource(event.getPotion().getItem())) {
             event.setCancelled(true);
             if (event.getPotion().getShooter() instanceof Player) {
-                ((Player)event.getPotion().getShooter()).sendMessage("\u00a7c\u26a0 Strength potions are disabled.");
+                MessageUtil.sendWithDefault((Player)event.getPotion().getShooter(), "abilities.potion-disabled", "§c⚠ Strength potions are disabled.");
             }
         }
     }
@@ -85,7 +87,7 @@ implements Listener {
             return;
         }
         for (PotionEffect effect : cloud.getCustomEffects()) {
-            if (!effect.getType().equals((Object)PotionEffectType.INCREASE_DAMAGE)) continue;
+            if (!effect.getType().equals(CompatUtil.resolvePotionEffect("STRENGTH", "INCREASE_DAMAGE"))) continue;
             event.setCancelled(true);
             return;
         }
@@ -105,7 +107,7 @@ implements Listener {
             arrow.setBasePotionData(new PotionData(PotionType.WATER));
         }
         if (!arrow.getCustomEffects().isEmpty()) {
-            arrow.removeCustomEffect(PotionEffectType.INCREASE_DAMAGE);
+            arrow.removeCustomEffect(CompatUtil.resolvePotionEffect("STRENGTH", "INCREASE_DAMAGE"));
         }
     }
 
@@ -121,7 +123,7 @@ implements Listener {
         if (event.getNewEffect() == null) {
             return;
         }
-        if (event.getNewEffect().getType().equals((Object)PotionEffectType.INCREASE_DAMAGE) && ((cause = event.getCause()).name().contains("POTION") || cause == EntityPotionEffectEvent.Cause.AREA_EFFECT_CLOUD || cause == EntityPotionEffectEvent.Cause.ARROW)) {
+        if (event.getNewEffect().getType().equals(CompatUtil.resolvePotionEffect("STRENGTH", "INCREASE_DAMAGE")) && ((cause = event.getCause()).name().contains("POTION") || cause == EntityPotionEffectEvent.Cause.AREA_EFFECT_CLOUD || cause == EntityPotionEffectEvent.Cause.ARROW)) {
             event.setCancelled(true);
         }
     }
@@ -139,7 +141,7 @@ implements Listener {
             return true;
         }
         for (PotionEffect effect : meta.getCustomEffects()) {
-            if (!effect.getType().equals((Object)PotionEffectType.INCREASE_DAMAGE)) continue;
+            if (!effect.getType().equals(CompatUtil.resolvePotionEffect("STRENGTH", "INCREASE_DAMAGE"))) continue;
             return true;
         }
         return false;

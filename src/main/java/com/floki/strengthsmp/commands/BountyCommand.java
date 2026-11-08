@@ -34,15 +34,8 @@ extends BaseCommand {
             return true;
         }
         Player player = (Player)sender;
-        if (args.length == 0) {
-            this.sendMessage((CommandSender)player, "<#f1c40f><b>[Bounty System]</b></#f1c40f>");
-            this.sendMessage((CommandSender)player, " <#f39c12>\u2022</#f39c12> <white>/bounty <player> <amount></white> <gray>Place a bounty using your STR</gray>");
-            this.sendMessage((CommandSender)player, " <#f39c12>\u2022</#f39c12> <white>/bounty list</white> <gray>See all active bounties</gray>");
-            return true;
-        }
-        if (args[0].equalsIgnoreCase("list")) {
-            this.sendMessage((CommandSender)player, "<#f1c40f><b>[Active Bounties]</b></#f1c40f>");
-            this.sendMessage((CommandSender)player, " <gray>Check Discord for the full leaderboard and bounty list!</gray>");
+        if (args.length == 0 || args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("gui")) {
+            new com.floki.strengthsmp.gui.BountyBoardGUI(this.plugin).open(player);
             return true;
         }
         if (args.length < 2) {

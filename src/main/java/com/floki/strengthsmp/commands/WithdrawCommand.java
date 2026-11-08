@@ -13,6 +13,7 @@ package com.floki.strengthsmp.commands;
 
 import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.commands.BaseCommand;
+import com.floki.strengthsmp.util.MessageUtil;
 import com.floki.strengthsmp.util.CompatUtil;
 import com.floki.strengthsmp.util.ItemFactory;
 import org.bukkit.Sound;
@@ -52,9 +53,17 @@ extends BaseCommand {
             this.sendError((CommandSender)player, "You must withdraw at least 1 strength!");
             return true;
         }
+        com.floki.strengthsmp.api.HollowHook hollow = this.plugin.getHollowHook();
+        long lockMs = hollow != null ? hollow.getWithdrawLockRemainingMs(player.getUniqueId()) : 0L;
+        if (lockMs > 0L) {
+            this.sendError((CommandSender)player, "You escaped the Hollow recently. Withdrawing unlocks in <#f1c40f>" + com.floki.strengthsmp.util.TimeFormat.duration(lockMs) + "</#f1c40f>.");
+            return true;
+        }
         int currentStrength = this.plugin.getDataManager().getStrength(player.getUniqueId());
-        if (currentStrength - amount < (min = this.plugin.getConfigManager().getMinStrength())) {
-            this.sendError((CommandSender)player, "You cannot withdraw this much! You must maintain at least <#f1c40f>" + min + " STR.");
+        // Withdrawing below the floor (0 by default) would let players dump strength and farm revives.
+        min = Math.max(this.plugin.getConfigManager().getMinStrength(), this.plugin.getConfigManager().getConfig().getInt("strength.withdraw-floor", 0));
+        if (currentStrength - amount < min) {
+            this.sendError((CommandSender)player, "You cannot withdraw this much! You must keep at least <#f1c40f>" + min + " STR.");
             return true;
         }
         long cooldownSeconds = Math.min(12L, 3L + 2L * (long)(amount - 1));
@@ -73,7 +82,7 @@ extends BaseCommand {
         player.getInventory().addItem(new ItemStack[]{ItemFactory.createStrengthItem(amount)});
         this.plugin.getDataManager().setAbilityCooldown(player.getUniqueId(), "withdraw_cmd", System.currentTimeMillis());
         int newBalance = this.plugin.getDataManager().getStrength(player.getUniqueId());
-        this.sendMessage((CommandSender)player, "<#2ecc71><b>WITHDRAW</b></#2ecc71> <gray>You withdrew</gray> <#f1c40f>" + amount + " STR</#f1c40f><gray>. Remaining:</gray> <white>" + newBalance + "</white>");
+        MessageUtil.sendWithDefault(player, "commands.withdraw-success", "<#2ecc71><b>WITHDRAW</b></#2ecc71> <gray>You withdrew</gray> <#f1c40f>%amount% STR</#f1c40f><gray>. Remaining:</gray> <white>%remaining%</white>", "amount", String.valueOf(amount), "remaining", String.valueOf(newBalance));
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.5f, 1.5f);
         CompatUtil.playSound(player, player.getLocation(), "BLOCK_AMETHYST_BLOCK_CHIME", 1.0f, 1.0f);
         for (int i = 0; i < 360; i += 30) {

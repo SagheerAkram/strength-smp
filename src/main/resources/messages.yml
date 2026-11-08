@@ -1,60 +1,2472 @@
-# StrengthSMP Messages
-prefix: "&x&f&f&8&c&0&0&lS&x&f&f&9&7&0&a&lT&x&f&f&a&3&1&4&lR&x&f&f&a&e&1&e&lE&x&f&f&b&a&2&8&lN&x&f&f&c&5&3&2&lG&x&f&f&d&1&3&c&lT&x&f&f&d&c&4&6&lH &8» "
+en:
+  prefix: '&x&f&f&8&c&0&0&lS&x&f&f&9&7&0&a&lT&x&f&f&a&3&1&4&lR&x&f&f&a&e&1&e&lE&x&f&f&b&a&2&8&lN&x&f&f&c&5&3&2&lG&x&f&f&d&1&3&c&lT&x&f&f&d&c&4&6&lH &8» '
+  no-permission: '&c&l✖ &c&lNO PERMISSION! &7You do not have access to this command.'
+  only-players: '&c&l✖ &c&lPLAYERS ONLY! &7This command can only be run in-game.'
+  player-not-found: '&c&l✖ &c&lPLAYER NOT FOUND! &7The specified player is not online.'
+  invalid-amount: '&c&l✖ &c&lINVALID AMOUNT! &7Please specify a valid positive number.'
+  combat:
+    tagged: '&c&l☠ &c&lCOMBAT TAG! &7You are in combat! &8(&cDo not logout&8)'
+    expired: '&a&l✔ &a&lCOMBAT EXPIRED! &7You can now safely logout.'
+    penalty: '&c&l☠ &c&lLOGOUT PENALTY! &e%player% &7logged out during combat and was &cexecuted&7!'
+    command-blocked: '&c&l☠ &c&lCOMBAT! &7You cannot use commands while in combat.'
+  bounty:
+    set: '&6&l🎯 [BOUNTY] &f%sender% &7placed a &6%amount% STR &7bounty on &e%target%&7!'
+    claim: '&6&l🎯 [BOUNTY] &e%player% &7claimed &6%amount% STR &7by defeating &e%target%&7!'
+    claim-bonus-skip: '&8(( Bounty claimed — normal kill strength gain suppressed ))'
+  monarch:
+    new: '&e&l👑 [MONARCH] &f%player% &7has ascended to become the &e&lServer Monarch&7!'
+    dethroned: '&e&l👑 [MONARCH] &f%player% &7has been &cdethroned &7as Monarch!'
+  season:
+    day: '&b&l📅 [SEASON] &7Current season day: &b%day%'
+  contract:
+    complete: '&a&l✔ [CONTRACT] &7You''ve completed a daily contract! &8(&a+%reward% STR&8)'
+  discord:
+    kill-log: ':crossed_swords: **%attacker%** defeated **%victim%** and gained **%amount%** strength! ⚔'
+    bounty-log: ':moneybag: **%attacker%** claimed **%victim%**''s bounty of **%amount%** strength!'
+  totem: null
+  strength:
+    insufficient: '&c&l✖ &c&lINSUFFICIENT STRENGTH! &7You need at least &e1 STR &7to reroll your class.'
+    free-reroll-reward: '&b&l🎁 [REWARD] &fYou received a &d&lFree Reroll Book&f! &7Right-click to use.'
+    cooldown: '&c&l⌛ [COOLDOWN] &7Please wait &c%time%s &7before using another strength item.'
+    max-reached: '&d&l⚡ [MAX STRENGTH] &7You are already at the maximum strength limit.'
+    protection-granted: '&b&l🛡 [PROTECTED] &fYou gained &b%hours% hours &fof &b&ldeath protection&f! &7(No strength lost)'
+    protected: '&b&l🛡 [PROTECTED] &fYou are under &b&lprotection&f! &7(No strength lost)'
+    protection-blocked: '&7(( Your target is &bprotected &7and cannot lose strength ))'
+    anti-farm: '&8(( Kill ignored — you have recently killed this player too much ))'
+    newbie-protection-start: '&a&l☘ [NEWBIE] &fWelcome! &a%hours% hours &fof newbie protection granted.'
+    newbie-you-protected: '&a&l☘ [NEWBIE] &fYou are under &a&lnewbie protection&f! &7(No STR lost)'
+    newbie-protected: '&7(( Your target is a &anew player &7and is protected ))'
+    newbie-no-gain: '&8(( You cannot gain STR from kills while under newbie protection ))'
+    protected-no-gain: '&8(( You cannot gain STR from kills while under death protection ))'
+    gain: '&a&l⚡ [STRENGTH GAINED] &7Your strength increased to &e&l%strength% STR&7!'
+    loss: '&c&l⚡ [STRENGTH LOST] &7Your strength decreased to &c&l%strength% STR&7!'
+    at-minimum: '&c&l✖ [AT MINIMUM] &7You are at the minimum strength limit.'
+    victim-at-minimum: '&c&l✖ [AT MINIMUM] &7Your target is already at the minimum strength.'
+  abilities:
+    supercharge: '&d&lSUPERCHARGE &r&7— Your bow has instant pull velocity!'
+    scorpion-miss: '&c⚡ Scorpion Hook missed!'
+    scorpion-hit-target: '&c⚡ You were pulled and stunned by %player%''s Scorpion Hook!'
+    scorpion-hit-player: '&a⚡ Scorpion Hook hit! Dragged %target% directly to you!'
+    no-arrows: '&cYou have no arrows!'
+    trident-no-throw: '&c&lYou cannot throw tridents! &7Use it as a melee weapon.'
+    ability-cooldown: '&cAbility on cooldown! (%remaining%s)'
+    bleed: '&5&lBLEED &r&7— Your blade caused the victim to wither!'
+    berserk-cooldown: '&cBerserk is on cooldown! (%remaining%s)'
+    blink-cooldown: '&cBlink is on cooldown! (%remaining%s)'
+    berserk-end: '&cBerserk mode has ended.'
+    berserk-start: '&e&lBERSERK &r&7— Gained Berserk mode! (+2 Attack Damage, Speed III for 15s)'
+    blink-success: '&5&lBLINK &r&7— You teleported forward!'
+    shield-active: '&6&lSHIELD ACTIVE &r&7— Reflecting all damage & Resistance II for 7s!'
+    shield-ended: '&cReflect has worn off.'
+    potion-disabled: '&c⚠ Strength potions are disabled.'
+    no-weapons-available: '&cNo other weapon types available!'
+    rapid-fire: '&b&lRAPID FIRE &r&7— Unleashing burst volley!'
+    axe-stunned: '&cYou have been stunned by an axe strike!'
+    axe-shield-disabled: '&cYour shield has been disabled by an axe strike!'
+  items:
+    swap-key-hint: '&d&l⚡ &7Use your Swap Item key (F) to use the Shield ability!'
+    actionbar-cooldown: '&e&l⚡ &7Bound Ability on cooldown! &c(%remaining%s)'
+    bound-to-another: '&d&l⚡ &7This weapon is bound to another soul!'
+    cannot-store-container: '&d&l⚡ &7You cannot store your bound weapon in containers!'
+    cannot-place-item: '&d&l⚡ &7You cannot place your bound weapon on this!'
+    void-return: '&d&l⚡ &fYour bound weapon returned from the void. &d&l⚡'
+    actionbar-returned: '&d&l⚡ Bound Weapon Returned! ⚡'
+    return-knockback: '&d&l⚡ &7You were knocked aside by a returning bound weapon!'
+    sealed-destiny-name: '&d&lSEALED DESTINY'
+    sealed-destiny-lore-1: '&7An ancient artifact that reveals'
+    sealed-destiny-lore-2: '&7your inner warrior potential.'
+    sealed-destiny-lore-click: '&fRight-click to &bAWAKEN &fyour power!'
+    sealed-destiny-lore-tag: '&a&lFREE &7(First Join Reward)'
+  gui:
+    bind-title: '&d&l⚡ Weapon Binding ⚡'
+    shuffle-title: '&0&lDestiny Awakening...'
+    invalid-class-slot: '&cInvalid class weapon in Slot 14!'
+    already-bound: '&cThis weapon is already bound!'
+    need-more-strength: '&cYou need at least %cost% strength to bind your weapon. You have %current%.'
+    bound-success: '&aSpent &e%cost% strength &ato bind your class weapon!'
+    bound-free-success: '&aYour weapon has been bound for &eFREE &aby the grace of your Soul Sacrifice!'
+    bound-broadcast: '&d&l⚡ &f&lYOUR WEAPON HAS BEEN BOUND TO YOU! &d&l⚡'
+    unbound-success: '&aSuccessfully unbound your weapon.'
+    starter-book-not-owner: '&c&l✖ &cThis Free Reroll Book is bound to %owner% and cannot be used by you!'
+    starter-book-no-drop: '&c&l✖ &cYou cannot drop your personal Free Reroll Book!'
+    starter-book-no-container: '&c&l✖ &cYou cannot place your personal Free Reroll Book in containers!'
+    bind-select-title: '&d&l⚡ Choose Weapon Model ⚡'
+    bind-back-btn-title: '&c&l⬅ Back to Weapon Slot'
+    bind-back-btn-lore: '&7Return to place or take back your weapon.'
+    bind-confirm-btn-bind: '&a&l⚡ Confirm Soul Binding ⚡'
+    bind-confirm-btn-change: '&a&l⚡ Confirm Model Change ⚡'
+    bind-confirm-btn-not-enough: '&c&l❌ Not Enough Strength'
+    bind-confirm-selected: '&7Selected Model: &b%model%'
+    bind-confirm-cost-free: FREE (Soul Sacrifice)
+    bind-confirm-cost-str: '%cost% Strength'
+    bind-confirm-cost-line: '&7Binding Cost: &e%cost%'
+    bind-confirm-strength-line: '&7Your Strength: &f%strength%'
+    bind-confirm-click-action: '&eClick to bind your weapon with this model!'
+    bind-confirm-need-more: '&cYou need at least %cost% Strength to bind!'
+    bind-model-selected: '&7Status: &a&lSELECTED'
+    bind-model-selected-lore: '&eThis model will be applied upon confirmation.'
+    bind-model-not-selected: '&7Status: &cNot Selected'
+    bind-model-click-to-select: '&eClick to select this model!'
+    bind-target-preview: '&e&lBinding Target: &f%item%'
+    bind-target-preview-lore: '&7Select 1 of the 3 exclusive 3D models below.'
+    bind-guide-title: '&d&l⚡ How It Works ⚡'
+    bind-guide-step1: '&71. Place your class weapon in &eSlot 14&7.'
+    bind-guide-step2: '&72. Click &d&lBind Weapon &7to view &e3 custom models&7.'
+    bind-guide-step3: '&73. Select your favorite model and click &a&lConfirm&7!'
+    bind-status-title: '&b&lBinding Status & Perks'
+    bind-status-class: '&7Your Class: %class%'
+    bind-status-bound: '&7Bound Weapon: %status%'
+    bind-status-perks: '&eBinding Perks:'
+    bind-status-perk-death: '&d- Keep on Death: &7Bound weapon is never dropped on death'
+    bind-status-perk-loyalty: '&d- Loyalty Flight: &7Flies back to you on respawn, knocking back enemies'
+    bind-status-perk-soulbound: '&d- Soulbound Aura: &7Emits custom class magic particles while wielded'
+    bind-btn-change-model: '&a&l✨ Change Model (1 Strength) ✨'
+    bind-btn-cannot-change: '&c&l✨ Cannot Change Model'
+    bind-btn-bind-weapon: '&d&l⚡ Bind Weapon ⚡'
+    bind-btn-cannot-bind: '&c&l⚡ Cannot Bind Weapon'
+    bind-btn-desc: '&7Bind this weapon to your soul.'
+    bind-btn-desc-change: '&7Change the 3D model of your bound weapon.'
+    bind-btn-cost: '&7Cost: &e%cost%'
+    bind-btn-status: '&7Status: %status%'
+    bind-btn-click-choose: '&eClick to choose your 3D weapon model!'
+    bind-action-place-weapon: '&cPlease place a weapon in Slot 14.'
+    bind-action-no-class: '&cYou do not have a weapon class!'
+    bind-action-wrong-class: '&cWeapon does not match your class (%class%)!'
+    bind-action-other-player: '&cBound to a different player!'
+    bind-action-change-model: '&aClick to choose a new model!'
+    bind-action-ready: '&aReady to choose your model!'
+    unbind-title: '&c&l⚡ Unbind Weapon ⚡'
+    unbind-desc: '&7Unbind your current bound weapon.'
+    unbind-status: '&7Status: %status%'
+    unbind-action: '&eClick to unbind weapon in Slot 14.'
+    unbind-cannot: '&cPlace a bound weapon in Slot 14.'
+    bind-stats-kills: '&d&l⚔ Weapon Kills'
+    bind-stats-kills-desc: '&7Tracks PvP kills secured with your bound weapon.'
+    bind-stats-damage: '&d&l💥 Damage Dealt'
+    bind-stats-damage-desc: '&7Tracks final damage dealt with your bound weapon.'
+    bind-stats-sacrifices: '&d&l🛡️ Soul Sacrifices'
+    bind-stats-sacrifices-desc: '&7Tracks death saves triggered by your bound weapon.'
+    bind-stats-duration: '&d&l⌛ Duration Bound'
+    bind-stats-duration-desc: '&7Tracks elapsed time since you bound your current weapon.'
+    bind-stats-abilities: '&d&l✨ Ability Triggers'
+    bind-stats-abilities-desc: '&7Tracks weapon ability uses while bound.'
+    not-your-weapon: '&cThis weapon is bound to another player!'
+    place-weapon-first: '&cPlease place your class weapon in Slot 14 first!'
+    skin-changed-success: '&aSpent &e1 strength &ato change your weapon model!'
+  ledger:
+    title: '  LEDGER OF LEGENDS'
+    header: '-------------------'
+    warrior: 'Warrior: '
+    strength: 'Strength: '
+    class: 'Class: '
+    bounty: 'Bounty: '
+    kills: 'Kills: '
+    deaths: 'Deaths: '
+    kd: 'K/D: '
+    footer: Destiny is forged in blood.
+  ranks:
+    unassigned: '&e[Unassigned]'
+    '-10': '&8[Hopeless]'
+    '-9': '&8[Wretched]'
+    '-8': '&7[Frail]'
+    '-7': '&7[Weakling]'
+    '-6': '&7[Peasant]'
+    '-5': '&f[Vassal]'
+    '-4': '&f[Citizen]'
+    '-3': '&a[Squire]'
+    '-2': '&a[Apprentice]'
+    '-1': '&e[Novice]'
+    '0': '&e[Neutral]'
+    '1': '&d[Initiate]'
+    '2': '&b[Soldier]'
+    '3': '&5&l[Knight]'
+    '4': '&6&l[Veteran]'
+    '5': '&c&l[Champion]'
+    '6': '&4&l[Warlord]'
+    '7': '&4&l[Conqueror]'
+    '8': '&5&l[Grandmaster]'
+    '9': '&d&l[Overlord]'
+    '10': '&x&f&f&a&a&0&0&l[Demigod]'
+  weapons:
+    unassigned: Unassigned
+    sword:
+      name: Sword
+      desc: Dual-wield & Auto-crit passive
+    axe:
+      name: Axe
+      desc: Critical hits Stun + Kinetic Damage Storage
+    trident:
+      name: Trident
+      desc: Lightning passive + Water Wave mobility
+    shield:
+      name: Shield
+      desc: Speed II on stun + 15s Immortality
+    bow:
+      name: Bow
+      desc: Linear Sonic Beam Ultimate (AOE)
+    crossbow:
+      name: Crossbow
+      desc: Glowing arrows + Leash Ultimate
+  commands:
+    withdraw-success: <#2ecc71><b>WITHDRAW</b></#2ecc71> <gray>You withdrew</gray> <#f1c40f>%amount% STR</#f1c40f><gray>. Remaining:</gray> <white>%remaining%</white>
+    punish-message: <#e74c3c><b>[PUNISH]</b></#e74c3c> <gray>You have been punished by an admin. For the next</gray> <white>24 hours</white><gray>, you will lose</gray> <red><b>2 STR</b></red> <gray>on each death.</gray>
+    no-newbie-message: <#e74c3c><b>[ADMIN]</b></#e74c3c> <gray>Your newbie protection has been removed. You are now fully in the strength economy.</gray>
+    bounty-refund: <#2ecc71><b>[!]</b></#2ecc71> <gray>Your bounty of</gray> <#f1c40f>%amount% STR</#f1c40f> <gray>on %target% was refunded by an admin.</gray>
+    bounty-help-header: <#f1c40f><b>[Bounty System]</b></#f1c40f>
+    bounty-help-place: ' <#f39c12>•</#f39c12> <white>/bounty <player> <amount></white> <gray>Place a bounty using your STR</gray>'
+    bounty-help-list: ' <#f39c12>•</#f39c12> <white>/bounty list</white> <gray>See all active bounties</gray>'
+    language-changed: <#2ecc71><b>[Language]</b></#2ecc71> <gray>Language changed to</gray> <white>%lang%</white><gray>!</gray>
+    error-prefix: '[ERROR]'
+    success-prefix: '[SUCCESS]'
+    admin:
+      help-header: <#f1c40f><b>[StrengthSMP Admin]</b></#f1c40f>
+      help-maintenance: ' <#f39c12>•</#f39c12> <white>/strengthsmp maintenance <on|off></white> <gray>— Toggle maintenance mode</gray>'
+      help-toggle: ' <#f39c12>•</#f39c12> <white>/strengthsmp toggle</white> <gray>— Quick toggle system</gray>'
+      help-reload: ' <#f39c12>•</#f39c12> <white>/strengthsmp reload</white> <gray>— Reload config</gray>'
+      help-lang: ' <#f39c12>•</#f39c12> <white>/strengthsmp lang <en|ru|es|de|fr|pt></white> <gray>— Switch plugin language</gray>'
+      help-info: ' <#f39c12>•</#f39c12> <white>/strengthsmp info</white> <gray>— System status</gray>'
+      help-setupboard: ' <#f39c12>•</#f39c12> <white>/strengthsmp setupboard</white> <gray>— Setup Discord</gray>'
+      help-resetplayer: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetplayer <player></white>'
+      help-reroll: ' <#f39c12>•</#f39c12> <white>/strengthsmp reroll <player></white>'
+      help-setstrength: ' <#f39c12>•</#f39c12> <white>/strengthsmp setstrength <player> <amount></white>'
+      help-setweapon: ' <#f39c12>•</#f39c12> <white>/strengthsmp setweapon <player> <weapon></white>'
+      help-giveitem: ' <#f39c12>•</#f39c12> <white>/strengthsmp giveitem <player> <strength|reroll></white>'
+      help-resetmonarch: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetmonarch</white> <gray>— Recalculate monarch</gray>'
+      help-pack: ' <#f39c12>•</#f39c12> <white>/strengthsmp pack</white> <gray>— Force resource pack</gray>'
+      state-on: <#e74c3c><b>ON</b></#e74c3c>
+      state-off: <b>OFF</b>
+      state-enabled: <b>ENABLED</b>
+      state-disabled: <#e74c3c><b>DISABLED</b></#e74c3c>
+      maintenance-on: <#e74c3c><b>[Maintenance Mode]</b> Maintenance is now <b>ON</b> (System Disabled & KeepInventory Active).</#e74c3c>
+      maintenance-off: <#2ecc71><b>[Maintenance Mode]</b> Maintenance is now <b>OFF</b> (System Enabled).</#2ecc71>
+      maintenance-usage: 'Usage: /strengthsmp maintenance <on|off>'
+      maintenance-toggled: <#2ecc71>Maintenance mode is now %state%
+      system-toggled: <#2ecc71>System is now %state%
+      reload-success: Configuration reloaded successfully.
+      lang-current: '<#f1c40f><b>[Language]</b> Current language is: <b>%lang%</b>. Usage: /strengthsmp lang <en|ru|es|de|fr|pt></#f1c40f>'
+      pack-sending: <#2ecc71>Attempting to send resource pack... Check console for debug info.</#2ecc71>
+      info-header: <#f1c40f><b>[System Info]</b></#f1c40f>
+      info-status: ' <#95a5a6>Status:</#95a5a6> %status%'
+      info-status-enabled: <#2ecc71>ENABLED</#2ecc71>
+      info-status-disabled: <#e74c3c>DISABLED</#e74c3c>
+      info-monarch: ' <#95a5a6>Monarch:</#95a5a6> <#f1c40f>%monarch%</#f1c40f>'
+      info-monarch-none: None
+      info-online: ' <#95a5a6>Online players:</#95a5a6> <white>%count%</white>'
+      reroll-usage: 'Usage: /strengthsmp reroll <player>'
+      reroll-success: Rerolled %player% → %icon% %weapon%
+      reroll-target: <#2ecc71><b>[!]</b></#2ecc71> <gray>An admin rerolled your weapon to</gray> <#f1c40f><b>%weapon%</b></#f1c40f>
+      setstrength-usage: 'Usage: /strengthsmp setstrength <player> <amount>'
+      setstrength-success: Set %player%'s strength to <#f1c40f>%amount%</#f1c40f>
+      setweapon-usage: 'Usage: /strengthsmp setweapon <player> <weapon>'
+      setweapon-success: Set %player%'s weapon to <#f1c40f>%weapon%</#f1c40f>
+      setweapon-target: <#2ecc71><b>[!]</b></#2ecc71> <gray>Your weapon class was changed to</gray> <#f1c40f><b>%weapon%</b></#f1c40f> <gray>by an admin.</gray>
+      setweapon-invalid: 'Invalid weapon type! Use: SWORD, AXE, BOW, CROSSBOW, SHIELD, TRIDENT'
+      resetplayer-usage: 'Usage: /strengthsmp resetplayer <player>'
+      resetplayer-success: Reset stats for <#f1c40f>%player%</#f1c40f>
+      resetplayer-target: <#e74c3c><b>[!]</b></#e74c3c> <gray>Your stats have been reset by an admin.</gray>
+      giveitem-usage: 'Usage: /strengthsmp giveitem <player> <strength|reroll|death>'
+      giveitem-strength: Gave a Strength item to <#f1c40f>%player%</#f1c40f>
+      giveitem-reroll: Gave a Reroll item to <#f1c40f>%player%</#f1c40f>
+      giveitem-death: Gave a Death Certificate to <#f1c40f>%player%</#f1c40f>
+      giveitem-unknown: 'Unknown item type. Use: strength, reroll, or death'
+      checkitem-usage: 'Usage: /strengthsmp checkitem <player>'
+      checkitem-not-holding: '%player% is not holding an item!'
+      checkitem-header: <#2ecc71><b>[Item Check]</b></#2ecc71>
+      checkitem-player: ' <#95a5a6>Player:</#95a5a6> <white>%player%</white>'
+      checkitem-material: ' <#95a5a6>Material:</#95a5a6> <white>%material%</white>'
+      checkitem-cmd: ' <#95a5a6>CustomModelData:</#95a5a6> <#f1c40f>%value%</#f1c40f>'
+      board-not-connected: Discord bot is not connected!
+      board-success: Discord board updated.
+      resetmonarch-success: Monarch status has been recalculated.
+      unknown-subcommand: 'Unknown subcommand: <#f1c40f>%sub%</#f1c40f>. Use <white>/strengthsmp</white> for help.'
+ru:
+  prefix: '&x&f&f&8&c&0&0&lS&x&f&f&9&7&0&a&lT&x&f&f&a&3&1&4&lR&x&f&f&a&e&1&e&lE&x&f&f&b&a&2&8&lN&x&f&f&c&5&3&2&lG&x&f&f&d&1&3&c&lT&x&f&f&d&c&4&6&lH &8» '
+  no-permission: '&c&l✖ &c&lНЕТ ПРАВ! &7У вас нет доступа к этой команде.'
+  only-players: '&c&l✖ &c&lТОЛЬКО ДЛЯ ИГРОКОВ! &7Эта команда доступна только в игре.'
+  player-not-found: '&c&l✖ &c&lИГРОК НЕ НАЙДЕН! &7Указанный игрок не в сети.'
+  invalid-amount: '&c&l✖ &c&lНЕВЕРНОЕ КОЛИЧЕСТВО! &7Укажите корректное положительное число.'
+  combat:
+    tagged: '&c&l☠ &c&lРЕЖИМ БОЯ! &7Вы в бою! &8(&cНе выходите из игры&8)'
+    expired: '&a&l✔ &a&lБОЙ ОКОНЧЕН! &7Теперь вы можете безопасно выйти.'
+    penalty: '&c&l☠ &c&lШТРАФ ЗА ВЫХОД! &e%player% &7вышел во время боя и был &cказнён&7!'
+    command-blocked: '&c&l☠ &c&lРЕЖИМ БОЯ! &7Вы не можете использовать команды во время боя.'
+  bounty:
+    set: '&6&l🎯 [НАГРАДА] &f%sender% &7назначил награду &6%amount% STR &7за голову &e%target%&7!'
+    claim: '&6&l🎯 [НАГРАДА] &e%player% &7получил &6%amount% STR &7за победу над &e%target%&7!'
+    claim-bonus-skip: '&8(( Награда получена — обычный прирост Силы от убийства отменён ))'
+  monarch:
+    new: '&e&l👑 [МОНАРХ] &f%player% &7взошёл на престол и стал &e&lМонархом сервера&7!'
+    dethroned: '&e&l👑 [МОНАРХ] &f%player% &7был &cсвергнут &7с поста Монарха!'
+  season:
+    day: '&b&l📅 [СЕЗОН] &7Текущий день сезона: &b%day%'
+  contract:
+    complete: '&a&l✔ [КОНТРАКТ] &7Вы выполнили ежедневный контракт! &8(&a+%reward% STR&8)'
+  discord:
+    kill-log: ':crossed_swords: **%attacker%** победил **%victim%** и получил **%amount%** силы! ⚔'
+    bounty-log: ':moneybag: **%attacker%** получил награду в **%amount%** силы за **%victim%**!'
+  totem: null
+  strength:
+    insufficient: '&c&l✖ &c&lНЕДОСТАТОЧНО СИЛЫ! &7Вам нужно как минимум &e1 STR &7для смены класса.'
+    free-reroll-reward: '&b&l🎁 [НАГРАДА] &fВы получили &d&lКнигу бесплатной смены класса&f! &7Нажмите ПКМ для использования.'
+    cooldown: '&c&l⌛ [КД] &7Пожалуйста, подождите &c%time%сек. &7перед использованием следующего предмета.'
+    max-reached: '&d&l⚡ [МАКС. СИЛА] &7У вас уже максимальный лимит силы.'
+    protection-granted: '&b&l🛡 [ЗАЩИТА] &fВы получили &b%hours% часа &f&bзащиты от смерти&f! &7(Сила не теряется)'
+    protected: '&b&l🛡 [ЗАЩИТА] &fВы под &b&lзащитой&f! &7(Сила не теряется)'
+    protection-blocked: '&7(( Ваша цель под &bзащитой &7и не может потерять силу ))'
+    anti-farm: '&8(( Убийство проигнорировано — вы слишком часто убивали этого игрока ))'
+    newbie-protection-start: '&a&l☘ [НОВИЧОК] &fДобро пожаловать! Вы получили &a%hours% часов &fзащиты новичка.'
+    newbie-you-protected: '&a&l☘ [НОВИЧОК] &fВы под &a&lзащитой новичка&f! &7(Сила не теряется)'
+    newbie-protected: '&7(( Ваша цель — &aновичок &7и находится под защитой ))'
+    newbie-no-gain: '&8(( Вы не можете получать силу за убийства под защитой новичка ))'
+    protected-no-gain: '&8(( Вы не можете получать силу за убийства под защитой от смерти ))'
+    gain: '&a&l⚡ [СИЛА ПОЛУЧЕНА] &7Ваша сила увеличилась до &e&l%strength% STR&7!'
+    loss: '&c&l⚡ [СИЛА ПОТЕРЯНА] &7Ваша сила уменьшилась до &c&l%strength% STR&7!'
+    at-minimum: '&c&l✖ [МИНИМУМ] &7У вас минимальный лимит силы.'
+    victim-at-minimum: '&c&l✖ [МИНИМУМ] &7Ваша цель уже на минимальном уровне силы.'
+  abilities:
+    supercharge: '&d&lСУПЕРЗАРЯД &r&7— Ваш лук мгновенно натягивается!'
+    scorpion-miss: '&c⚡ Крюк Скорпиона промахнулся!'
+    scorpion-hit-target: '&c⚡ Вас притянул и оглушил %player% с помощью Крюка Скорпиона!'
+    scorpion-hit-player: '&a⚡ Крюк Скорпиона попал! %target% притянут к вам!'
+    no-arrows: '&cУ вас нет стрел!'
+    trident-no-throw: '&c&lВы не можете бросать трезубцы! &7Используйте его как ближнее оружие.'
+    ability-cooldown: '&cСпособность на перезарядке! (%remaining%сек.)'
+    bleed: '&5&lКРОВОТЕЧЕНИЕ &r&7— Ваше лезвие наложило иссушение на жертву!'
+    berserk-cooldown: '&cБерсерк на перезарядке! (%remaining%сек.)'
+    blink-cooldown: '&cСкачок на перезарядке! (%remaining%сек.)'
+    berserk-end: '&cРежим Берсерка завершился.'
+    berserk-start: '&e&lБЕРСЕРК &r&7— Активирован режим Берсерка! (+2 к урону, Скорость III на 15сек.)'
+    blink-success: '&5&lСКАЧОК &r&7— Вы телепортировались вперёд!'
+    shield-active: '&6&lЩИТ АКТИВЕН &r&7— Отражение всего урона и Сопротивление II на 7сек.!'
+    shield-ended: '&cОтражение щита закончилось.'
+    potion-disabled: '&c⚠ Зелья силы отключены.'
+    no-weapons-available: '&cНет других доступных типов оружия!'
+    rapid-fire: '&b&lБЫСТРАЯ СТРЕЛЬБА &r&7— Запуск залпа стрел!'
+    axe-stunned: '&cВы оглушены ударом топора!'
+    axe-shield-disabled: '&cВаш щит отключен ударом топора!'
+  items:
+    swap-key-hint: '&d&l⚡ &7Используйте клавишу смены предмета (F) для активации способности Щита!'
+    actionbar-cooldown: '&e&l⚡ &7Способность на перезарядке! &c(%remaining%сек.)'
+    bound-to-another: '&d&l⚡ &7Это оружие привязано к другой душе!'
+    cannot-store-container: '&d&l⚡ &7Вы не можете хранить привязанное оружие в контейнерах!'
+    cannot-place-item: '&d&l⚡ &7Вы не можете ставить или вешать привязанное оружие!'
+    void-return: '&d&l⚡ &fВаше привязанное оружие вернулось из бездны. &d&l⚡'
+    actionbar-returned: '&d&l⚡ Привязанное оружие вернулось! ⚡'
+    return-knockback: '&d&l⚡ &7Вас оттолкнуло возвращающееся привязанное оружие!'
+    sealed-destiny-name: '&d&lСВЯЩЕННЫЙ ГРИМУАР СУДЬБЫ'
+    sealed-destiny-lore-1: '&7Древний артефакт, раскрывающий'
+    sealed-destiny-lore-2: '&7твой внутренний потенциал воина.'
+    sealed-destiny-lore-click: '&fНажми ПКМ, чтобы &bПРОБУДИТЬ &fсилу!'
+    sealed-destiny-lore-tag: '&a&lБЕСПЛАТНО &7(Награда за первый вход)'
+  gui:
+    bind-title: '&d&l⚡ Привязка Оружия ⚡'
+    shuffle-title: '&0&lПробуждение Судьбы...'
+    invalid-class-slot: '&cНеверный тип оружия в слоте 13!'
+    already-bound: '&cЭто оружие уже привязано!'
+    need-more-strength: '&cВам нужно минимум %cost% силы для привязки. У вас %current%.'
+    bound-success: '&aПотрачено &e%cost% силы &aна привязку оружия классом!'
+    bound-free-success: '&aВаше оружие привязано &eБЕСПЛАТНО &aблагодаря Жертвоприношению Души!'
+    bound-broadcast: '&d&l⚡ &f&lВАШЕ ОРУЖИЕ ПРИВЯЗАНО К ВАМ! &d&l⚡'
+    unbound-success: '&aОружие успешно отвязано.'
+    starter-book-not-owner: '&c&l✖ &cЭта Книга смены класса привязана к %owner% и не может быть использована вами!'
+    starter-book-no-drop: '&c&l✖ &cВы не можете выбросить свою персональную Книгу смены класса!'
+    starter-book-no-container: '&c&l✖ &cВы не можете положить свою персональную Книгу смены класса в контейнеры!'
+    bind-select-title: '&d&l⚡ Choose Weapon Model ⚡'
+    bind-back-btn-title: '&c&l⬅ Back to Weapon Slot'
+    bind-back-btn-lore: '&7Return to place or take back your weapon.'
+    bind-confirm-btn-bind: '&a&l⚡ Confirm Soul Binding ⚡'
+    bind-confirm-btn-change: '&a&l⚡ Confirm Model Change ⚡'
+    bind-confirm-btn-not-enough: '&c&l❌ Not Enough Strength'
+    bind-confirm-selected: '&7Selected Model: &b%model%'
+    bind-confirm-cost-free: FREE (Soul Sacrifice)
+    bind-confirm-cost-str: '%cost% Strength'
+    bind-confirm-cost-line: '&7Binding Cost: &e%cost%'
+    bind-confirm-strength-line: '&7Your Strength: &f%strength%'
+    bind-confirm-click-action: '&eClick to bind your weapon with this model!'
+    bind-confirm-need-more: '&cYou need at least %cost% Strength to bind!'
+    bind-model-selected: '&7Status: &a&lSELECTED'
+    bind-model-selected-lore: '&eThis model will be applied upon confirmation.'
+    bind-model-not-selected: '&7Status: &cNot Selected'
+    bind-model-click-to-select: '&eClick to select this model!'
+    bind-target-preview: '&e&lBinding Target: &f%item%'
+    bind-target-preview-lore: '&7Select 1 of the 3 exclusive 3D models below.'
+    bind-guide-title: '&d&l⚡ How It Works ⚡'
+    bind-guide-step1: '&71. Place your class weapon in &eSlot 14&7.'
+    bind-guide-step2: '&72. Click &d&lBind Weapon &7to view &e3 custom models&7.'
+    bind-guide-step3: '&73. Select your favorite model and click &a&lConfirm&7!'
+    bind-status-title: '&b&lBinding Status & Perks'
+    bind-status-class: '&7Your Class: %class%'
+    bind-status-bound: '&7Bound Weapon: %status%'
+    bind-status-perks: '&eBinding Perks:'
+    bind-status-perk-death: '&d- Keep on Death: &7Bound weapon is never dropped on death'
+    bind-status-perk-loyalty: '&d- Loyalty Flight: &7Flies back to you on respawn, knocking back enemies'
+    bind-status-perk-soulbound: '&d- Soulbound Aura: &7Emits custom class magic particles while wielded'
+    bind-btn-change-model: '&a&l✨ Change Model (1 Strength) ✨'
+    bind-btn-cannot-change: '&c&l✨ Cannot Change Model'
+    bind-btn-bind-weapon: '&d&l⚡ Bind Weapon ⚡'
+    bind-btn-cannot-bind: '&c&l⚡ Cannot Bind Weapon'
+    bind-btn-desc: '&7Bind this weapon to your soul.'
+    bind-btn-desc-change: '&7Change the 3D model of your bound weapon.'
+    bind-btn-cost: '&7Cost: &e%cost%'
+    bind-btn-status: '&7Status: %status%'
+    bind-btn-click-choose: '&eClick to choose your 3D weapon model!'
+    bind-action-place-weapon: '&cPlease place a weapon in Slot 14.'
+    bind-action-no-class: '&cYou do not have a weapon class!'
+    bind-action-wrong-class: '&cWeapon does not match your class (%class%)!'
+    bind-action-other-player: '&cBound to a different player!'
+    bind-action-change-model: '&aClick to choose a new model!'
+    bind-action-ready: '&aReady to choose your model!'
+    unbind-title: '&c&l⚡ Unbind Weapon ⚡'
+    unbind-desc: '&7Unbind your current bound weapon.'
+    unbind-status: '&7Status: %status%'
+    unbind-action: '&eClick to unbind weapon in Slot 14.'
+    unbind-cannot: '&cPlace a bound weapon in Slot 14.'
+    bind-stats-kills: '&d&l⚔ Weapon Kills'
+    bind-stats-kills-desc: '&7Tracks PvP kills secured with your bound weapon.'
+    bind-stats-damage: '&d&l💥 Damage Dealt'
+    bind-stats-damage-desc: '&7Tracks final damage dealt with your bound weapon.'
+    bind-stats-sacrifices: '&d&l🛡️ Soul Sacrifices'
+    bind-stats-sacrifices-desc: '&7Tracks death saves triggered by your bound weapon.'
+    bind-stats-duration: '&d&l⌛ Duration Bound'
+    bind-stats-duration-desc: '&7Tracks elapsed time since you bound your current weapon.'
+    bind-stats-abilities: '&d&l✨ Ability Triggers'
+    bind-stats-abilities-desc: '&7Tracks weapon ability uses while bound.'
+    not-your-weapon: '&cThis weapon is bound to another player!'
+    place-weapon-first: '&cPlease place your class weapon in Slot 14 first!'
+    skin-changed-success: '&aSpent &e1 strength &ato change your weapon model!'
+  ledger:
+    title: '  КНИГА ЛЕГЕНД'
+    header: '-------------------'
+    warrior: 'Воин: '
+    strength: 'Сила: '
+    class: 'Класс: '
+    bounty: 'Награда: '
+    kills: 'Убийства: '
+    deaths: 'Смерти: '
+    kd: 'K/D: '
+    footer: Судьба куется в крови.
+  ranks:
+    unassigned: '&e[Без класса]'
+    '-10': '&8[Безнадёжный]'
+    '-9': '&8[Жалкий]'
+    '-8': '&7[Хрупкий]'
+    '-7': '&7[Слабак]'
+    '-6': '&7[Крестьянин]'
+    '-5': '&f[Вассал]'
+    '-4': '&f[Горожанин]'
+    '-3': '&a[Оруженосец]'
+    '-2': '&a[Ученик]'
+    '-1': '&e[Новичок]'
+    '0': '&e[Нейтральный]'
+    '1': '&d[Посвящённый]'
+    '2': '&b[Воин]'
+    '3': '&5&l[Рыцарь]'
+    '4': '&6&l[Ветеран]'
+    '5': '&c&l[Чемпион]'
+    '6': '&4&l[Воевода]'
+    '7': '&4&l[Завоеватель]'
+    '8': '&5&l[Гроссмейстер]'
+    '9': '&d&l[Владыка]'
+    '10': '&x&f&f&a&a&0&0&l[Полубог]'
+  weapons:
+    unassigned: Без класса
+    sword:
+      name: Меч
+      desc: Двуручное оружие и авто-крит
+    axe:
+      name: Топор
+      desc: Оглушение при крите + накопление урона
+    trident:
+      name: Трезубец
+      desc: Молния и водный рывок
+    shield:
+      name: Щит
+      desc: Скорость II при оглушении + бессмертие 15с
+    bow:
+      name: Лук
+      desc: Звуковой луч (AOE)
+    crossbow:
+      name: Арбалет
+      desc: Светящиеся стрелы + притягивание
+  commands:
+    withdraw-success: <#2ecc71><b>СНЯТИЕ</b></#2ecc71> <gray>Вы сняли</gray> <#f1c40f>%amount% STR</#f1c40f><gray>. Остаток:</gray> <white>%remaining%</white>
+    punish-message: <#e74c3c><b>[НАКАЗАНИЕ]</b></#e74c3c> <gray>Вы были наказаны администратором. В течение</gray> <white>24 часов</white><gray>, вы будете терять</gray> <red><b>2 STR</b></red> <gray>при каждой смерти.</gray>
+    no-newbie-message: <#e74c3c><b>[АДМИН]</b></#e74c3c> <gray>Ваша защита новичка снята. Теперь вы полноценный участник экономики силы.</gray>
+    bounty-refund: <#2ecc71><b>[!]</b></#2ecc71> <gray>Ваша награда в</gray> <#f1c40f>%amount% STR</#f1c40f> <gray>за %target% была возвращена администратором.</gray>
+    bounty-help-header: <#f1c40f><b>[Система Наград]</b></#f1c40f>
+    bounty-help-place: ' <#f39c12>•</#f39c12> <white>/bounty <игрок> <сумма></white> <gray>Назначить награду из своей STR</gray>'
+    bounty-help-list: ' <#f39c12>•</#f39c12> <white>/bounty list</white> <gray>Посмотреть все активные награды</gray>'
+    language-changed: <#2ecc71><b>[Язык]</b></#2ecc71> <gray>Язык успешно изменён на</gray> <white>%lang%</white><gray>!</gray>
+    error-prefix: '[ОШИБКА]'
+    success-prefix: '[ГОТОВО]'
+    admin:
+      help-header: <#f1c40f><b>[Администрирование StrengthSMP]</b></#f1c40f>
+      help-maintenance: ' <#f39c12>•</#f39c12> <white>/strengthsmp maintenance <on|off></white> <gray>— Переключить режим обслуживания</gray>'
+      help-toggle: ' <#f39c12>•</#f39c12> <white>/strengthsmp toggle</white> <gray>— Быстрое переключение системы</gray>'
+      help-reload: ' <#f39c12>•</#f39c12> <white>/strengthsmp reload</white> <gray>— Перезагрузить конфигурацию</gray>'
+      help-lang: ' <#f39c12>•</#f39c12> <white>/strengthsmp lang <en|ru|es|de|fr|pt></white> <gray>— Сменить язык плагина</gray>'
+      help-info: ' <#f39c12>•</#f39c12> <white>/strengthsmp info</white> <gray>— Статус системы</gray>'
+      help-setupboard: ' <#f39c12>•</#f39c12> <white>/strengthsmp setupboard</white> <gray>— Настроить Discord</gray>'
+      help-resetplayer: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetplayer <игрок></white>'
+      help-reroll: ' <#f39c12>•</#f39c12> <white>/strengthsmp reroll <игрок></white>'
+      help-setstrength: ' <#f39c12>•</#f39c12> <white>/strengthsmp setstrength <игрок> <количество></white>'
+      help-setweapon: ' <#f39c12>•</#f39c12> <white>/strengthsmp setweapon <игрок> <оружие></white>'
+      help-giveitem: ' <#f39c12>•</#f39c12> <white>/strengthsmp giveitem <игрок> <strength|reroll></white>'
+      help-resetmonarch: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetmonarch</white> <gray>— Пересчитать монарха</gray>'
+      help-pack: ' <#f39c12>•</#f39c12> <white>/strengthsmp pack</white> <gray>— Принудительно выдать ресурс-пак</gray>'
+      state-on: <#e74c3c><b>ВКЛ</b></#e74c3c>
+      state-off: <b>ВЫКЛ</b>
+      state-enabled: <b>ВКЛЮЧЕНА</b>
+      state-disabled: <#e74c3c><b>ОТКЛЮЧЕНА</b></#e74c3c>
+      maintenance-on: <#e74c3c><b>[Режим обслуживания]</b> Обслуживание теперь <b>ВКЛ</b> (система отключена, KeepInventory активен).</#e74c3c>
+      maintenance-off: <#2ecc71><b>[Режим обслуживания]</b> Обслуживание теперь <b>ВЫКЛ</b> (система включена).</#2ecc71>
+      maintenance-usage: 'Использование: /strengthsmp maintenance <on|off>'
+      maintenance-toggled: <#2ecc71>Режим обслуживания теперь %state%
+      system-toggled: <#2ecc71>Система теперь %state%
+      reload-success: Конфигурация успешно перезагружена.
+      lang-current: '<#f1c40f><b>[Язык]</b> Текущий язык: <b>%lang%</b>. Использование: /strengthsmp lang <en|ru|es|de|fr|pt></#f1c40f>'
+      pack-sending: <#2ecc71>Попытка отправить ресурс-пак... Подробности смотрите в консоли.</#2ecc71>
+      info-header: <#f1c40f><b>[Информация о системе]</b></#f1c40f>
+      info-status: ' <#95a5a6>Статус:</#95a5a6> %status%'
+      info-status-enabled: <#2ecc71>ВКЛЮЧЕНА</#2ecc71>
+      info-status-disabled: <#e74c3c>ОТКЛЮЧЕНА</#e74c3c>
+      info-monarch: ' <#95a5a6>Монарх:</#95a5a6> <#f1c40f>%monarch%</#f1c40f>'
+      info-monarch-none: Нет
+      info-online: ' <#95a5a6>Игроков онлайн:</#95a5a6> <white>%count%</white>'
+      reroll-usage: 'Использование: /strengthsmp reroll <игрок>'
+      reroll-success: Оружие игрока %player% переброшено → %icon% %weapon%
+      reroll-target: <#2ecc71><b>[!]</b></#2ecc71> <gray>Администратор сменил ваше оружие на</gray> <#f1c40f><b>%weapon%</b></#f1c40f>
+      setstrength-usage: 'Использование: /strengthsmp setstrength <игрок> <количество>'
+      setstrength-success: Сила игрока %player% установлена на <#f1c40f>%amount%</#f1c40f>
+      setweapon-usage: 'Использование: /strengthsmp setweapon <игрок> <оружие>'
+      setweapon-success: Оружие игрока %player% установлено на <#f1c40f>%weapon%</#f1c40f>
+      setweapon-target: <#2ecc71><b>[!]</b></#2ecc71> <gray>Администратор изменил ваш класс оружия на</gray> <#f1c40f><b>%weapon%</b></#f1c40f><gray>.</gray>
+      setweapon-invalid: 'Неверный тип оружия! Используйте: SWORD, AXE, BOW, CROSSBOW, SHIELD, TRIDENT'
+      resetplayer-usage: 'Использование: /strengthsmp resetplayer <игрок>'
+      resetplayer-success: Статистика игрока <#f1c40f>%player%</#f1c40f> сброшена
+      resetplayer-target: <#e74c3c><b>[!]</b></#e74c3c> <gray>Ваша статистика была сброшена администратором.</gray>
+      giveitem-usage: 'Использование: /strengthsmp giveitem <игрок> <strength|reroll|death>'
+      giveitem-strength: Предмет Силы выдан игроку <#f1c40f>%player%</#f1c40f>
+      giveitem-reroll: Книга переброса выдана игроку <#f1c40f>%player%</#f1c40f>
+      giveitem-death: Свидетельство о смерти выдано игроку <#f1c40f>%player%</#f1c40f>
+      giveitem-unknown: 'Неизвестный тип предмета. Используйте: strength, reroll или death'
+      checkitem-usage: 'Использование: /strengthsmp checkitem <игрок>'
+      checkitem-not-holding: Игрок %player% не держит предмет в руке!
+      checkitem-header: <#2ecc71><b>[Проверка предмета]</b></#2ecc71>
+      checkitem-player: ' <#95a5a6>Игрок:</#95a5a6> <white>%player%</white>'
+      checkitem-material: ' <#95a5a6>Материал:</#95a5a6> <white>%material%</white>'
+      checkitem-cmd: ' <#95a5a6>CustomModelData:</#95a5a6> <#f1c40f>%value%</#f1c40f>'
+      board-not-connected: Discord-бот не подключён!
+      board-success: Панель Discord обновлена.
+      resetmonarch-success: Статус монарха пересчитан.
+      unknown-subcommand: 'Неизвестная подкоманда: <#f1c40f>%sub%</#f1c40f>. Используйте <white>/strengthsmp</white> для справки.'
+es:
+  prefix: '&x&f&f&8&c&0&0&lS&x&f&f&9&7&0&a&lT&x&f&f&a&3&1&4&lR&x&f&f&a&e&1&e&lE&x&f&f&b&a&2&8&lN&x&f&f&c&5&3&2&lG&x&f&f&d&1&3&c&lT&x&f&f&d&c&4&6&lH &8» '
+  no-permission: '&c&l✖ &c&l¡SIN PERMISO! &7No tienes acceso a este comando.'
+  only-players: '&c&l✖ &c&l¡SOLO JUGADORES! &7Este comando solo se puede ejecutar en el juego.'
+  player-not-found: '&c&l✖ &c&l¡JUGADOR NO ENCONTRADO! &7El jugador especificado no está en línea.'
+  invalid-amount: '&c&l✖ &c&l¡CANTIDAD INVÁLIDA! &7Por favor especifica un número positivo válido.'
+  combat:
+    tagged: '&c&l☠ &c&l¡EN COMBATE! &7¡Estás en combate! &8(&cNo salgas del juego&8)'
+    expired: '&a&l✔ &a&l¡COMBATE FINALIZADO! &7Ahora puedes salir con seguridad.'
+    penalty: '&c&l☠ &c&l¡SANCIÓN DE SALIDA! &e%player% &7se desconectó en combate y fue &cejecutado&7!'
+    command-blocked: '&c&l☠ &c&l¡EN COMBATE! &7No puedes usar comandos durante el combate.'
+  bounty:
+    set: '&6&l🎯 [RECOMPENSA] &f%sender% &7colocó una recompensa de &6%amount% STR &7sobre &e%target%&7!'
+    claim: '&6&l🎯 [RECOMPENSA] &e%player% &7reclamó &6%amount% STR &7al derrotar a &e%target%&7!'
+    claim-bonus-skip: '&8(( Recompensa reclamada — ganancia normal suprimida ))'
+  monarch:
+    new: '&e&l👑 [MONARCA] &f%player% &7¡ha ascendido a &e&lMonarca del Servidor&7!'
+    dethroned: '&e&l👑 [MONARCA] &f%player% &7¡ha sido &cdestronado &7como Monarca!'
+  season:
+    day: '&b&l📅 [TEMPORADA] &7Día de la temporada actual: &b%day%'
+  contract:
+    complete: '&a&l✔ [CONTRATO] &7¡Has completado un contrato diario! &8(&a+%reward% STR&8)'
+  discord:
+    kill-log: ':crossed_swords: **%attacker%** derrotó a **%victim%** y ganó **%amount%** de fuerza! ⚔'
+    bounty-log: ':moneybag: **%attacker%** reclamó la recompensa de **%amount%** de fuerza de **%victim%**!'
+  totem: null
+  strength:
+    insufficient: '&c&l✖ &c&l¡FUERZA INSUFICIENTE! &7Necesitas al menos &e1 STR &7para cambiar tu clase.'
+    free-reroll-reward: '&b&l🎁 [RECOMPENSA] &f¡Recibiste un &d&lLibro de Cambio Gratis&f! &7Haz clic derecho para usar.'
+    cooldown: '&c&l⌛ [EN ESPERA] &7Espera &c%time%s &7antes de usar otro objeto de fuerza.'
+    max-reached: '&d&l⚡ [FUERZA MÁXIMA] &7Ya estás en el límite máximo de fuerza.'
+    protection-granted: '&b&l🛡 [PROTEGIDO] &f¡Obtuviste &b%hours% horas &fde &b&lprotección contra la muerte&f! &7(Sin pérdida de fuerza)'
+    protected: '&b&l🛡 [PROTEGIDO] &f¡Estás bajo &b&lprotección&f! &7(Sin pérdida de fuerza)'
+    protection-blocked: '&7(( Tu objetivo está protegido y no puede perder fuerza ))'
+    anti-farm: '&8(( Asesinato ignorado — has matado demasiado a este jugador recientemente ))'
+    newbie-protection-start: '&a&l☘ [NOVATO] &f¡Bienvenido! Obtuviste &a%hours% horas &fde protección para novatos.'
+    newbie-you-protected: '&a&l☘ [NOVATO] &f¡Estás bajo &a&lprotección para novatos&f! &7(Sin pérdida de STR)'
+    newbie-protected: '&7(( Tu objetivo es un nuevo jugador y está protegido ))'
+    newbie-no-gain: '&8(( No puedes ganar STR bajo protección para novatos ))'
+    protected-no-gain: '&8(( No puedes ganar STR bajo protección contra la muerte ))'
+    gain: '&a&l⚡ [FUERZA GANADA] &7¡Tu fuerza aumentó a &e&l%strength% STR&7!'
+    loss: '&c&l⚡ [FUERZA PERDIDA] &7¡Tu fuerza disminuyó a &c&l%strength% STR&7!'
+    at-minimum: '&c&l✖ [EN MÍNIMO] &7Estás en el límite mínimo de fuerza.'
+    victim-at-minimum: '&c&l✖ [EN MÍNIMO] &7Tu objetivo ya está en el límite mínimo de fuerza.'
+  abilities:
+    supercharge: '&d&lSUPERCARGA &r&7— ¡Tu arco tiene velocidad de disparo instantánea!'
+    scorpion-miss: '&c⚡ ¡El Gancho de Escorpión falló!'
+    scorpion-hit-target: '&c⚡ ¡Fuiste arrastrado y aturdido por el Gancho de Escorpión de %player%!'
+    scorpion-hit-player: '&a⚡ ¡Gancho de Escorpión acertado! ¡%target% fue arrastrado hacia ti!'
+    no-arrows: '&c¡No tienes flechas!'
+    trident-no-throw: '&c&l¡No puedes lanzar tridentes! &7Úsalo como arma cuerpo a cuerpo.'
+    ability-cooldown: '&c¡Habilidad en enfriamiento! (%remaining%s)'
+    bleed: '&5&lSANGRADO &r&7— ¡Tu hoja hizo marchitar a la víctima!'
+    berserk-cooldown: '&cBerserk en enfriamiento! (%remaining%s)'
+    blink-cooldown: '&cDestello en enfriamiento! (%remaining%s)'
+    berserk-end: '&cEl modo Berserk ha terminado.'
+    berserk-start: '&e&lBERSERK &r&7— ¡Modo Berserk activado! (+2 Daño de ataque, Velocidad III por 15s)'
+    blink-success: '&5&lDESTELLO &r&7— ¡Te teletransportaste hacia adelante!'
+    shield-active: '&6&lESCUDO ACTIVO &r&7— Reflejando todo el daño y Resistencia II por 7s!'
+    shield-ended: '&cEl reflejo del escudo terminó.'
+    potion-disabled: '&c⚠ Las pociones de fuerza están desactivadas.'
+    no-weapons-available: '&c¡No hay otros tipos de armas disponibles!'
+    rapid-fire: '&b&lFUEGO RÁPIDO &r&7— ¡Desatando ráfaga de flechas!'
+    axe-stunned: '&c¡Has sido aturdido por un golpe de hacha!'
+    axe-shield-disabled: '&c¡Tu escudo ha sido desactivado por un golpe de hacha!'
+  items:
+    swap-key-hint: '&d&l⚡ &7¡Usa la tecla Cambiar Objeto (F) para usar la habilidad del Escudo!'
+    actionbar-cooldown: '&e&l⚡ &7¡Habilidad vinculada en enfriamiento! &c(%remaining%s)'
+    bound-to-another: '&d&l⚡ &7¡Esta arma está vinculada a otra alma!'
+    cannot-store-container: '&d&l⚡ &7¡No puedes guardar tu arma vinculada en contenedores!'
+    cannot-place-item: '&d&l⚡ &7¡No puedes colocar tu arma vinculada aquí!'
+    void-return: '&d&l⚡ &fTu arma vinculada regresó del vacío. &d&l⚡'
+    actionbar-returned: '&d&l⚡ ¡Arma vinculada regresó! ⚡'
+    return-knockback: '&d&l⚡ &7¡Fuiste empujado por un arma vinculada que regresaba!'
+    sealed-destiny-name: '&d&lSELLO DEL DESTINO'
+    sealed-destiny-lore-1: '&7Un antiguo artefacto que revela'
+    sealed-destiny-lore-2: '&7tu potencial de guerrero interior.'
+    sealed-destiny-lore-click: '&f¡Haz clic derecho para &bDESPERTAR &ftu poder!'
+    sealed-destiny-lore-tag: '&a&lGRATIS &7(Recompensa de primer ingreso)'
+  gui:
+    bind-title: '&d&l⚡ Vinculación de Armas ⚡'
+    shuffle-title: '&0&lDespertar del Destino...'
+    invalid-class-slot: '&c¡Arma de clase inválida en la ranura 13!'
+    already-bound: '&c¡Esta arma ya está vinculada!'
+    need-more-strength: '&cNecesitas al menos %cost% de fuerza para vincular tu arma. Tienes %current%.'
+    bound-success: '&a¡Gastaste &e%cost% de fuerza &apara vincular tu arma de clase!'
+    bound-free-success: '&a¡Tu arma fue vinculada &eGRATIS &apor la gracia de tu Sacrificio de Alma!'
+    bound-broadcast: '&d&l⚡ &f&l¡TU ARMA HA SIDO VINCULADA A TI! &d&l⚡'
+    unbound-success: '&aArma desvinculada con éxito.'
+    starter-book-not-owner: '&c&l✖ &c¡Este Libro de Cambio Gratis está vinculado a %owner% y no puedes usarlo!'
+    starter-book-no-drop: '&c&l✖ &c¡No puedes soltar tu Libro de Cambio Gratis personal!'
+    starter-book-no-container: '&c&l✖ &c¡No puedes guardar tu Libro de Cambio Gratis personal en contenedores!'
+    bind-select-title: '&d&l⚡ Choose Weapon Model ⚡'
+    bind-back-btn-title: '&c&l⬅ Back to Weapon Slot'
+    bind-back-btn-lore: '&7Return to place or take back your weapon.'
+    bind-confirm-btn-bind: '&a&l⚡ Confirm Soul Binding ⚡'
+    bind-confirm-btn-change: '&a&l⚡ Confirm Model Change ⚡'
+    bind-confirm-btn-not-enough: '&c&l❌ Not Enough Strength'
+    bind-confirm-selected: '&7Selected Model: &b%model%'
+    bind-confirm-cost-free: FREE (Soul Sacrifice)
+    bind-confirm-cost-str: '%cost% Strength'
+    bind-confirm-cost-line: '&7Binding Cost: &e%cost%'
+    bind-confirm-strength-line: '&7Your Strength: &f%strength%'
+    bind-confirm-click-action: '&eClick to bind your weapon with this model!'
+    bind-confirm-need-more: '&cYou need at least %cost% Strength to bind!'
+    bind-model-selected: '&7Status: &a&lSELECTED'
+    bind-model-selected-lore: '&eThis model will be applied upon confirmation.'
+    bind-model-not-selected: '&7Status: &cNot Selected'
+    bind-model-click-to-select: '&eClick to select this model!'
+    bind-target-preview: '&e&lBinding Target: &f%item%'
+    bind-target-preview-lore: '&7Select 1 of the 3 exclusive 3D models below.'
+    bind-guide-title: '&d&l⚡ How It Works ⚡'
+    bind-guide-step1: '&71. Place your class weapon in &eSlot 14&7.'
+    bind-guide-step2: '&72. Click &d&lBind Weapon &7to view &e3 custom models&7.'
+    bind-guide-step3: '&73. Select your favorite model and click &a&lConfirm&7!'
+    bind-status-title: '&b&lBinding Status & Perks'
+    bind-status-class: '&7Your Class: %class%'
+    bind-status-bound: '&7Bound Weapon: %status%'
+    bind-status-perks: '&eBinding Perks:'
+    bind-status-perk-death: '&d- Keep on Death: &7Bound weapon is never dropped on death'
+    bind-status-perk-loyalty: '&d- Loyalty Flight: &7Flies back to you on respawn, knocking back enemies'
+    bind-status-perk-soulbound: '&d- Soulbound Aura: &7Emits custom class magic particles while wielded'
+    bind-btn-change-model: '&a&l✨ Change Model (1 Strength) ✨'
+    bind-btn-cannot-change: '&c&l✨ Cannot Change Model'
+    bind-btn-bind-weapon: '&d&l⚡ Bind Weapon ⚡'
+    bind-btn-cannot-bind: '&c&l⚡ Cannot Bind Weapon'
+    bind-btn-desc: '&7Bind this weapon to your soul.'
+    bind-btn-desc-change: '&7Change the 3D model of your bound weapon.'
+    bind-btn-cost: '&7Cost: &e%cost%'
+    bind-btn-status: '&7Status: %status%'
+    bind-btn-click-choose: '&eClick to choose your 3D weapon model!'
+    bind-action-place-weapon: '&cPlease place a weapon in Slot 14.'
+    bind-action-no-class: '&cYou do not have a weapon class!'
+    bind-action-wrong-class: '&cWeapon does not match your class (%class%)!'
+    bind-action-other-player: '&cBound to a different player!'
+    bind-action-change-model: '&aClick to choose a new model!'
+    bind-action-ready: '&aReady to choose your model!'
+    unbind-title: '&c&l⚡ Unbind Weapon ⚡'
+    unbind-desc: '&7Unbind your current bound weapon.'
+    unbind-status: '&7Status: %status%'
+    unbind-action: '&eClick to unbind weapon in Slot 14.'
+    unbind-cannot: '&cPlace a bound weapon in Slot 14.'
+    bind-stats-kills: '&d&l⚔ Weapon Kills'
+    bind-stats-kills-desc: '&7Tracks PvP kills secured with your bound weapon.'
+    bind-stats-damage: '&d&l💥 Damage Dealt'
+    bind-stats-damage-desc: '&7Tracks final damage dealt with your bound weapon.'
+    bind-stats-sacrifices: '&d&l🛡️ Soul Sacrifices'
+    bind-stats-sacrifices-desc: '&7Tracks death saves triggered by your bound weapon.'
+    bind-stats-duration: '&d&l⌛ Duration Bound'
+    bind-stats-duration-desc: '&7Tracks elapsed time since you bound your current weapon.'
+    bind-stats-abilities: '&d&l✨ Ability Triggers'
+    bind-stats-abilities-desc: '&7Tracks weapon ability uses while bound.'
+    not-your-weapon: '&cThis weapon is bound to another player!'
+    place-weapon-first: '&cPlease place your class weapon in Slot 14 first!'
+    skin-changed-success: '&aSpent &e1 strength &ato change your weapon model!'
+  ledger:
+    title: '  LIBRO DE LEYENDAS'
+    header: '-------------------'
+    warrior: 'Guerrero: '
+    strength: 'Fuerza: '
+    class: 'Clase: '
+    bounty: 'Recompensa: '
+    kills: 'Asesinatos: '
+    deaths: 'Muertes: '
+    kd: 'K/D: '
+    footer: El destino se forja en sangre.
+  ranks:
+    unassigned: '&e[Sin clase]'
+    '-10': '&8[Desesperado]'
+    '-9': '&8[Miserable]'
+    '-8': '&7[Frágil]'
+    '-7': '&7[Débil]'
+    '-6': '&7[Campesino]'
+    '-5': '&f[Vasallo]'
+    '-4': '&f[Ciudadano]'
+    '-3': '&a[Escudero]'
+    '-2': '&a[Aprendiz]'
+    '-1': '&e[Novato]'
+    '0': '&e[Neutral]'
+    '1': '&d[Iniciado]'
+    '2': '&b[Soldado]'
+    '3': '&5&l[Caballero]'
+    '4': '&6&l[Veterano]'
+    '5': '&c&l[Campeón]'
+    '6': '&4&l[Señor de la Guerra]'
+    '7': '&4&l[Conquistador]'
+    '8': '&5&l[Gran Maestro]'
+    '9': '&d&l[Soberano]'
+    '10': '&x&f&f&a&a&0&0&l[Semidiós]'
+  weapons:
+    unassigned: Sin clase
+    sword:
+      name: Espada
+      desc: Doble empuñadura y crítico automático
+    axe:
+      name: Hacha
+      desc: Golpes críticos aturden + almacenamiento de daño
+    trident:
+      name: Tridente
+      desc: Rayo pasivo y movilidad de ola de agua
+    shield:
+      name: Escudo
+      desc: Velocidad II al aturdir + 15s de inmortalidad
+    bow:
+      name: Arco
+      desc: Rayo sónico lineal (AOE)
+    crossbow:
+      name: Ballesta
+      desc: Flechas brillantes + tirón definitivo
+  commands:
+    withdraw-success: <#2ecc71><b>RETIRO</b></#2ecc71> <gray>Retiraste</gray> <#f1c40f>%amount% STR</#f1c40f><gray>. Restante:</gray> <white>%remaining%</white>
+    punish-message: <#e74c3c><b>[CASTIGO]</b></#e74c3c> <gray>Has sido castigado por un admin. Durante las próximas</gray> <white>24 horas</white><gray>, perderás</gray> <red><b>2 STR</b></red> <gray>en cada muerte.</gray>
+    no-newbie-message: <#e74c3c><b>[ADMIN]</b></#e74c3c> <gray>Tu protección de novato ha sido removida. Ahora estás plenamente en la economía de fuerza.</gray>
+    bounty-refund: <#2ecc71><b>[!]</b></#2ecc71> <gray>Tu recompensa de</gray> <#f1c40f>%amount% STR</#f1c40f> <gray>sobre %target% fue reembolsada por un admin.</gray>
+    bounty-help-header: <#f1c40f><b>[Sistema de Recompensas]</b></#f1c40f>
+    bounty-help-place: ' <#f39c12>•</#f39c12> <white>/bounty <jugador> <cantidad></white> <gray>Coloca una recompensa usando tu STR</gray>'
+    bounty-help-list: ' <#f39c12>•</#f39c12> <white>/bounty list</white> <gray>Ver todas las recompensas activas</gray>'
+    language-changed: <#2ecc71><b>[Idioma]</b></#2ecc71> <gray>¡Idioma cambiado exitosamente a</gray> <white>%lang%</white><gray>!</gray>
+    error-prefix: '[ERROR]'
+    success-prefix: '[ÉXITO]'
+    admin:
+      help-header: <#f1c40f><b>[Admin de StrengthSMP]</b></#f1c40f>
+      help-maintenance: ' <#f39c12>•</#f39c12> <white>/strengthsmp maintenance <on|off></white> <gray>— Alternar el modo mantenimiento</gray>'
+      help-toggle: ' <#f39c12>•</#f39c12> <white>/strengthsmp toggle</white> <gray>— Alternar el sistema rápidamente</gray>'
+      help-reload: ' <#f39c12>•</#f39c12> <white>/strengthsmp reload</white> <gray>— Recargar la configuración</gray>'
+      help-lang: ' <#f39c12>•</#f39c12> <white>/strengthsmp lang <en|ru|es|de|fr|pt></white> <gray>— Cambiar el idioma del plugin</gray>'
+      help-info: ' <#f39c12>•</#f39c12> <white>/strengthsmp info</white> <gray>— Estado del sistema</gray>'
+      help-setupboard: ' <#f39c12>•</#f39c12> <white>/strengthsmp setupboard</white> <gray>— Configurar Discord</gray>'
+      help-resetplayer: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetplayer <jugador></white>'
+      help-reroll: ' <#f39c12>•</#f39c12> <white>/strengthsmp reroll <jugador></white>'
+      help-setstrength: ' <#f39c12>•</#f39c12> <white>/strengthsmp setstrength <jugador> <cantidad></white>'
+      help-setweapon: ' <#f39c12>•</#f39c12> <white>/strengthsmp setweapon <jugador> <arma></white>'
+      help-giveitem: ' <#f39c12>•</#f39c12> <white>/strengthsmp giveitem <jugador> <strength|reroll></white>'
+      help-resetmonarch: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetmonarch</white> <gray>— Recalcular el monarca</gray>'
+      help-pack: ' <#f39c12>•</#f39c12> <white>/strengthsmp pack</white> <gray>— Forzar el paquete de recursos</gray>'
+      state-on: <#e74c3c><b>ACTIVADO</b></#e74c3c>
+      state-off: <b>DESACTIVADO</b>
+      state-enabled: <b>ACTIVADO</b>
+      state-disabled: <#e74c3c><b>DESACTIVADO</b></#e74c3c>
+      maintenance-on: <#e74c3c><b>[Modo Mantenimiento]</b> El mantenimiento está ahora <b>ACTIVADO</b> (sistema desactivado y KeepInventory activo).</#e74c3c>
+      maintenance-off: <#2ecc71><b>[Modo Mantenimiento]</b> El mantenimiento está ahora <b>DESACTIVADO</b> (sistema activado).</#2ecc71>
+      maintenance-usage: 'Uso: /strengthsmp maintenance <on|off>'
+      maintenance-toggled: <#2ecc71>El modo mantenimiento está ahora %state%
+      system-toggled: <#2ecc71>El sistema está ahora %state%
+      reload-success: Configuración recargada correctamente.
+      lang-current: '<#f1c40f><b>[Idioma]</b> El idioma actual es: <b>%lang%</b>. Uso: /strengthsmp lang <en|ru|es|de|fr|pt></#f1c40f>'
+      pack-sending: <#2ecc71>Intentando enviar el paquete de recursos... Consulta la consola para más información.</#2ecc71>
+      info-header: <#f1c40f><b>[Información del Sistema]</b></#f1c40f>
+      info-status: ' <#95a5a6>Estado:</#95a5a6> %status%'
+      info-status-enabled: <#2ecc71>ACTIVADO</#2ecc71>
+      info-status-disabled: <#e74c3c>DESACTIVADO</#e74c3c>
+      info-monarch: ' <#95a5a6>Monarca:</#95a5a6> <#f1c40f>%monarch%</#f1c40f>'
+      info-monarch-none: Ninguno
+      info-online: ' <#95a5a6>Jugadores conectados:</#95a5a6> <white>%count%</white>'
+      reroll-usage: 'Uso: /strengthsmp reroll <jugador>'
+      reroll-success: Clase de %player% relanzada → %icon% %weapon%
+      reroll-target: <#2ecc71><b>[!]</b></#2ecc71> <gray>Un administrador cambió tu arma a</gray> <#f1c40f><b>%weapon%</b></#f1c40f>
+      setstrength-usage: 'Uso: /strengthsmp setstrength <jugador> <cantidad>'
+      setstrength-success: Fuerza de %player% establecida en <#f1c40f>%amount%</#f1c40f>
+      setweapon-usage: 'Uso: /strengthsmp setweapon <jugador> <arma>'
+      setweapon-success: Arma de %player% establecida en <#f1c40f>%weapon%</#f1c40f>
+      setweapon-target: <#2ecc71><b>[!]</b></#2ecc71> <gray>Un administrador cambió tu clase de arma a</gray> <#f1c40f><b>%weapon%</b></#f1c40f><gray>.</gray>
+      setweapon-invalid: '¡Tipo de arma inválido! Usa: SWORD, AXE, BOW, CROSSBOW, SHIELD, TRIDENT'
+      resetplayer-usage: 'Uso: /strengthsmp resetplayer <jugador>'
+      resetplayer-success: Estadísticas de <#f1c40f>%player%</#f1c40f> reiniciadas
+      resetplayer-target: <#e74c3c><b>[!]</b></#e74c3c> <gray>Un administrador ha reiniciado tus estadísticas.</gray>
+      giveitem-usage: 'Uso: /strengthsmp giveitem <jugador> <strength|reroll|death>'
+      giveitem-strength: Se dio un objeto de Fuerza a <#f1c40f>%player%</#f1c40f>
+      giveitem-reroll: Se dio un libro de Reroll a <#f1c40f>%player%</#f1c40f>
+      giveitem-death: Se dio un Certificado de Defunción a <#f1c40f>%player%</#f1c40f>
+      giveitem-unknown: 'Tipo de objeto desconocido. Usa: strength, reroll o death'
+      checkitem-usage: 'Uso: /strengthsmp checkitem <jugador>'
+      checkitem-not-holding: ¡%player% no sostiene ningún objeto!
+      checkitem-header: <#2ecc71><b>[Comprobación de Objeto]</b></#2ecc71>
+      checkitem-player: ' <#95a5a6>Jugador:</#95a5a6> <white>%player%</white>'
+      checkitem-material: ' <#95a5a6>Material:</#95a5a6> <white>%material%</white>'
+      checkitem-cmd: ' <#95a5a6>CustomModelData:</#95a5a6> <#f1c40f>%value%</#f1c40f>'
+      board-not-connected: ¡El bot de Discord no está conectado!
+      board-success: Panel de Discord actualizado.
+      resetmonarch-success: El estado del monarca ha sido recalculado.
+      unknown-subcommand: 'Subcomando desconocido: <#f1c40f>%sub%</#f1c40f>. Usa <white>/strengthsmp</white> para ver la ayuda.'
+de:
+  prefix: '&x&f&f&8&c&0&0&lS&x&f&f&9&7&0&a&lT&x&f&f&a&3&1&4&lR&x&f&f&a&e&1&e&lE&x&f&f&b&a&2&8&lN&x&f&f&c&5&3&2&lG&x&f&f&d&1&3&c&lT&x&f&f&d&c&4&6&lH &8» '
+  no-permission: '&c&l✖ &c&lKEINE BERECHTIGUNG! &7Du hast keinen Zugriff auf diesen Befehl.'
+  only-players: '&c&l✖ &c&lNUR FÜR SPIELER! &7Dieser Befehl kann nur im Spiel ausgeführt werden.'
+  player-not-found: '&c&l✖ &c&lSPIELER NICHT GEFUNDEN! &7Der angegebene Spieler ist nicht online.'
+  invalid-amount: '&c&l✖ &c&lUNGÜLTIGE ANZAHL! &7Bitte gib eine gültige positive Zahl an.'
+  combat:
+    tagged: '&c&l☠ &c&lKAMPF-MARKIERUNG! &7Du bist im Kampf! &8(&cNicht ausloggen&8)'
+    expired: '&a&l✔ &a&lKAMPF BEENDET! &7Du kannst dich jetzt sicher ausloggen.'
+    penalty: '&c&l☠ &c&lAUSLOGG-STRAFE! &e%player% &7hat sich im Kampf ausgeloggt und wurde &chingerichtet&7!'
+    command-blocked: '&c&l☠ &c&lKAMPF! &7Du kannst während des Kampfes keine Befehle nutzen.'
+  bounty:
+    set: '&6&l🎯 [KOPFGELD] &f%sender% &7hat ein Kopfgeld von &6%amount% STR &7auf &e%target% &7ausgesetzt!'
+    claim: '&6&l🎯 [KOPFGELD] &e%player% &7hat &6%amount% STR &7durch den Sieg über &e%target% &7erhalten!'
+    claim-bonus-skip: '&8(( Kopfgeld erhalten — gewöhnlicher Stärkegewinn unterdrückt ))'
+  monarch:
+    new: '&e&l👑 [MONARCH] &f%player% &7ist zum &e&lServer-Monarchen &7aufgestiegen!'
+    dethroned: '&e&l👑 [MONARCH] &f%player% &7wurde als Monarch &centthrohnt&7!'
+  season:
+    day: '&b&l📅 [SAISON] &7Aktueller Saisontag: &b%day%'
+  contract:
+    complete: '&a&l✔ [VERTRAG] &7Tagesvertrag erfolgreich abgeschlossen! &8(&a+%reward% STR&8)'
+  discord:
+    kill-log: ':crossed_swords: **%attacker%** hat **%victim%** besiegt und **%amount%** Stärke erhalten! ⚔'
+    bounty-log: ':moneybag: **%attacker%** hat das Kopfgeld von **%victim%** in Höhe von **%amount%** Stärke kassiert!'
+  totem: null
+  strength:
+    insufficient: '&c&l✖ &c&lUNZUREICHENDE STÄRKE! &7Du benötigst mindestens &e1 STR &7für den Klassenwechsel.'
+    free-reroll-reward: '&b&l🎁 [BELOHNUNG] &fDu hast ein &d&lKostenloses Klassenwechsel-Buch &ferhalten! &7Rechtsklick zum Nutzen.'
+    cooldown: '&c&l⌛ [ABKLINGZEIT] &7Bitte warte &c%time%s &7vor der Nutzung eines weiteren Stärke-Items.'
+    max-reached: '&d&l⚡ [MAXIMALE STÄRKE] &7Du hast bereits das maximale Stärkelimit erreicht.'
+    protection-granted: '&b&l🛡 [GESCHÜTZT] &fDu hast &b%hours% Stunden &f&bTodes-Schutz &ferhalten! &7(Kein Stärkeverlust)'
+    protected: '&b&l🛡 [GESCHÜTZT] &fDu stehst unter &b&lSchutz&f! &7(Kein Stärkeverlust)'
+    protection-blocked: '&7(( Dein Ziel ist geschützt und kann keine Stärke verlieren ))'
+    anti-farm: '&8(( Kill ignoriert — du hast diesen Spieler kürzlich zu oft getötet ))'
+    newbie-protection-start: '&a&l☘ [ANFÄNGER] &fWillkommen! &a%hours% Stunden &fAnfängerschutz gewährt.'
+    newbie-you-protected: '&a&l☘ [ANFÄNGER] &fDu stehst unter &a&lAnfängerschutz&f! &7(Kein STR-Verlust)'
+    newbie-protected: '&7(( Dein Ziel ist ein neuer Spieler und ist geschützt ))'
+    newbie-no-gain: '&8(( Unter Anfängerschutz kannst du keine STR erhalten ))'
+    protected-no-gain: '&8(( Unter Todesschutz kannst du keine STR erhalten ))'
+    gain: '&a&l⚡ [STÄRKE ERHALTEN] &7Deine Stärke stieg auf &e&l%strength% STR&7!'
+    loss: '&c&l⚡ [STÄRKE VERLOREN] &7Deine Stärke sank auf &c&l%strength% STR&7!'
+    at-minimum: '&c&l✖ [MINIMUM] &7Du bist am minimalen Stärkelimit.'
+    victim-at-minimum: '&c&l✖ [MINIMUM] &7Dein Ziel ist bereits am minimalen Stärkelimit.'
+  abilities:
+    supercharge: '&d&lSUPERLADUNG &r&7— Dein Bogen hat sofortige Pfeilgeschwindigkeit!'
+    scorpion-miss: '&c⚡ Skorpion-Haken hat verfehlt!'
+    scorpion-hit-target: '&c⚡ Du wurdest von %player%s Skorpion-Haken herangezogen und betäubt!'
+    scorpion-hit-player: '&a⚡ Skorpion-Haken Treffer! %target% wurde zu dir gezogen!'
+    no-arrows: '&cDu hast keine Pfeile!'
+    trident-no-throw: '&c&lDu kannst keine Dreizacke werfen! &7Nutze ihn als Nahampfwaffe.'
+    ability-cooldown: '&cFähigkeit in Abklingzeit! (%remaining%s)'
+    bleed: '&5&lBLUTUNG &r&7— Deine Klinge hat dem Opfer Verwelken zugefügt!'
+    berserk-cooldown: '&cBerserker ist in Abklingzeit! (%remaining%s)'
+    blink-cooldown: '&cTeleportation ist in Abklingzeit! (%remaining%s)'
+    berserk-end: '&cder Berserker-Modus ist beendet.'
+    berserk-start: '&e&lBERSERKER &r&7— Berserker-Modus aktiviert! (+2 Angriffsschaden, Tempo III für 15s)'
+    blink-success: '&5&lTELEPORTATION &r&7— Du hast dich nach vorne teleportiert!'
+    shield-active: '&6&lSCHILD AKTIV &r&7— Reflektiert allen Schaden & Resistenz II für 7s!'
+    shield-ended: '&cSchild-Reflektion ist abgelaufen.'
+    potion-disabled: '&c⚠ Stärketränke sind deaktiviert.'
+    no-weapons-available: '&cKeine anderen Waffentypen verfügbar!'
+    rapid-fire: '&b&lSCHNELLFEUER &r&7— Pfeilsalve wird abgefeuert!'
+    axe-stunned: '&cDu wurdest durch einen Axtschlag betäubt!'
+    axe-shield-disabled: '&cDein Schild wurde durch einen Axtschlag deaktiviert!'
+  items:
+    swap-key-hint: '&d&l⚡ &7Nutze die Hand-Wechsel-Taste (F) für die Schild-Fähigkeit!'
+    actionbar-cooldown: '&e&l⚡ &7Gebundene Fähigkeit in Abklingzeit! &c(%remaining%s)'
+    bound-to-another: '&d&l⚡ &7Diese Waffe ist an eine andere Seele gebunden!'
+    cannot-store-container: '&d&l⚡ &7Du kannst deine gebundene Waffe nicht in Truhen lagern!'
+    cannot-place-item: '&d&l⚡ &7Du kannst deine gebundene Waffe hier nicht platzieren!'
+    void-return: '&d&l⚡ &fDeine gebundene Waffe ist aus dem Nichts zurückgekehrt. &d&l⚡'
+    actionbar-returned: '&d&l⚡ Gebundene Waffe zurückgekehrt! ⚡'
+    return-knockback: '&d&l⚡ &7Du wurdest von einer zurückkehrenden Waffe zur Seite gestoßen!'
+    sealed-destiny-name: '&d&lVERSCHLOSSENES SCHICKSAL'
+    sealed-destiny-lore-1: '&7Ein altes Artefakt, das dein'
+    sealed-destiny-lore-2: '&7inneres Kriegerpotenzial enthüllt.'
+    sealed-destiny-lore-click: '&fRechtsklick um deine Macht zu &bERWECKEN&f!'
+    sealed-destiny-lore-tag: '&a&lKOSTENLOS &7(Belohnung für ersten Beitritt)'
+  gui:
+    bind-title: '&d&l⚡ Waffen-Bindung ⚡'
+    shuffle-title: '&0&lSchicksalserwachen...'
+    invalid-class-slot: '&cUngültige Klassenwaffe in Slot 14!'
+    already-bound: '&cDiese Waffe ist bereits gebunden!'
+    need-more-strength: '&cDu benötigst mindestens %cost% Stärke zum Binden. Du hast %current%.'
+    bound-success: '&a%cost% Stärke &aausgegeben um deine Klassenwaffe zu binden!'
+    bound-free-success: '&aDeine Waffe wurde durch das Seelenopfer &eKOSTENLOS &agebunden!'
+    bound-broadcast: '&d&l⚡ &f&lDEINE WAFFE WURDE AN DICH GEBUNDEN! &d&l⚡'
+    unbound-success: '&aWaffe erfolgreich entbunden.'
+    starter-book-not-owner: '&c&l✖ &cDieses Kostenlose Klassenwechsel-Buch ist an %owner% gebunden!'
+    starter-book-no-drop: '&c&l✖ &cDu kannst dein persönliches Klassenwechsel-Buch nicht fallen lassen!'
+    starter-book-no-container: '&c&l✖ &cDu kannst dein persönliches Klassenwechsel-Buch nicht in Truhen lagern!'
+    bind-select-title: '&d&l⚡ Choose Weapon Model ⚡'
+    bind-back-btn-title: '&c&l⬅ Back to Weapon Slot'
+    bind-back-btn-lore: '&7Return to place or take back your weapon.'
+    bind-confirm-btn-bind: '&a&l⚡ Confirm Soul Binding ⚡'
+    bind-confirm-btn-change: '&a&l⚡ Confirm Model Change ⚡'
+    bind-confirm-btn-not-enough: '&c&l❌ Not Enough Strength'
+    bind-confirm-selected: '&7Selected Model: &b%model%'
+    bind-confirm-cost-free: FREE (Soul Sacrifice)
+    bind-confirm-cost-str: '%cost% Strength'
+    bind-confirm-cost-line: '&7Binding Cost: &e%cost%'
+    bind-confirm-strength-line: '&7Your Strength: &f%strength%'
+    bind-confirm-click-action: '&eClick to bind your weapon with this model!'
+    bind-confirm-need-more: '&cYou need at least %cost% Strength to bind!'
+    bind-model-selected: '&7Status: &a&lSELECTED'
+    bind-model-selected-lore: '&eThis model will be applied upon confirmation.'
+    bind-model-not-selected: '&7Status: &cNot Selected'
+    bind-model-click-to-select: '&eClick to select this model!'
+    bind-target-preview: '&e&lBinding Target: &f%item%'
+    bind-target-preview-lore: '&7Select 1 of the 3 exclusive 3D models below.'
+    bind-guide-title: '&d&l⚡ How It Works ⚡'
+    bind-guide-step1: '&71. Place your class weapon in &eSlot 14&7.'
+    bind-guide-step2: '&72. Click &d&lBind Weapon &7to view &e3 custom models&7.'
+    bind-guide-step3: '&73. Select your favorite model and click &a&lConfirm&7!'
+    bind-status-title: '&b&lBinding Status & Perks'
+    bind-status-class: '&7Your Class: %class%'
+    bind-status-bound: '&7Bound Weapon: %status%'
+    bind-status-perks: '&eBinding Perks:'
+    bind-status-perk-death: '&d- Keep on Death: &7Bound weapon is never dropped on death'
+    bind-status-perk-loyalty: '&d- Loyalty Flight: &7Flies back to you on respawn, knocking back enemies'
+    bind-status-perk-soulbound: '&d- Soulbound Aura: &7Emits custom class magic particles while wielded'
+    bind-btn-change-model: '&a&l✨ Change Model (1 Strength) ✨'
+    bind-btn-cannot-change: '&c&l✨ Cannot Change Model'
+    bind-btn-bind-weapon: '&d&l⚡ Bind Weapon ⚡'
+    bind-btn-cannot-bind: '&c&l⚡ Cannot Bind Weapon'
+    bind-btn-desc: '&7Bind this weapon to your soul.'
+    bind-btn-desc-change: '&7Change the 3D model of your bound weapon.'
+    bind-btn-cost: '&7Cost: &e%cost%'
+    bind-btn-status: '&7Status: %status%'
+    bind-btn-click-choose: '&eClick to choose your 3D weapon model!'
+    bind-action-place-weapon: '&cPlease place a weapon in Slot 14.'
+    bind-action-no-class: '&cYou do not have a weapon class!'
+    bind-action-wrong-class: '&cWeapon does not match your class (%class%)!'
+    bind-action-other-player: '&cBound to a different player!'
+    bind-action-change-model: '&aClick to choose a new model!'
+    bind-action-ready: '&aReady to choose your model!'
+    unbind-title: '&c&l⚡ Unbind Weapon ⚡'
+    unbind-desc: '&7Unbind your current bound weapon.'
+    unbind-status: '&7Status: %status%'
+    unbind-action: '&eClick to unbind weapon in Slot 14.'
+    unbind-cannot: '&cPlace a bound weapon in Slot 14.'
+    bind-stats-kills: '&d&l⚔ Weapon Kills'
+    bind-stats-kills-desc: '&7Tracks PvP kills secured with your bound weapon.'
+    bind-stats-damage: '&d&l💥 Damage Dealt'
+    bind-stats-damage-desc: '&7Tracks final damage dealt with your bound weapon.'
+    bind-stats-sacrifices: '&d&l🛡️ Soul Sacrifices'
+    bind-stats-sacrifices-desc: '&7Tracks death saves triggered by your bound weapon.'
+    bind-stats-duration: '&d&l⌛ Duration Bound'
+    bind-stats-duration-desc: '&7Tracks elapsed time since you bound your current weapon.'
+    bind-stats-abilities: '&d&l✨ Ability Triggers'
+    bind-stats-abilities-desc: '&7Tracks weapon ability uses while bound.'
+    not-your-weapon: '&cThis weapon is bound to another player!'
+    place-weapon-first: '&cPlease place your class weapon in Slot 14 first!'
+    skin-changed-success: '&aSpent &e1 strength &ato change your weapon model!'
+  ledger:
+    title: '  BUCH DER LEGENDEN'
+    header: '-------------------'
+    warrior: 'Krieger: '
+    strength: 'Stärke: '
+    class: 'Klasse: '
+    bounty: 'Kopfgeld: '
+    kills: 'Kills: '
+    deaths: 'Tode: '
+    kd: 'K/D: '
+    footer: Das Schicksal wird in Blut geschmiedet.
+  ranks:
+    unassigned: '&e[Nicht zugewiesen]'
+    '-10': '&8[Hoffnungslos]'
+    '-9': '&8[Elend]'
+    '-8': '&7[Gebrechlich]'
+    '-7': '&7[Schwächling]'
+    '-6': '&7[Bauer]'
+    '-5': '&f[Vasall]'
+    '-4': '&f[Bürger]'
+    '-3': '&a[Knappe]'
+    '-2': '&a[Lehrling]'
+    '-1': '&e[Neuling]'
+    '0': '&e[Neutral]'
+    '1': '&d[Initiat]'
+    '2': '&b[Soldat]'
+    '3': '&5&l[Ritter]'
+    '4': '&6&l[Veteran]'
+    '5': '&c&l[Champion]'
+    '6': '&4&l[Kriegsherr]'
+    '7': '&4&l[Eroberer]'
+    '8': '&5&l[Großmeister]'
+    '9': '&d&l[Herrscher]'
+    '10': '&x&f&f&a&a&0&0&l[Halbgott]'
+  weapons:
+    unassigned: Nicht zugewiesen
+    sword:
+      name: Schwert
+      desc: Doppelhändige Führung & Auto-Krit
+    axe:
+      name: Axt
+      desc: Kritische Treffer betäuben + Schadensspeicher
+    trident:
+      name: Dreizack
+      desc: Blitz-Passiv + Wasserwellen-Mobilität
+    shield:
+      name: Schild
+      desc: Tempo II bei Betäubung + 15s Unsterblichkeit
+    bow:
+      name: Bogen
+      desc: Linearer Schallstrahl (Flächenschaden)
+    crossbow:
+      name: Armbrust
+      desc: Leuchtende Pfeile + Leinen-Ultimativ
+  commands:
+    withdraw-success: <#2ecc71><b>ABHEBUNG</b></#2ecc71> <gray>Du hast</gray> <#f1c40f>%amount% STR</#f1c40f> <gray>abgehoben. Verbleibend:</gray> <white>%remaining%</white>
+    punish-message: <#e74c3c><b>[BESTRAFUNG]</b></#e74c3c> <gray>Du wurdest von einem Admin bestraft. Für die nächsten</gray> <white>24 Stunden</white><gray> verlierst du</gray> <red><b>2 STR</b></red> <gray>pro Tod.</gray>
+    no-newbie-message: <#e74c3c><b>[ADMIN]</b></#e74c3c> <gray>Dein Anfängerschutz wurde entfernt. Du nimmst nun voll an der Stärkewirtschaft teil.</gray>
+    bounty-refund: <#2ecc71><b>[!]</b></#2ecc71> <gray>Dein Kopfgeld von</gray> <#f1c40f>%amount% STR</#f1c40f> <gray>auf %target% wurde zurückerstattet.</gray>
+    bounty-help-header: <#f1c40f><b>[Kopfgeld-System]</b></#f1c40f>
+    bounty-help-place: ' <#f39c12>•</#f39c12> <white>/bounty <spieler> <anzahl></white> <gray>Setze ein Kopfgeld mit deiner STR</gray>'
+    bounty-help-list: ' <#f39c12>•</#f39c12> <white>/bounty list</white> <gray>Zeige alle aktiven Kopfgelder</gray>'
+    language-changed: <#2ecc71><b>[Sprache]</b></#2ecc71> <gray>Sprache erfolgreich geändert zu</gray> <white>%lang%</white><gray>!</gray>
+    error-prefix: '[FEHLER]'
+    success-prefix: '[ERFOLG]'
+    admin:
+      help-header: <#f1c40f><b>[StrengthSMP Admin]</b></#f1c40f>
+      help-maintenance: ' <#f39c12>•</#f39c12> <white>/strengthsmp maintenance <on|off></white> <gray>— Wartungsmodus umschalten</gray>'
+      help-toggle: ' <#f39c12>•</#f39c12> <white>/strengthsmp toggle</white> <gray>— System schnell umschalten</gray>'
+      help-reload: ' <#f39c12>•</#f39c12> <white>/strengthsmp reload</white> <gray>— Konfiguration neu laden</gray>'
+      help-lang: ' <#f39c12>•</#f39c12> <white>/strengthsmp lang <en|ru|es|de|fr|pt></white> <gray>— Plugin-Sprache wechseln</gray>'
+      help-info: ' <#f39c12>•</#f39c12> <white>/strengthsmp info</white> <gray>— Systemstatus</gray>'
+      help-setupboard: ' <#f39c12>•</#f39c12> <white>/strengthsmp setupboard</white> <gray>— Discord einrichten</gray>'
+      help-resetplayer: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetplayer <Spieler></white>'
+      help-reroll: ' <#f39c12>•</#f39c12> <white>/strengthsmp reroll <Spieler></white>'
+      help-setstrength: ' <#f39c12>•</#f39c12> <white>/strengthsmp setstrength <Spieler> <Menge></white>'
+      help-setweapon: ' <#f39c12>•</#f39c12> <white>/strengthsmp setweapon <Spieler> <Waffe></white>'
+      help-giveitem: ' <#f39c12>•</#f39c12> <white>/strengthsmp giveitem <Spieler> <strength|reroll></white>'
+      help-resetmonarch: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetmonarch</white> <gray>— Monarch neu berechnen</gray>'
+      help-pack: ' <#f39c12>•</#f39c12> <white>/strengthsmp pack</white> <gray>— Resource Pack erzwingen</gray>'
+      state-on: <#e74c3c><b>AN</b></#e74c3c>
+      state-off: <b>AUS</b>
+      state-enabled: <b>AKTIVIERT</b>
+      state-disabled: <#e74c3c><b>DEAKTIVIERT</b></#e74c3c>
+      maintenance-on: <#e74c3c><b>[Wartungsmodus]</b> Die Wartung ist jetzt <b>AN</b> (System deaktiviert & KeepInventory aktiv).</#e74c3c>
+      maintenance-off: <#2ecc71><b>[Wartungsmodus]</b> Die Wartung ist jetzt <b>AUS</b> (System aktiviert).</#2ecc71>
+      maintenance-usage: 'Verwendung: /strengthsmp maintenance <on|off>'
+      maintenance-toggled: <#2ecc71>Der Wartungsmodus ist jetzt %state%
+      system-toggled: <#2ecc71>Das System ist jetzt %state%
+      reload-success: Konfiguration erfolgreich neu geladen.
+      lang-current: '<#f1c40f><b>[Sprache]</b> Aktuelle Sprache: <b>%lang%</b>. Verwendung: /strengthsmp lang <en|ru|es|de|fr|pt></#f1c40f>'
+      pack-sending: <#2ecc71>Resource Pack wird gesendet... Details findest du in der Konsole.</#2ecc71>
+      info-header: <#f1c40f><b>[Systeminfo]</b></#f1c40f>
+      info-status: ' <#95a5a6>Status:</#95a5a6> %status%'
+      info-status-enabled: <#2ecc71>AKTIVIERT</#2ecc71>
+      info-status-disabled: <#e74c3c>DEAKTIVIERT</#e74c3c>
+      info-monarch: ' <#95a5a6>Monarch:</#95a5a6> <#f1c40f>%monarch%</#f1c40f>'
+      info-monarch-none: Keiner
+      info-online: ' <#95a5a6>Spieler online:</#95a5a6> <white>%count%</white>'
+      reroll-usage: 'Verwendung: /strengthsmp reroll <Spieler>'
+      reroll-success: Waffe von %player% neu gewürfelt → %icon% %weapon%
+      reroll-target: <#2ecc71><b>[!]</b></#2ecc71> <gray>Ein Admin hat deine Waffe geändert zu</gray> <#f1c40f><b>%weapon%</b></#f1c40f>
+      setstrength-usage: 'Verwendung: /strengthsmp setstrength <Spieler> <Menge>'
+      setstrength-success: Stärke von %player% auf <#f1c40f>%amount%</#f1c40f> gesetzt
+      setweapon-usage: 'Verwendung: /strengthsmp setweapon <Spieler> <Waffe>'
+      setweapon-success: Waffe von %player% auf <#f1c40f>%weapon%</#f1c40f> gesetzt
+      setweapon-target: <#2ecc71><b>[!]</b></#2ecc71> <gray>Deine Waffenklasse wurde von einem Admin geändert zu</gray> <#f1c40f><b>%weapon%</b></#f1c40f><gray>.</gray>
+      setweapon-invalid: 'Ungültiger Waffentyp! Nutze: SWORD, AXE, BOW, CROSSBOW, SHIELD, TRIDENT'
+      resetplayer-usage: 'Verwendung: /strengthsmp resetplayer <Spieler>'
+      resetplayer-success: Statistiken von <#f1c40f>%player%</#f1c40f> zurückgesetzt
+      resetplayer-target: <#e74c3c><b>[!]</b></#e74c3c> <gray>Deine Statistiken wurden von einem Admin zurückgesetzt.</gray>
+      giveitem-usage: 'Verwendung: /strengthsmp giveitem <Spieler> <strength|reroll|death>'
+      giveitem-strength: Stärke-Item an <#f1c40f>%player%</#f1c40f> gegeben
+      giveitem-reroll: Reroll-Buch an <#f1c40f>%player%</#f1c40f> gegeben
+      giveitem-death: Todesurkunde an <#f1c40f>%player%</#f1c40f> gegeben
+      giveitem-unknown: 'Unbekannter Item-Typ. Nutze: strength, reroll oder death'
+      checkitem-usage: 'Verwendung: /strengthsmp checkitem <Spieler>'
+      checkitem-not-holding: '%player% hält kein Item in der Hand!'
+      checkitem-header: <#2ecc71><b>[Item-Prüfung]</b></#2ecc71>
+      checkitem-player: ' <#95a5a6>Spieler:</#95a5a6> <white>%player%</white>'
+      checkitem-material: ' <#95a5a6>Material:</#95a5a6> <white>%material%</white>'
+      checkitem-cmd: ' <#95a5a6>CustomModelData:</#95a5a6> <#f1c40f>%value%</#f1c40f>'
+      board-not-connected: Der Discord-Bot ist nicht verbunden!
+      board-success: Discord-Board aktualisiert.
+      resetmonarch-success: Der Monarch-Status wurde neu berechnet.
+      unknown-subcommand: 'Unbekannter Unterbefehl: <#f1c40f>%sub%</#f1c40f>. Nutze <white>/strengthsmp</white> für Hilfe.'
+fr:
+  prefix: '&x&f&f&8&c&0&0&lS&x&f&f&9&7&0&a&lT&x&f&f&a&3&1&4&lR&x&f&f&a&e&1&e&lE&x&f&f&b&a&2&8&lN&x&f&f&c&5&3&2&lG&x&f&f&d&1&3&c&lT&x&f&f&d&c&4&6&lH &8» '
+  no-permission: '&c&l✖ &c&lPAS DE PERMISSION ! &7Vous n''avez pas accès à cette commande.'
+  only-players: '&c&l✖ &c&lJOUEURS UNIQUEMENT ! &7Cette commande ne peut être exécutée qu''en jeu.'
+  player-not-found: '&c&l✖ &c&lJOUEUR INTROUVABLE ! &7Le joueur spécifié n''est pas en ligne.'
+  invalid-amount: '&c&l✖ &c&lMONTANT INVALIDE ! &7Veuillez spécifier un nombre positif valide.'
+  combat:
+    tagged: '&c&l☠ &c&lMODE COMBAT ! &7Vous êtes en combat ! &8(&cNe vous déconnectez pas&8)'
+    expired: '&a&l✔ &a&lCOMBAT TERMINÉ ! &7Vous pouvez maintenant vous déconnecter en toute sécurité.'
+    penalty: '&c&l☠ &c&lPÉNALITÉ DE DÉCONNEXION ! &e%player% &7s''est déconnecté en combat et a été &céxécuté&7 !'
+    command-blocked: '&c&l☠ &c&lMODE COMBAT ! &7Vous ne pouvez pas utiliser de commandes pendant le combat.'
+  bounty:
+    set: '&6&l🎯 [PRIME] &f%sender% &7a placé une prime de &6%amount% STR &7sur &e%target%&7 !'
+    claim: '&6&l🎯 [PRIME] &e%player% &7a réclamé &6%amount% STR &7en vainquant &e%target%&7 !'
+    claim-bonus-skip: '&8(( Prime réclamée — gain de force normal ignoré ))'
+  monarch:
+    new: '&e&l👑 [MONARQUE] &f%player% &7est devenu le &e&lMonarque du Serveur&7 !'
+    dethroned: '&e&l👑 [MONARQUE] &f%player% &7a été &cdétrôné&7 !'
+  season:
+    day: '&b&l📅 [SAISON] &7Jour de la saison actuelle : &b%day%'
+  contract:
+    complete: '&a&l✔ [CONTRAT] &7Vous avez terminé un contrat quotidien ! &8(&a+%reward% STR&8)'
+  discord:
+    kill-log: ':crossed_swords: **%attacker%** a vaincu **%victim%** et a gagné **%amount%** de force ! ⚔'
+    bounty-log: ':moneybag: **%attacker%** a réclamé la prime de **%amount%** de force de **%victim%** !'
+  totem: null
+  strength:
+    insufficient: '&c&l✖ &c&lFORCE INSUFFISANTE ! &7Vous avez besoin d''au moins &e1 STR &7pour changer de classe.'
+    free-reroll-reward: '&b&l🎁 [RÉCOMPENSE] &fVous avez reçu un &d&lLivre de Reroll Gratuit&f ! &7Clic droit pour utiliser.'
+    cooldown: '&c&l⌛ [RECHARGEMENT] &7Veuillez patienter &c%time%s &7avant d''utiliser un autre objet de force.'
+    max-reached: '&d&l⚡ [FORCE MAXIMALE] &7Vous avez déjà atteint la limite maximale de force.'
+    protection-granted: '&b&l🛡 [PROTÉGÉ] &fVous avez obtenu &b%hours% heures &fde &b&lprotection contre la mort&f ! &7(Aucune perte de force)'
+    protected: '&b&l🛡 [PROTÉGÉ] &fVous êtes sous &b&lprotection&f ! &7(Aucune perte de force)'
+    protection-blocked: '&7(( Votre cible est protégée et ne peut pas perdre de force ))'
+    anti-farm: '&8(( Meurtre ignoré — vous avez tué ce joueur trop souvent récemment ))'
+    newbie-protection-start: '&a&l☘ [NONTÉ] &fBienvenue ! Vous avez obtenu &a%hours% heures &fde protection débutant.'
+    newbie-you-protected: '&a&l☘ [NONTÉ] &fVous êtes sous &a&lprotection débutant&f ! &7(Aucune perte de STR)'
+    newbie-protected: '&7(( Votre cible est un nouveau joueur et est protégée ))'
+    newbie-no-gain: '&8(( Vous ne pouvez pas gagner de STR sous protection débutant ))'
+    protected-no-gain: '&8(( Vous ne pouvez pas gagner de STR sous protection contre la mort ))'
+    gain: '&a&l⚡ [FORCE GAGNÉE] &7Votre force a augmenté à &e&l%strength% STR&7 !'
+    loss: '&c&l⚡ [FORCE PERDUE] &7Votre force a diminué à &c&l%strength% STR&7 !'
+    at-minimum: '&c&l✖ [AU MINIMUM] &7Vous êtes à la limite minimale de force.'
+    victim-at-minimum: '&c&l✖ [AU MINIMUM] &7Votre cible est déjà à la limite minimale de force.'
+  abilities:
+    supercharge: '&d&lSURALIMENTATION &r&7— Votre arc a une vitesse de tir instantanée !'
+    scorpion-miss: '&c⚡ Le Grappin du Scorpion a manqué sa cible !'
+    scorpion-hit-target: '&c⚡ Vous avez été tiré et étourdi par le Grappin du Scorpion de %player% !'
+    scorpion-hit-player: '&a⚡ Grappin du Scorpion réussi ! %target% a été tiré vers vous !'
+    no-arrows: '&cVous n''avez pas de flèches !'
+    trident-no-throw: '&c&lVous ne pouvez pas lancer de tridents ! &7Utilisez-le comme arme de mêlée.'
+    ability-cooldown: '&cCompétence en rechargement ! (%remaining%s)'
+    bleed: '&5&lSAIGNEMENT &r&7— Votre lame a flétri la victime !'
+    berserk-cooldown: '&cBerserk en rechargement ! (%remaining%s)'
+    blink-cooldown: '&cTéléportation en rechargement ! (%remaining%s)'
+    berserk-end: '&cLe mode Berserk est terminé.'
+    berserk-start: '&e&lBERSERK &r&7— Mode Berserk activé ! (+2 Dégâts d''attaque, Vitesse III pendant 15s)'
+    blink-success: '&5&lTÉLÉPORTATION &r&7— Vous vous êtes téléporté vers l''avant !'
+    shield-active: '&6&lBOUCLIER ACTIF &r&7— Renvoie tous les dégâts & Résistance II pendant 7s !'
+    shield-ended: '&cLe renvoi du bouclier est terminé.'
+    potion-disabled: '&c⚠ Les potions de force sont désactivées.'
+    no-weapons-available: '&cAucun autre type d''arme disponible !'
+    rapid-fire: '&b&lTIR RAPIDE &r&7— Déchaînement d''une volée de flèches !'
+    axe-stunned: '&cVous avez été étourdi par un coup de hache !'
+    axe-shield-disabled: '&cVotre bouclier a été désactivé par un coup de hache !'
+  items:
+    swap-key-hint: '&d&l⚡ &7Utilisez votre touche d''échange d''objet (F) pour activer la compétence du Bouclier !'
+    actionbar-cooldown: '&e&l⚡ &7Compétence liée en rechargement ! &c(%remaining%s)'
+    bound-to-another: '&d&l⚡ &7Cette arme est liée à une autre âme !'
+    cannot-store-container: '&d&l⚡ &7Vous ne pouvez pas stocker votre arme liée dans des coffres !'
+    cannot-place-item: '&d&l⚡ &7Vous ne pouvez pas placer votre arme liée ici !'
+    void-return: '&d&l⚡ &fVotre arme liée est revenue du vide. &d&l⚡'
+    actionbar-returned: '&d&l⚡ Arme liée revenue ! ⚡'
+    return-knockback: '&d&l⚡ &7Vous avez été repoussé par une arme liée qui revenait !'
+    sealed-destiny-name: '&d&lSCEAU DU DESTIN'
+    sealed-destiny-lore-1: '&7Un ancient artefact qui révèle'
+    sealed-destiny-lore-2: '&7votre potentiel de guerrier intérieur.'
+    sealed-destiny-lore-click: '&fClic droit pour &bÉVEILLER &fvotre pouvoir !'
+    sealed-destiny-lore-tag: '&a&lGRATUIT &7(Récompense de première connexion)'
+  gui:
+    bind-title: '&d&l⚡ Liaison d''Arme ⚡'
+    shuffle-title: '&0&lÉveil du Destin...'
+    invalid-class-slot: '&cArme de classe invalide dans l''emplacement 13 !'
+    already-bound: '&cCette arme est déjà liée !'
+    need-more-strength: '&cVous avez besoin d''au moins %cost% de force pour lier votre arme. Vous avez %current%.'
+    bound-success: '&a%cost% de force dépensés pour lier votre arme de classe !'
+    bound-free-success: '&aVotre arme a été liée &eGRATUITEMENT &agrâce à votre Sacrifice d''Âme !'
+    bound-broadcast: '&d&l⚡ &f&lVOTRE ARME A ÉTÉ LIÉE À VOUS ! &d&l⚡'
+    unbound-success: '&aArme déliée avec succès.'
+    starter-book-not-owner: '&c&l✖ &cCe Livre de Reroll Gratuit est lié à %owner% et ne peut pas être utilisé par vous !'
+    starter-book-no-drop: '&c&l✖ &cVous ne pouvez pas jeter votre Livre de Reroll Gratuit personnel !'
+    starter-book-no-container: '&c&l✖ &cVous ne pouvez pas placer votre Livre de Reroll Gratuit personnel dans des coffres !'
+    bind-select-title: '&d&l⚡ Choose Weapon Model ⚡'
+    bind-back-btn-title: '&c&l⬅ Back to Weapon Slot'
+    bind-back-btn-lore: '&7Return to place or take back your weapon.'
+    bind-confirm-btn-bind: '&a&l⚡ Confirm Soul Binding ⚡'
+    bind-confirm-btn-change: '&a&l⚡ Confirm Model Change ⚡'
+    bind-confirm-btn-not-enough: '&c&l❌ Not Enough Strength'
+    bind-confirm-selected: '&7Selected Model: &b%model%'
+    bind-confirm-cost-free: FREE (Soul Sacrifice)
+    bind-confirm-cost-str: '%cost% Strength'
+    bind-confirm-cost-line: '&7Binding Cost: &e%cost%'
+    bind-confirm-strength-line: '&7Your Strength: &f%strength%'
+    bind-confirm-click-action: '&eClick to bind your weapon with this model!'
+    bind-confirm-need-more: '&cYou need at least %cost% Strength to bind!'
+    bind-model-selected: '&7Status: &a&lSELECTED'
+    bind-model-selected-lore: '&eThis model will be applied upon confirmation.'
+    bind-model-not-selected: '&7Status: &cNot Selected'
+    bind-model-click-to-select: '&eClick to select this model!'
+    bind-target-preview: '&e&lBinding Target: &f%item%'
+    bind-target-preview-lore: '&7Select 1 of the 3 exclusive 3D models below.'
+    bind-guide-title: '&d&l⚡ How It Works ⚡'
+    bind-guide-step1: '&71. Place your class weapon in &eSlot 14&7.'
+    bind-guide-step2: '&72. Click &d&lBind Weapon &7to view &e3 custom models&7.'
+    bind-guide-step3: '&73. Select your favorite model and click &a&lConfirm&7!'
+    bind-status-title: '&b&lBinding Status & Perks'
+    bind-status-class: '&7Your Class: %class%'
+    bind-status-bound: '&7Bound Weapon: %status%'
+    bind-status-perks: '&eBinding Perks:'
+    bind-status-perk-death: '&d- Keep on Death: &7Bound weapon is never dropped on death'
+    bind-status-perk-loyalty: '&d- Loyalty Flight: &7Flies back to you on respawn, knocking back enemies'
+    bind-status-perk-soulbound: '&d- Soulbound Aura: &7Emits custom class magic particles while wielded'
+    bind-btn-change-model: '&a&l✨ Change Model (1 Strength) ✨'
+    bind-btn-cannot-change: '&c&l✨ Cannot Change Model'
+    bind-btn-bind-weapon: '&d&l⚡ Bind Weapon ⚡'
+    bind-btn-cannot-bind: '&c&l⚡ Cannot Bind Weapon'
+    bind-btn-desc: '&7Bind this weapon to your soul.'
+    bind-btn-desc-change: '&7Change the 3D model of your bound weapon.'
+    bind-btn-cost: '&7Cost: &e%cost%'
+    bind-btn-status: '&7Status: %status%'
+    bind-btn-click-choose: '&eClick to choose your 3D weapon model!'
+    bind-action-place-weapon: '&cPlease place a weapon in Slot 14.'
+    bind-action-no-class: '&cYou do not have a weapon class!'
+    bind-action-wrong-class: '&cWeapon does not match your class (%class%)!'
+    bind-action-other-player: '&cBound to a different player!'
+    bind-action-change-model: '&aClick to choose a new model!'
+    bind-action-ready: '&aReady to choose your model!'
+    unbind-title: '&c&l⚡ Unbind Weapon ⚡'
+    unbind-desc: '&7Unbind your current bound weapon.'
+    unbind-status: '&7Status: %status%'
+    unbind-action: '&eClick to unbind weapon in Slot 14.'
+    unbind-cannot: '&cPlace a bound weapon in Slot 14.'
+    bind-stats-kills: '&d&l⚔ Weapon Kills'
+    bind-stats-kills-desc: '&7Tracks PvP kills secured with your bound weapon.'
+    bind-stats-damage: '&d&l💥 Damage Dealt'
+    bind-stats-damage-desc: '&7Tracks final damage dealt with your bound weapon.'
+    bind-stats-sacrifices: '&d&l🛡️ Soul Sacrifices'
+    bind-stats-sacrifices-desc: '&7Tracks death saves triggered by your bound weapon.'
+    bind-stats-duration: '&d&l⌛ Duration Bound'
+    bind-stats-duration-desc: '&7Tracks elapsed time since you bound your current weapon.'
+    bind-stats-abilities: '&d&l✨ Ability Triggers'
+    bind-stats-abilities-desc: '&7Tracks weapon ability uses while bound.'
+    not-your-weapon: '&cThis weapon is bound to another player!'
+    place-weapon-first: '&cPlease place your class weapon in Slot 14 first!'
+    skin-changed-success: '&aSpent &e1 strength &ato change your weapon model!'
+  ledger:
+    title: '  LIVRE DES LÉGENDES'
+    header: '-------------------'
+    warrior: 'Guerrier : '
+    strength: 'Force : '
+    class: 'Classe : '
+    bounty: 'Prime : '
+    kills: 'Éliminations : '
+    deaths: 'Morts : '
+    kd: 'K/D : '
+    footer: Le destin est forgé dans le sang.
+  ranks:
+    unassigned: '&e[Non assigné]'
+    '-10': '&8[Désespéré]'
+    '-9': '&8[Misérable]'
+    '-8': '&7[Fragile]'
+    '-7': '&7[Faible]'
+    '-6': '&7[Paysan]'
+    '-5': '&f[Vassal]'
+    '-4': '&f[Citoyen]'
+    '-3': '&a[Écuyer]'
+    '-2': '&a[Apprenti]'
+    '-1': '&e[Novice]'
+    '0': '&e[Neutre]'
+    '1': '&d[Initié]'
+    '2': '&b[Soldat]'
+    '3': '&5&l[Chevalier]'
+    '4': '&6&l[Vétéran]'
+    '5': '&c&l[Champion]'
+    '6': '&4&l[Seigneur de guerre]'
+    '7': '&4&l[Conquérant]'
+    '8': '&5&l[Grand Maître]'
+    '9': '&d&l[Souverain]'
+    '10': '&x&f&f&a&a&0&0&l[Demi-dieu]'
+  weapons:
+    unassigned: Non assigné
+    sword:
+      name: Épée
+      desc: Maniement double et coup critique auto
+    axe:
+      name: Hache
+      desc: Coups critiques étourdissent + stockage de dégâts
+    trident:
+      name: Trident
+      desc: Éclair passif et mobilité vague d'eau
+    shield:
+      name: Bouclier
+      desc: Vitesse II sur étourdissement + 15s d'immortalité
+    bow:
+      name: Arc
+      desc: Rayon sonique linéaire (AOE)
+    crossbow:
+      name: Arbalète
+      desc: Flèches brillantes + grappin ultime
+  commands:
+    withdraw-success: <#2ecc71><b>RETRAIT</b></#2ecc71> <gray>Vous avez retiré</gray> <#f1c40f>%amount% STR</#f1c40f><gray>. Restant :</gray> <white>%remaining%</white>
+    punish-message: <#e74c3c><b>[PUNITION]</b></#e74c3c> <gray>Vous avez été puni par un admin. Pour les prochaines</gray> <white>24 heures</white><gray>, vous perdrez</gray> <red><b>2 STR</b></red> <gray>à chaque mort.</gray>
+    no-newbie-message: <#e74c3c><b>[ADMIN]</b></#e74c3c> <gray>Votre protection débutant a été retirée. Vous faites maintenant pleinement partie de l'économie de force.</gray>
+    bounty-refund: <#2ecc71><b>[!]</b></#2ecc71> <gray>Votre prime de</gray> <#f1c40f>%amount% STR</#f1c40f> <gray>sur %target% a été remboursée par un admin.</gray>
+    bounty-help-header: <#f1c40f><b>[Système de Primes]</b></#f1c40f>
+    bounty-help-place: ' <#f39c12>•</#f39c12> <white>/bounty <joueur> <montant></white> <gray>Placer une prime avec votre STR</gray>'
+    bounty-help-list: ' <#f39c12>•</#f39c12> <white>/bounty list</white> <gray>Voir toutes les primes actives</gray>'
+    language-changed: <#2ecc71><b>[Langue]</b></#2ecc71> <gray>Langue modifiée avec succès vers</gray> <white>%lang%</white><gray> !</gray>
+    error-prefix: '[ERREUR]'
+    success-prefix: '[SUCCÈS]'
+    admin:
+      help-header: <#f1c40f><b>[Admin StrengthSMP]</b></#f1c40f>
+      help-maintenance: ' <#f39c12>•</#f39c12> <white>/strengthsmp maintenance <on|off></white> <gray>— Basculer le mode maintenance</gray>'
+      help-toggle: ' <#f39c12>•</#f39c12> <white>/strengthsmp toggle</white> <gray>— Basculer rapidement le système</gray>'
+      help-reload: ' <#f39c12>•</#f39c12> <white>/strengthsmp reload</white> <gray>— Recharger la configuration</gray>'
+      help-lang: ' <#f39c12>•</#f39c12> <white>/strengthsmp lang <en|ru|es|de|fr|pt></white> <gray>— Changer la langue du plugin</gray>'
+      help-info: ' <#f39c12>•</#f39c12> <white>/strengthsmp info</white> <gray>— État du système</gray>'
+      help-setupboard: ' <#f39c12>•</#f39c12> <white>/strengthsmp setupboard</white> <gray>— Configurer Discord</gray>'
+      help-resetplayer: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetplayer <joueur></white>'
+      help-reroll: ' <#f39c12>•</#f39c12> <white>/strengthsmp reroll <joueur></white>'
+      help-setstrength: ' <#f39c12>•</#f39c12> <white>/strengthsmp setstrength <joueur> <montant></white>'
+      help-setweapon: ' <#f39c12>•</#f39c12> <white>/strengthsmp setweapon <joueur> <arme></white>'
+      help-giveitem: ' <#f39c12>•</#f39c12> <white>/strengthsmp giveitem <joueur> <strength|reroll></white>'
+      help-resetmonarch: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetmonarch</white> <gray>— Recalculer le monarque</gray>'
+      help-pack: ' <#f39c12>•</#f39c12> <white>/strengthsmp pack</white> <gray>— Forcer le pack de ressources</gray>'
+      state-on: <#e74c3c><b>ACTIVÉ</b></#e74c3c>
+      state-off: <b>DÉSACTIVÉ</b>
+      state-enabled: <b>ACTIVÉ</b>
+      state-disabled: <#e74c3c><b>DÉSACTIVÉ</b></#e74c3c>
+      maintenance-on: <#e74c3c><b>[Mode Maintenance]</b> La maintenance est maintenant <b>ACTIVÉE</b> (système désactivé et KeepInventory actif).</#e74c3c>
+      maintenance-off: <#2ecc71><b>[Mode Maintenance]</b> La maintenance est maintenant <b>DÉSACTIVÉE</b> (système activé).</#2ecc71>
+      maintenance-usage: 'Utilisation: /strengthsmp maintenance <on|off>'
+      maintenance-toggled: <#2ecc71>Le mode maintenance est maintenant %state%
+      system-toggled: <#2ecc71>Le système est maintenant %state%
+      reload-success: Configuration rechargée avec succès.
+      lang-current: '<#f1c40f><b>[Langue]</b> Langue actuelle: <b>%lang%</b>. Utilisation: /strengthsmp lang <en|ru|es|de|fr|pt></#f1c40f>'
+      pack-sending: <#2ecc71>Envoi du pack de ressources en cours... Consultez la console pour plus de détails.</#2ecc71>
+      info-header: <#f1c40f><b>[Infos Système]</b></#f1c40f>
+      info-status: ' <#95a5a6>Statut:</#95a5a6> %status%'
+      info-status-enabled: <#2ecc71>ACTIVÉ</#2ecc71>
+      info-status-disabled: <#e74c3c>DÉSACTIVÉ</#e74c3c>
+      info-monarch: ' <#95a5a6>Monarque:</#95a5a6> <#f1c40f>%monarch%</#f1c40f>'
+      info-monarch-none: Aucun
+      info-online: ' <#95a5a6>Joueurs connectés:</#95a5a6> <white>%count%</white>'
+      reroll-usage: 'Utilisation: /strengthsmp reroll <joueur>'
+      reroll-success: Arme de %player% relancée → %icon% %weapon%
+      reroll-target: <#2ecc71><b>[!]</b></#2ecc71> <gray>Un administrateur a changé votre arme en</gray> <#f1c40f><b>%weapon%</b></#f1c40f>
+      setstrength-usage: 'Utilisation: /strengthsmp setstrength <joueur> <montant>'
+      setstrength-success: Force de %player% définie à <#f1c40f>%amount%</#f1c40f>
+      setweapon-usage: 'Utilisation: /strengthsmp setweapon <joueur> <arme>'
+      setweapon-success: Arme de %player% définie sur <#f1c40f>%weapon%</#f1c40f>
+      setweapon-target: <#2ecc71><b>[!]</b></#2ecc71> <gray>Votre classe d'arme a été changée par un administrateur en</gray> <#f1c40f><b>%weapon%</b></#f1c40f><gray>.</gray>
+      setweapon-invalid: 'Type d''arme invalide! Utilisez: SWORD, AXE, BOW, CROSSBOW, SHIELD, TRIDENT'
+      resetplayer-usage: 'Utilisation: /strengthsmp resetplayer <joueur>'
+      resetplayer-success: Statistiques de <#f1c40f>%player%</#f1c40f> réinitialisées
+      resetplayer-target: <#e74c3c><b>[!]</b></#e74c3c> <gray>Vos statistiques ont été réinitialisées par un administrateur.</gray>
+      giveitem-usage: 'Utilisation: /strengthsmp giveitem <joueur> <strength|reroll|death>'
+      giveitem-strength: Objet de Force donné à <#f1c40f>%player%</#f1c40f>
+      giveitem-reroll: Livre de Reroll donné à <#f1c40f>%player%</#f1c40f>
+      giveitem-death: Certificat de Décès donné à <#f1c40f>%player%</#f1c40f>
+      giveitem-unknown: 'Type d''objet inconnu. Utilisez: strength, reroll ou death'
+      checkitem-usage: 'Utilisation: /strengthsmp checkitem <joueur>'
+      checkitem-not-holding: '%player% ne tient aucun objet!'
+      checkitem-header: <#2ecc71><b>[Vérification d'Objet]</b></#2ecc71>
+      checkitem-player: ' <#95a5a6>Joueur:</#95a5a6> <white>%player%</white>'
+      checkitem-material: ' <#95a5a6>Matériau:</#95a5a6> <white>%material%</white>'
+      checkitem-cmd: ' <#95a5a6>CustomModelData:</#95a5a6> <#f1c40f>%value%</#f1c40f>'
+      board-not-connected: Le bot Discord n'est pas connecté!
+      board-success: Tableau Discord mis à jour.
+      resetmonarch-success: Le statut du monarque a été recalculé.
+      unknown-subcommand: 'Sous-commande inconnue: <#f1c40f>%sub%</#f1c40f>. Utilisez <white>/strengthsmp</white> pour l''aide.'
+pt:
+  prefix: '&x&f&f&8&c&0&0&lS&x&f&f&9&7&0&a&lT&x&f&f&a&3&1&4&lR&x&f&f&a&e&1&e&lE&x&f&f&b&a&2&8&lN&x&f&f&c&5&3&2&lG&x&f&f&d&1&3&c&lT&x&f&f&d&c&4&6&lH &8» '
+  no-permission: '&c&l✖ &c&lSEM PERMISSÃO! &7Você não tem acesso a este comando.'
+  only-players: '&c&l✖ &c&lAPENAS JOGADORES! &7Este comando só pode ser usado no jogo.'
+  player-not-found: '&c&l✖ &c&lJOGADOR NÃO ENCONTRADO! &7O jogador especificado não está online.'
+  invalid-amount: '&c&l✖ &c&lQUANTIDADE INVÁLIDA! &7Por favor especifique um número positivo válido.'
+  combat:
+    tagged: '&c&l☠ &c&lEM COMBATE! &7Você está em combate! &8(&cNão saia do jogo&8)'
+    expired: '&a&l✔ &a&lCOMBATE FINALIZADO! &7Agora você pode sair com segurança.'
+    penalty: '&c&l☠ &c&lPENALIDADE DE SAÍDA! &e%player% &7desconectou em combate e foi &cexecutado&7!'
+    command-blocked: '&c&l☠ &c&lEM COMBATE! &7Você não pode usar comandos durante o combate.'
+  bounty:
+    set: '&6&l🎯 [RECOMPENSA] &f%sender% &7colocou uma recompensa de &6%amount% STR &7em &e%target%&7!'
+    claim: '&6&l🎯 [RECOMPENSA] &e%player% &7resgatou &6%amount% STR &7ao derrotar &e%target%&7!'
+    claim-bonus-skip: '&8(( Recompensa resgatada — ganho normal de força suprimido ))'
+  monarch:
+    new: '&e&l👑 [MONARCA] &f%player% &7tornou-se o &e&lMonarca do Servidor&7!'
+    dethroned: '&e&l👑 [MONARCA] &f%player% &7foi &cdestronado &7como Monarca!'
+  season:
+    day: '&b&l📅 [TEMPORADA] &7Dia da temporada atual: &b%day%'
+  contract:
+    complete: '&a&l✔ [CONTRATO] &7Você concluiu um contrato diário! &8(&a+%reward% STR&8)'
+  discord:
+    kill-log: ':crossed_swords: **%attacker%** derrotou **%victim%** e ganhou **%amount%** de força! ⚔'
+    bounty-log: ':moneybag: **%attacker%** resgatou a recompensa de **%amount%** de força de **%victim%**!'
+  totem: null
+  strength:
+    insufficient: '&c&l✖ &c&lFORÇA INSUFICIENTE! &7Você precisa de pelo menos &e1 STR &7para mudar de classe.'
+    free-reroll-reward: '&b&l🎁 [RECOMPENSA] &fVocê recebeu um &d&lLivro de Troca Grátis&f! &7Clique com o botão direito para usar.'
+    cooldown: '&c&l⌛ [TEMPO DE ESPERA] &7Aguarde &c%time%s &7antes de usar outro item de força.'
+    max-reached: '&d&l⚡ [FORÇA MÁXIMA] &7Você já está no limite máximo de força.'
+    protection-granted: '&b&l🛡 [PROTEGIDO] &fVocê recebeu &b%hours% horas &fde &b&lproteção contra morte&f! &7(Sem perda de força)'
+    protected: '&b&l🛡 [PROTEGIDO] &fVocê está sob &b&lproteção&f! &7(Sem perda de força)'
+    protection-blocked: '&7(( Seu alvo está protegido e não pode perder força ))'
+    anti-farm: '&8(( Morte ignorada — você matou este jogador muitas vezes recentemente ))'
+    newbie-protection-start: '&a&l☘ [INICIANTE] &fBem-vindo! Você recebeu &a%hours% horas &fde proteção para iniciantes.'
+    newbie-you-protected: '&a&l☘ [INICIANTE] &fVocê está sob &a&lproteção para iniciantes&f! &7(Sem perda de STR)'
+    newbie-protected: '&7(( Seu alvo é um novo jogador e está protegido ))'
+    newbie-no-gain: '&8(( Você não pode ganhar STR sob proteção para iniciantes ))'
+    protected-no-gain: '&8(( Você não pode ganhar STR sob proteção contra morte ))'
+    gain: '&a&l⚡ [FORÇA GANHA] &7Sua força aumentou para &e&l%strength% STR&7!'
+    loss: '&c&l⚡ [FORÇA PERDIDA] &7Sua força diminuiu para &c&l%strength% STR&7!'
+    at-minimum: '&c&l✖ [NO MÍNIMO] &7Você está no limite mínimo de força.'
+    victim-at-minimum: '&c&l✖ [NO MÍNIMO] &7Seu alvo já está no limite mínimo de força.'
+  abilities:
+    supercharge: '&d&lSUPERCARGA &r&7— Seu arco tem velocidade de disparo instantânea!'
+    scorpion-miss: '&c⚡ O Gancho de Escorpião errou o alvo!'
+    scorpion-hit-target: '&c⚡ Você foi puxado e atordoado pelo Gancho de Escorpião de %player%!'
+    scorpion-hit-player: '&a⚡ Gancho de Escorpião acertou! %target% foi puxado para você!'
+    no-arrows: '&cVocê não tem flechas!'
+    trident-no-throw: '&c&lVocê não pode arremessar tridentes! &7Use-o como arma corpo a corpo.'
+    ability-cooldown: '&cHabilidade em tempo de espera! (%remaining%s)'
+    bleed: '&5&lSANGRAMENTO &r&7— Sua lâmina fez a vítima murchar!'
+    berserk-cooldown: '&cBerserk em tempo de espera! (%remaining%s)'
+    blink-cooldown: '&cTeleporte em tempo de espera! (%remaining%s)'
+    berserk-end: '&cO modo Berserk terminou.'
+    berserk-start: '&e&lBERSERK &r&7— Modo Berserk ativado! (+2 Dano de ataque, Velocidade III por 15s)'
+    blink-success: '&5&lTELEPORTE &r&7— Você se teleportou para a frente!'
+    shield-active: '&6&lESCUDO ATIVO &r&7— Refletindo todo o dano & Resistência II por 7s!'
+    shield-ended: '&cO reflexo do escudo terminou.'
+    potion-disabled: '&c⚠ Poções de força estão desativadas.'
+    no-weapons-available: '&cNenhum outro tipo de arma disponível!'
+    rapid-fire: '&b&lTIRO RÁPIDO &r&7— Disparando uma rajada de flechas!'
+    axe-stunned: '&cVocê foi atordoado por um golpe de machado!'
+    axe-shield-disabled: '&cSeu escudo foi desativado por um golpe de machado!'
+  items:
+    swap-key-hint: '&d&l⚡ &7Use a tecla de trocar item (F) para usar a habilidade do Escudo!'
+    actionbar-cooldown: '&e&l⚡ &7Habilidade vinculada em tempo de espera! &c(%remaining%s)'
+    bound-to-another: '&d&l⚡ &7Esta arma está vinculada a outra alma!'
+    cannot-store-container: '&d&l⚡ &7Você não pode guardar sua arma vinculada em baús!'
+    cannot-place-item: '&d&l⚡ &7Você não pode colocar sua arma vinculada aqui!'
+    void-return: '&d&l⚡ &fSua arma vinculada retornou do vazio. &d&l⚡'
+    actionbar-returned: '&d&l⚡ Arma Vinculada Retornou! ⚡'
+    return-knockback: '&d&l⚡ &7Você foi empurrado por uma arma vinculada que retornava!'
+    sealed-destiny-name: '&d&lSELO DO DESTINO'
+    sealed-destiny-lore-1: '&7Um antigo artefato que revela'
+    sealed-destiny-lore-2: '&7seu potencial de guerreiro interior.'
+    sealed-destiny-lore-click: '&fClique com o botão direito para &bDESPERTAR &fseu poder!'
+    sealed-destiny-lore-tag: '&a&lGRÁTIS &7(Recompensa de primeiro acesso)'
+  gui:
+    bind-title: '&d&l⚡ Vinculação de Armas ⚡'
+    shuffle-title: '&0&lDespertar do Destino...'
+    invalid-class-slot: '&cArma de classe inválida no slot 14!'
+    already-bound: '&cEsta arma já está vinculada!'
+    need-more-strength: '&cVocê precisa de pelo menos %cost% de força para vincular sua arma. Você tem %current%.'
+    bound-success: '&aGasto &e%cost% de força &apara vincular sua arma de classe!'
+    bound-free-success: '&aSua arma foi vinculada &eGRÁTIS &apela graça do seu Sacrifício de Alma!'
+    bound-broadcast: '&d&l⚡ &f&lSUA ARMA FOI VINCULADA A VOCÊ! &d&l⚡'
+    unbound-success: '&aArma desvinculada com sucesso.'
+    starter-book-not-owner: '&c&l✖ &cEste Livro de Troca Grátis está vinculado a %owner% e não pode ser usado por você!'
+    starter-book-no-drop: '&c&l✖ &cVocê não pode dropar seu Livro de Troca Grátis pessoal!'
+    starter-book-no-container: '&c&l✖ &cVocê não pode guardar seu Livro de Troca Grátis pessoal em baús!'
+    bind-select-title: '&d&l⚡ Choose Weapon Model ⚡'
+    bind-back-btn-title: '&c&l⬅ Back to Weapon Slot'
+    bind-back-btn-lore: '&7Return to place or take back your weapon.'
+    bind-confirm-btn-bind: '&a&l⚡ Confirm Soul Binding ⚡'
+    bind-confirm-btn-change: '&a&l⚡ Confirm Model Change ⚡'
+    bind-confirm-btn-not-enough: '&c&l❌ Not Enough Strength'
+    bind-confirm-selected: '&7Selected Model: &b%model%'
+    bind-confirm-cost-free: FREE (Soul Sacrifice)
+    bind-confirm-cost-str: '%cost% Strength'
+    bind-confirm-cost-line: '&7Binding Cost: &e%cost%'
+    bind-confirm-strength-line: '&7Your Strength: &f%strength%'
+    bind-confirm-click-action: '&eClick to bind your weapon with this model!'
+    bind-confirm-need-more: '&cYou need at least %cost% Strength to bind!'
+    bind-model-selected: '&7Status: &a&lSELECTED'
+    bind-model-selected-lore: '&eThis model will be applied upon confirmation.'
+    bind-model-not-selected: '&7Status: &cNot Selected'
+    bind-model-click-to-select: '&eClick to select this model!'
+    bind-target-preview: '&e&lBinding Target: &f%item%'
+    bind-target-preview-lore: '&7Select 1 of the 3 exclusive 3D models below.'
+    bind-guide-title: '&d&l⚡ How It Works ⚡'
+    bind-guide-step1: '&71. Place your class weapon in &eSlot 14&7.'
+    bind-guide-step2: '&72. Click &d&lBind Weapon &7to view &e3 custom models&7.'
+    bind-guide-step3: '&73. Select your favorite model and click &a&lConfirm&7!'
+    bind-status-title: '&b&lBinding Status & Perks'
+    bind-status-class: '&7Your Class: %class%'
+    bind-status-bound: '&7Bound Weapon: %status%'
+    bind-status-perks: '&eBinding Perks:'
+    bind-status-perk-death: '&d- Keep on Death: &7Bound weapon is never dropped on death'
+    bind-status-perk-loyalty: '&d- Loyalty Flight: &7Flies back to you on respawn, knocking back enemies'
+    bind-status-perk-soulbound: '&d- Soulbound Aura: &7Emits custom class magic particles while wielded'
+    bind-btn-change-model: '&a&l✨ Change Model (1 Strength) ✨'
+    bind-btn-cannot-change: '&c&l✨ Cannot Change Model'
+    bind-btn-bind-weapon: '&d&l⚡ Bind Weapon ⚡'
+    bind-btn-cannot-bind: '&c&l⚡ Cannot Bind Weapon'
+    bind-btn-desc: '&7Bind this weapon to your soul.'
+    bind-btn-desc-change: '&7Change the 3D model of your bound weapon.'
+    bind-btn-cost: '&7Cost: &e%cost%'
+    bind-btn-status: '&7Status: %status%'
+    bind-btn-click-choose: '&eClick to choose your 3D weapon model!'
+    bind-action-place-weapon: '&cPlease place a weapon in Slot 14.'
+    bind-action-no-class: '&cYou do not have a weapon class!'
+    bind-action-wrong-class: '&cWeapon does not match your class (%class%)!'
+    bind-action-other-player: '&cBound to a different player!'
+    bind-action-change-model: '&aClick to choose a new model!'
+    bind-action-ready: '&aReady to choose your model!'
+    unbind-title: '&c&l⚡ Unbind Weapon ⚡'
+    unbind-desc: '&7Unbind your current bound weapon.'
+    unbind-status: '&7Status: %status%'
+    unbind-action: '&eClick to unbind weapon in Slot 14.'
+    unbind-cannot: '&cPlace a bound weapon in Slot 14.'
+    bind-stats-kills: '&d&l⚔ Weapon Kills'
+    bind-stats-kills-desc: '&7Tracks PvP kills secured with your bound weapon.'
+    bind-stats-damage: '&d&l💥 Damage Dealt'
+    bind-stats-damage-desc: '&7Tracks final damage dealt with your bound weapon.'
+    bind-stats-sacrifices: '&d&l🛡️ Soul Sacrifices'
+    bind-stats-sacrifices-desc: '&7Tracks death saves triggered by your bound weapon.'
+    bind-stats-duration: '&d&l⌛ Duration Bound'
+    bind-stats-duration-desc: '&7Tracks elapsed time since you bound your current weapon.'
+    bind-stats-abilities: '&d&l✨ Ability Triggers'
+    bind-stats-abilities-desc: '&7Tracks weapon ability uses while bound.'
+    not-your-weapon: '&cThis weapon is bound to another player!'
+    place-weapon-first: '&cPlease place your class weapon in Slot 14 first!'
+    skin-changed-success: '&aSpent &e1 strength &ato change your weapon model!'
+  ledger:
+    title: '  LIVRO DAS LENDAS'
+    header: '-------------------'
+    warrior: 'Guerreiro: '
+    strength: 'Força: '
+    class: 'Classe: '
+    bounty: 'Recompensa: '
+    kills: 'Abates: '
+    deaths: 'Mortes: '
+    kd: 'K/D: '
+    footer: O destino é forjado em sangue.
+  ranks:
+    unassigned: '&e[Sem classe]'
+    '-10': '&8[Sem esperança]'
+    '-9': '&8[Miserável]'
+    '-8': '&7[Frágil]'
+    '-7': '&7[Fracote]'
+    '-6': '&7[Camponês]'
+    '-5': '&f[Vassalo]'
+    '-4': '&f[Cidadão]'
+    '-3': '&a[Escudeiro]'
+    '-2': '&a[Aprendiz]'
+    '-1': '&e[Novato]'
+    '0': '&e[Neutro]'
+    '1': '&d[Iniciado]'
+    '2': '&b[Soldado]'
+    '3': '&5&l[Cavaleiro]'
+    '4': '&6&l[Veterano]'
+    '5': '&c&l[Campeão]'
+    '6': '&4&l[Senhor da Guerra]'
+    '7': '&4&l[Conquistador]'
+    '8': '&5&l[Grão-Mestre]'
+    '9': '&d&l[Soberano]'
+    '10': '&x&f&f&a&a&0&0&l[Semideus]'
+  weapons:
+    unassigned: Sem classe
+    sword:
+      name: Espada
+      desc: Empunhadura dupla e crítico automático
+    axe:
+      name: Machado
+      desc: Ataques críticos atordoam + acúmulo de dano
+    trident:
+      name: Tridente
+      desc: Raio passivo e mobilidade de onda de água
+    shield:
+      name: Escudo
+      desc: Velocidade II ao atordoar + 15s de imortalidade
+    bow:
+      name: Arco
+      desc: Feixe sônico linear (AOE)
+    crossbow:
+      name: Besta
+      desc: Flechas brilhantes + laço supremo
+  commands:
+    withdraw-success: <#2ecc71><b>SAQUE</b></#2ecc71> <gray>Você sacou</gray> <#f1c40f>%amount% STR</#f1c40f><gray>. Restante:</gray> <white>%remaining%</white>
+    punish-message: <#e74c3c><b>[PUNIÇÃO]</b></#e74c3c> <gray>Você foi punido por um admin. Pelas próximas</gray> <white>24 horas</white><gray>, você perderá</gray> <red><b>2 STR</b></red> <gray>a cada morte.</gray>
+    no-newbie-message: <#e74c3c><b>[ADMIN]</b></#e74c3c> <gray>Sua proteção de iniciante foi removida. Você agora está totalmente na economia de força.</gray>
+    bounty-refund: <#2ecc71><b>[!]</b></#2ecc71> <gray>Sua recompensa de</gray> <#f1c40f>%amount% STR</#f1c40f> <gray>em %target% foi reembolsada por um admin.</gray>
+    bounty-help-header: <#f1c40f><b>[Sistema de Recompensas]</b></#f1c40f>
+    bounty-help-place: ' <#f39c12>•</#f39c12> <white>/bounty <jogador> <quantidade></white> <gray>Coloque uma recompensa usando sua STR</gray>'
+    bounty-help-list: ' <#f39c12>•</#f39c12> <white>/bounty list</white> <gray>Ver todas as recompensas ativas</gray>'
+    language-changed: <#2ecc71><b>[Idioma]</b></#2ecc71> <gray>Idioma alterado com sucesso para</gray> <white>%lang%</white><gray>!</gray>
+    error-prefix: '[ERRO]'
+    success-prefix: '[SUCESSO]'
+    admin:
+      help-header: <#f1c40f><b>[Admin do StrengthSMP]</b></#f1c40f>
+      help-maintenance: ' <#f39c12>•</#f39c12> <white>/strengthsmp maintenance <on|off></white> <gray>— Alternar o modo de manutenção</gray>'
+      help-toggle: ' <#f39c12>•</#f39c12> <white>/strengthsmp toggle</white> <gray>— Alternar o sistema rapidamente</gray>'
+      help-reload: ' <#f39c12>•</#f39c12> <white>/strengthsmp reload</white> <gray>— Recarregar a configuração</gray>'
+      help-lang: ' <#f39c12>•</#f39c12> <white>/strengthsmp lang <en|ru|es|de|fr|pt></white> <gray>— Mudar o idioma do plugin</gray>'
+      help-info: ' <#f39c12>•</#f39c12> <white>/strengthsmp info</white> <gray>— Estado do sistema</gray>'
+      help-setupboard: ' <#f39c12>•</#f39c12> <white>/strengthsmp setupboard</white> <gray>— Configurar o Discord</gray>'
+      help-resetplayer: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetplayer <jogador></white>'
+      help-reroll: ' <#f39c12>•</#f39c12> <white>/strengthsmp reroll <jogador></white>'
+      help-setstrength: ' <#f39c12>•</#f39c12> <white>/strengthsmp setstrength <jogador> <quantidade></white>'
+      help-setweapon: ' <#f39c12>•</#f39c12> <white>/strengthsmp setweapon <jogador> <arma></white>'
+      help-giveitem: ' <#f39c12>•</#f39c12> <white>/strengthsmp giveitem <jogador> <strength|reroll></white>'
+      help-resetmonarch: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetmonarch</white> <gray>— Recalcular o monarca</gray>'
+      help-pack: ' <#f39c12>•</#f39c12> <white>/strengthsmp pack</white> <gray>— Forçar o pacote de recursos</gray>'
+      state-on: <#e74c3c><b>ATIVADO</b></#e74c3c>
+      state-off: <b>DESATIVADO</b>
+      state-enabled: <b>ATIVADO</b>
+      state-disabled: <#e74c3c><b>DESATIVADO</b></#e74c3c>
+      maintenance-on: <#e74c3c><b>[Modo Manutenção]</b> A manutenção está agora <b>ATIVADA</b> (sistema desativado e KeepInventory ativo).</#e74c3c>
+      maintenance-off: <#2ecc71><b>[Modo Manutenção]</b> A manutenção está agora <b>DESATIVADA</b> (sistema ativado).</#2ecc71>
+      maintenance-usage: 'Uso: /strengthsmp maintenance <on|off>'
+      maintenance-toggled: <#2ecc71>O modo de manutenção está agora %state%
+      system-toggled: <#2ecc71>O sistema está agora %state%
+      reload-success: Configuração recarregada com sucesso.
+      lang-current: '<#f1c40f><b>[Idioma]</b> O idioma atual é: <b>%lang%</b>. Uso: /strengthsmp lang <en|ru|es|de|fr|pt></#f1c40f>'
+      pack-sending: <#2ecc71>Tentando enviar o pacote de recursos... Verifique o console para mais detalhes.</#2ecc71>
+      info-header: <#f1c40f><b>[Informações do Sistema]</b></#f1c40f>
+      info-status: ' <#95a5a6>Estado:</#95a5a6> %status%'
+      info-status-enabled: <#2ecc71>ATIVADO</#2ecc71>
+      info-status-disabled: <#e74c3c>DESATIVADO</#e74c3c>
+      info-monarch: ' <#95a5a6>Monarca:</#95a5a6> <#f1c40f>%monarch%</#f1c40f>'
+      info-monarch-none: Nenhum
+      info-online: ' <#95a5a6>Jogadores online:</#95a5a6> <white>%count%</white>'
+      reroll-usage: 'Uso: /strengthsmp reroll <jogador>'
+      reroll-success: Arma de %player% re-sorteada → %icon% %weapon%
+      reroll-target: <#2ecc71><b>[!]</b></#2ecc71> <gray>Um admin mudou sua arma para</gray> <#f1c40f><b>%weapon%</b></#f1c40f>
+      setstrength-usage: 'Uso: /strengthsmp setstrength <jogador> <quantidade>'
+      setstrength-success: Força de %player% definida para <#f1c40f>%amount%</#f1c40f>
+      setweapon-usage: 'Uso: /strengthsmp setweapon <jogador> <arma>'
+      setweapon-success: Arma de %player% definida para <#f1c40f>%weapon%</#f1c40f>
+      setweapon-target: <#2ecc71><b>[!]</b></#2ecc71> <gray>Sua classe de arma foi alterada por um admin para</gray> <#f1c40f><b>%weapon%</b></#f1c40f><gray>.</gray>
+      setweapon-invalid: 'Tipo de arma inválido! Use: SWORD, AXE, BOW, CROSSBOW, SHIELD, TRIDENT'
+      resetplayer-usage: 'Uso: /strengthsmp resetplayer <jogador>'
+      resetplayer-success: Estatísticas de <#f1c40f>%player%</#f1c40f> redefinidas
+      resetplayer-target: <#e74c3c><b>[!]</b></#e74c3c> <gray>Suas estatísticas foram redefinidas por um admin.</gray>
+      giveitem-usage: 'Uso: /strengthsmp giveitem <jogador> <strength|reroll|death>'
+      giveitem-strength: Item de Força dado a <#f1c40f>%player%</#f1c40f>
+      giveitem-reroll: Livro de Reroll dado a <#f1c40f>%player%</#f1c40f>
+      giveitem-death: Certificado de Óbito dado a <#f1c40f>%player%</#f1c40f>
+      giveitem-unknown: 'Tipo de item desconhecido. Use: strength, reroll ou death'
+      checkitem-usage: 'Uso: /strengthsmp checkitem <jogador>'
+      checkitem-not-holding: '%player% não está segurando nenhum item!'
+      checkitem-header: <#2ecc71><b>[Verificação de Item]</b></#2ecc71>
+      checkitem-player: ' <#95a5a6>Jogador:</#95a5a6> <white>%player%</white>'
+      checkitem-material: ' <#95a5a6>Material:</#95a5a6> <white>%material%</white>'
+      checkitem-cmd: ' <#95a5a6>CustomModelData:</#95a5a6> <#f1c40f>%value%</#f1c40f>'
+      board-not-connected: O bot do Discord não está conectado!
+      board-success: Painel do Discord atualizado.
+      resetmonarch-success: O estado do monarca foi recalculado.
+      unknown-subcommand: 'Subcomando desconhecido: <#f1c40f>%sub%</#f1c40f>. Use <white>/strengthsmp</white> para ver a ajuda.'
+hi:
+  prefix: '&x&f&f&8&c&0&0&lS&x&f&f&9&7&0&a&lT&x&f&f&a&3&1&4&lR&x&f&f&a&e&1&e&lE&x&f&f&b&a&2&8&lN&x&f&f&c&5&3&2&lG&x&f&f&d&1&3&c&lT&x&f&f&d&c&4&6&lH &8» '
+  no-permission: '&c&l✖ &c&lअनुमति नहीं है! &7आपको इस कमांड का उपयोग करने की अनुमति नहीं है।'
+  only-players: '&c&l✖ &c&lकेवल खिलाड़ी! &7यह कमांड केवल खेल के अंदर चलाई जा सकती है।'
+  player-not-found: '&c&l✖ &c&lखिलाड़ी नहीं मिला! &7निर्दिष्ट खिलाड़ी ऑनलाइन नहीं है।'
+  invalid-amount: '&c&l✖ &c&lअमान्य संख्या! &7कृपया एक मान्य सकारात्मक संख्या दर्ज करें।'
+  combat:
+    tagged: '&c&l☠ &c&lलड़ाई शुरू! &7आप युद्ध में हैं! &8(&cलॉगआउट न करें&8)'
+    expired: '&a&l✔ &a&lलड़ाई समाप्त! &7अब आप सुरक्षित रूप से लॉगआउट कर सकते हैं।'
+    penalty: '&c&l☠ &c&lलॉगआउट दंड! &e%player% &7ने लड़ाई के दौरान लॉगआउट किया और &cमारा गया&7!'
+    command-blocked: '&c&l☠ &c&lलड़ाई! &7आप युद्ध के दौरान कमांड का उपयोग नहीं कर सकते।'
+  bounty:
+    set: '&6&l🎯 [इनाम] &f%sender% &7ने &e%target% &7पर &6%amount% STR &7का इनाम रखा!'
+    claim: '&6&l🎯 [इनाम] &e%player% &7ने &e%target% &7को हराकर &6%amount% STR &7का इनाम जीता!'
+    claim-bonus-skip: '&8(( इनाम प्राप्त हुआ — सामान्य स्ट्रेंथ लाभ दबा दिया गया ))'
+  monarch:
+    new: '&e&l👑 [सम्राट] &f%player% &7नए &e&lसर्वर सम्राट &7बन गए हैं!'
+    dethroned: '&e&l👑 [सम्राट] &f%player% &7को सम्राट पद से &cहटा दिया गया है&7!'
+  season:
+    day: '&b&l📅 [सीजन] &7वर्तमान सीजन दिन: &b%day%'
+  contract:
+    complete: '&a&l✔ [अनुबंध] &7आपने दैनिक अनुबंध पूरा किया! &8(&a+%reward% STR&8)'
+  discord:
+    kill-log: ':crossed_swords: **%attacker%** ने **%victim%** को हराया और **%amount%** स्ट्रेंथ हासिल की! ⚔'
+    bounty-log: ':moneybag: **%attacker%** ने **%victim%** का **%amount%** स्ट्रेंथ का इनाम जीता!'
+  totem: null
+  strength:
+    insufficient: '&c&l✖ &c&lअपर्याप्त स्ट्रेंथ! &7क्लास बदलने के लिए कम से कम &e1 STR &7चाहिए।'
+    free-reroll-reward: '&b&l🎁 [पुरस्कार] &fआपको एक &d&lमुफ्त रीरोल किताब &fमिली! &7उपयोग करने के लिए राइट-क्लिक करें।'
+    cooldown: '&c&l⌛ [कूलडाउन] &7कृपया दूसरी स्ट्रेंथ आइटम उपयोग करने से पहले &c%time%s &7प्रतीक्षा करें।'
+    max-reached: '&d&l⚡ [अधिकतम स्ट्रेंथ] &7आप पहले से ही अधिकतम स्ट्रेंथ सीमा पर हैं।'
+    protection-granted: '&b&l🛡 [सुरक्षा] &fआपको &b%hours% घंटे &fकी &b&lमृत्यु सुरक्षा &fमिली! &7(स्ट्रेंथ नहीं घटेगी)'
+    protected: '&b&l🛡 [सुरक्षा] &fआप &b&lसुरक्षा &fके अधीन हैं! &7(स्ट्रेंथ नहीं घटेगी)'
+    protection-blocked: '&7(( आपका लक्ष्य &bसुरक्षित &7है और स्ट्रेंथ नहीं खो सकता ))'
+    anti-farm: '&8(( हत्या अनदेखी — आपने हाल ही में इस खिलाड़ी को बहुत बार मारा है ))'
+    newbie-protection-start: '&a&l☘ [नौसिखिया] &fस्वागत है! आपको &a%hours% घंटे &fकी सुरक्षा दी गई है।'
+    newbie-you-protected: '&a&l☘ [नौसिखिया] &fआप &a&lनौसिखिया सुरक्षा &fमें हैं! &7(स्ट्रेंथ नहीं घटेगी)'
+    newbie-protected: '&7(( आपका लक्ष्य एक &aनया खिलाड़ी &7है और सुरक्षित है ))'
+    newbie-no-gain: '&8(( नौसिखिया सुरक्षा में होने पर आप स्ट्रेंथ हासिल नहीं कर सकते ))'
+    protected-no-gain: '&8(( मृत्यु सुरक्षा में होने पर आप स्ट्रेंथ हासिल नहीं कर सकते ))'
+    gain: '&a&l⚡ [स्ट्रेंथ बढ़ी] &7आपकी स्ट्रेंथ बढ़कर &e&l%strength% STR &7हो गई!'
+    loss: '&c&l⚡ [स्ट्रेंथ घटी] &7आपकी स्ट्रेंथ घटकर &c&l%strength% STR &7हो गई!'
+    at-minimum: '&c&l✖ [न्यूनतम सीमा] &7आप न्यूनतम स्ट्रेंथ सीमा पर हैं।'
+    victim-at-minimum: '&c&l✖ [न्यूनतम सीमा] &7आपका लक्ष्य पहले से ही न्यूनतम स्ट्रेंथ पर है।'
+  abilities:
+    supercharge: '&d&lसुपरचार्ज &r&7— आपके धनुष की गति तुरंत अधिकतम हो गई!'
+    scorpion-miss: '&c⚡ बिच्छू हुक चूक गया!'
+    scorpion-hit-target: '&c⚡ आप %player% के बिच्छू हुक द्वारा खींचे और स्तब्ध किए गए!'
+    scorpion-hit-player: '&a⚡ बिच्छू हुक लगा! %target% को सीधे आपके पास खींचा!'
+    no-arrows: '&cआपके पास तीर नहीं हैं!'
+    trident-no-throw: '&c&lआप त्रिशूल फेंक नहीं सकते! &7इसे हाथापाई हथियार के रूप में उपयोग करें।'
+    ability-cooldown: '&cक्षमता कूलडाउन पर है! (%remaining%s)'
+    bleed: '&5&lरक्तस्राव &r&7— आपके वार से पीड़ित कमजोर हो गया!'
+    berserk-cooldown: '&cबर्सर्क कूलडाउन पर है! (%remaining%s)'
+    blink-cooldown: '&cब्लिंक कूलडाउन पर है! (%remaining%s)'
+    berserk-end: '&cबर्सर्क मोड समाप्त हो गया।'
+    berserk-start: '&e&lबर्सर्क &r&7— बर्सर्क मोड सक्रिय! (+2 हमला क्षति, 15 सेकंड के लिए स्पीड III)'
+    blink-success: '&5&lब्लिंक &r&7— आप आगे टेलीपोर्ट हो गए!'
+    shield-active: '&6&lशील्ड सक्रिय &r&7— सभी क्षति परावर्तित और 7 सेकंड के लिए प्रतिरोध II!'
+    shield-ended: '&cपरावर्तन समाप्त हो गया।'
+    potion-disabled: '&c⚠ स्ट्रेंथ पोशन अक्षम हैं।'
+    no-weapons-available: '&cकोई अन्य हथियार प्रकार उपलब्ध नहीं है!'
+    rapid-fire: '&b&lरैपिड फायर &r&7— तीरों की बौछार!'
+    axe-stunned: '&cआप कुल्हाड़ी के वार से स्तब्ध हो गए हैं!'
+    axe-shield-disabled: '&cआपकी ढाल कुल्हाड़ी के वार से अक्षम हो गई है!'
+  items:
+    swap-key-hint: '&d&l⚡ &7शील्ड क्षमता का उपयोग करने के लिए स्वैप की (F) दबाएं!'
+    actionbar-cooldown: '&e&l⚡ &7बाउंड क्षमता कूलडाउन पर! &c(%remaining%s)'
+    bound-to-another: '&d&l⚡ &7यह हथियार किसी अन्य आत्मा से बंधा हुआ है!'
+    cannot-store-container: '&d&l⚡ &7आप अपना बाउंड हथियार कंटेनर में नहीं रख सकते!'
+    cannot-place-item: '&d&l⚡ &7आप अपना बाउंड हथियार इस पर नहीं रख सकते!'
+    void-return: '&d&l⚡ &fआपका बाउंड हथियार शून्य से वापस लौट आया। &d&l⚡'
+    actionbar-returned: '&d&l⚡ बाउंड हथियार वापस आ गया! ⚡'
+    return-knockback: '&d&l⚡ &7लौटते हुए बाउंड हथियार ने आपको पीछे धकेल दिया!'
+    sealed-destiny-name: '&d&lसील किया गया भाग्य'
+    sealed-destiny-lore-1: '&7एक प्राचीन वस्तु जो आपकी'
+    sealed-destiny-lore-2: '&7आंतरिक योद्धा क्षमता को उजागर करती है।'
+    sealed-destiny-lore-click: '&fअपनी शक्ति को &bजागृत &fकरने के लिए राइट-क्लिक करें!'
+    sealed-destiny-lore-tag: '&a&lमुफ्त &7(पहली बार जुड़ने का इनाम)'
+  gui:
+    bind-title: '&d&l⚡ हथियार बंधन (Weapon Binding) ⚡'
+    bind-select-title: '&d&l⚡ हथियार मॉडल चुनें (Choose Model) ⚡'
+    shuffle-title: '&0&lभाग्य का जागरण...'
+    invalid-class-slot: '&cस्लॉट 13 में अमान्य क्लास हथियार!'
+    already-bound: '&cयह हथियार पहले से ही बंधा हुआ है!'
+    need-more-strength: '&cहथियार बांधने के लिए आपको कम से कम %cost% स्ट्रेंथ चाहिए। आपके पास %current% है।'
+    bound-success: '&aअपने क्लास हथियार को बांधने के लिए &e%cost% स्ट्रेंथ &aखर्च की!'
+    bound-free-success: '&aआत्मा बलिदान के कारण आपका हथियार &eमुफ्त &aमें बंध गया!'
+    bound-broadcast: '&d&l⚡ &f&lआपका हथियार आपसे बंध गया है! &d&l⚡'
+    unbound-success: '&aसफलतापूर्वक आपका हथियार मुक्त (unbound) कर दिया गया।'
+    starter-book-not-owner: '&c&l✖ &cयह मुफ्त रीरोल किताब %owner% से बंधी है और आप इसका उपयोग नहीं कर सकते!'
+    starter-book-no-drop: '&c&l✖ &cआप अपनी व्यक्तिगत मुफ्त रीरोल किताब नहीं गिरा सकते!'
+    starter-book-no-container: '&c&l✖ &cआप अपनी व्यक्तिगत मुफ्त रीरोल किताब को कंटेनर में नहीं रख सकते!'
+    not-your-weapon: '&cयह हथियार किसी अन्य खिलाड़ी से बंधा है!'
+    place-weapon-first: '&cकृपया पहले स्लॉट 13 में अपना क्लास हथियार रखें!'
+    skin-changed-success: '&aहथियार मॉडल बदलने के लिए &e1 स्ट्रेंथ &aखर्च की!'
+    bind-back-btn-title: '&c&l⬅ हथियार स्लॉट पर वापस जाएं'
+    bind-back-btn-lore: '&7हथियार रखने या वापस लेने के लिए लौटें।'
+    bind-confirm-btn-bind: '&a&l⚡ आत्मा बंधन की पुष्टि करें ⚡'
+    bind-confirm-btn-change: '&a&l⚡ मॉडल बदलने की पुष्टि करें ⚡'
+    bind-confirm-btn-not-enough: '&c&l❌ पर्याप्त स्ट्रेंथ नहीं है'
+    bind-confirm-selected: '&7चुना गया मॉडल: &b%model%'
+    bind-confirm-cost-free: मुफ्त (आत्मा बलिदान)
+    bind-confirm-cost-str: '%cost% स्ट्रेंथ'
+    bind-confirm-cost-line: '&7बंधन लागत: &e%cost%'
+    bind-confirm-strength-line: '&7आपकी स्ट्रेंथ: &f%strength%'
+    bind-confirm-click-action: '&eइस मॉडल के साथ अपने हथियार को बांधने के लिए क्लिक करें!'
+    bind-confirm-need-more: '&cबांधने के लिए आपको कम से कम %cost% स्ट्रेंथ की आवश्यकता है!'
+    bind-model-selected: '&7स्थिति: &a&lचयनित (SELECTED)'
+    bind-model-selected-lore: '&eपुष्टि करने पर यह मॉडल लागू होगा।'
+    bind-model-not-selected: '&7स्थिति: &cअचयनित'
+    bind-model-click-to-select: '&eयह मॉडल चुनने के लिए क्लिक करें!'
+    bind-target-preview: '&e&lबंधन लक्ष्य: &f%item%'
+    bind-target-preview-lore: '&7नीचे दिए गए 3 विशेष 3D मॉडलों में से 1 चुनें।'
+    bind-guide-title: '&d&l⚡ यह कैसे काम करता है ⚡'
+    bind-guide-step1: '&71. अपना क्लास हथियार &eस्लॉट 13 &7में रखें।'
+    bind-guide-step2: '&72. &e3 कस्टम मॉडल &7देखने के लिए &d&lBind Weapon &7पर क्लिक करें।'
+    bind-guide-step3: '&73. अपना पसंदीदा मॉडल चुनें और &a&lConfirm &7पर क्लिक करें!'
+    bind-status-title: '&b&lबंधन स्थिति और सुविधाएं'
+    bind-status-class: '&7आपकी क्लास: %class%'
+    bind-status-bound: '&7बाउंड हथियार: %status%'
+    bind-status-perks: '&eबंधन सुविधाएं:'
+    bind-status-perk-death: '&d- मृत्यु पर सुरक्षित: &7बाउंड हथियार मृत्यु पर कभी नहीं गिरता'
+    bind-status-perk-loyalty: '&d- निष्ठा उड़ान: &7पुनर्जन्म पर दुश्मनों को धकेलते हुए आपके पास उड़कर आता है'
+    bind-status-perk-soulbound: '&d- आत्मा आभामंडल: &7हाथ में पकड़ने पर विशेष जादुई कण उत्सर्जित करता है'
+    bind-btn-change-model: '&a&l✨ मॉडल बदलें (1 स्ट्रेंथ) ✨'
+    bind-btn-cannot-change: '&c&l✨ मॉडल नहीं बदल सकते'
+    bind-btn-bind-weapon: '&d&l⚡ हथियार बांधें ⚡'
+    bind-btn-cannot-bind: '&c&l⚡ हथियार नहीं बांध सकते'
+    bind-btn-desc: '&7इस हथियार को अपनी आत्मा से बांधें।'
+    bind-btn-desc-change: '&7अपने बाउंड हथियार का 3D मॉडल बदलें।'
+    bind-btn-cost: '&7लागत: &e%cost%'
+    bind-btn-status: '&7स्थिति: %status%'
+    bind-btn-click-choose: '&eअपना 3D हथियार मॉडल चुनने के लिए क्लिक करें!'
+    bind-action-place-weapon: '&cकृपया स्लॉट 13 में हथियार रखें।'
+    bind-action-no-class: '&cआपके पास कोई हथियार क्लास नहीं है!'
+    bind-action-wrong-class: '&cहथियार आपकी क्लास (%class%) से मेल नहीं खाता!'
+    bind-action-other-player: '&cकिसी अन्य खिलाड़ी से बंधा हुआ है!'
+    bind-action-change-model: '&aनया मॉडल चुनने के लिए क्लिक करें!'
+    bind-action-ready: '&aअपना मॉडल चुनने के लिए तैयार!'
+    unbind-title: '&c&l⚡ हथियार बंधन हटाएं ⚡'
+    unbind-desc: '&7अपने वर्तमान बाउंड हथियार को मुक्त करें।'
+    unbind-status: '&7स्थिति: %status%'
+    unbind-action: '&eस्लॉट 13 में रखे हथियार को मुक्त करने के लिए क्लिक करें।'
+    unbind-cannot: '&cस्लॉट 13 में एक बाउंड हथियार रखें।'
+    bind-stats-kills: '&d&l⚔ हथियार से हत्याएं'
+    bind-stats-kills-desc: '&7आपके बाउंड हथियार से की गई PvP हत्याएं।'
+    bind-stats-damage: '&d&l💥 कुल क्षति'
+    bind-stats-damage-desc: '&7आपके बाउंड हथियार द्वारा दी गई कुल क्षति।'
+    bind-stats-sacrifices: '&d&l🛡️ आत्मा बलिदान'
+    bind-stats-sacrifices-desc: '&7आपके बाउंड हथियार द्वारा बचाए गए जीवन।'
+    bind-stats-duration: '&d&l⌛ बंधन अवधि'
+    bind-stats-duration-desc: '&7हथियार बांधने के बाद बीता हुआ समय।'
+    bind-stats-abilities: '&d&l✨ क्षमता उपयोग'
+    bind-stats-abilities-desc: '&7बाउंड रहते हुए क्षमता सक्रियण।'
+  ledger:
+    title: '  महावीरों का खाता (LEDGER)'
+    header: '-------------------'
+    warrior: 'योद्धा: '
+    strength: 'स्ट्रेंथ: '
+    class: 'क्लास: '
+    bounty: 'इनाम: '
+    kills: 'हत्याएं: '
+    deaths: 'मृत्यु: '
+    kd: 'K/D: '
+    footer: भाग्य खून से लिखा जाता है।
+  ranks:
+    unassigned: '&e[अनिर्धारित]'
+    '-10': '&8[निराश]'
+    '-9': '&8[दयनीय]'
+    '-8': '&7[कमजोर]'
+    '-7': '&7[निर्बल]'
+    '-6': '&7[किसान]'
+    '-5': '&f[सामंत]'
+    '-4': '&f[नागरिक]'
+    '-3': '&a[योद्धा प्रशिक्षु]'
+    '-2': '&a[शिशु योद्धा]'
+    '-1': '&e[नौसिखिया]'
+    '0': '&e[तटस्थ]'
+    '1': '&d[आरंभी]'
+    '2': '&b[सैनिक]'
+    '3': '&5&l[शूरवीर]'
+    '4': '&6&l[अनुभवी]'
+    '5': '&c&l[चैंपियन]'
+    '6': '&4&l[युद्धनायक]'
+    '7': '&4&l[विजेता]'
+    '8': '&5&l[ग्रैंडमास्टर]'
+    '9': '&d&l[सर्वोच्च स्वामी]'
+    '10': '&x&f&f&a&a&0&0&l[डेमीगॉड]'
+  weapons:
+    unassigned: अनिर्धारित
+    sword:
+      name: तलवार
+      desc: दोहरा वार और स्वतः गंभीर प्रहार क्षमता
+    axe:
+      name: कुल्हाड़ी
+      desc: गंभीर प्रहार पर स्तब्ध + गतिज क्षति संचय
+    trident:
+      name: त्रिशूल
+      desc: बिजली की मार + जल तरंग गतिशीलता
+    shield:
+      name: ढाल
+      desc: क्षति परावर्तन + नॉकबैक झटका
+    bow:
+      name: धनुष
+      desc: सुपरचार्ज वेग + जहरीला तीर
+    crossbow:
+      name: क्रॉसबो
+      desc: रैपिड-फायर बौछार + कवच वेधन
+  commands:
+    language-changed: <#2ecc71><b>[भाषा]</b></#2ecc71> <gray>भाषा सफलतापूर्वक बदलकर</gray> <white>%lang%</white><gray> कर दी गई!</gray>
+    help-lang: ' <#f39c12>•</#f39c12> <white>/strengthsmp lang <en|ru|es|de|fr|pt|hi></white> <gray>— प्लगइन की भाषा बदलें</gray>'
+    lang-current: '<#f1c40f><b>[भाषा]</b> वर्तमान भाषा: <b>%lang%</b>। उपयोग: /strengthsmp lang <en|ru|es|de|fr|pt|hi></#f1c40f>'
 
-# General
-no-permission: "&c&l✖ &c&lɴᴏ ᴘᴇʀᴍɪssɪᴏɴ! &7ʏᴏᴜ ᴅᴏ ɴᴏᴛ ʜᴀᴠᴇ ᴀᴄᴄᴇss ᴛᴏ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ."
-only-players: "&c&l✖ &c&lᴘʟᴀʏᴇʀs ᴏɴʟʏ! &7ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ᴄᴀɴ ᴏɴʟʏ ʙᴇ ʀᴜɴ ɪɴ-ɢᴀᴍᴇ."
-player-not-found: "&c&l✖ &c&lᴘʟᴀʏᴇʀ ɴᴏᴛ ꜰᴏᴜɴᴅ! &7ᴛʜᴇ sᴘᴇᴄɪғɪᴇᴅ ᴘʟᴀʏᴇʀ ɪs ɴᴏᴛ ᴏɴʟɪɴᴇ."
-invalid-amount: "&c&l✖ &c&lɪɴᴠᴀʟɪᴅ ᴀᴍᴏᴜɴᴛ! &7ᴘʟᴇᴀsᴇ sᴘᴇᴄɪғʏ ᴀ ᴠᴀʟɪᴅ ᴘᴏsɪᴛɪᴠᴇ ɴᴜᴍʙᴇʀ."
-
-# Combat Logging
-combat:
-  tagged: "&c&l☠ &c&lᴄᴏᴍʙᴀᴛ ᴛᴀɢ! &7ʏᴏᴜ ᴀʀᴇ ɪɴ ᴄᴏᴍʙᴀᴛ! &8(&cᴅᴏ ɴᴏᴛ ʟᴏɢᴏᴜᴛ&8)"
-  expired: "&a&l✔ &a&lᴄᴏᴍʙᴀᴛ ᴇxᴘɪʀᴇᴅ! &7ʏᴏᴜ ᴄᴀɴ ɴᴏᴡ sᴀꜰᴇʟʏ ʟᴏɢᴏᴜᴛ."
-  penalty: "&c&l☠ &c&lʟᴏɢᴏᴜᴛ ᴘᴇɴᴀʟᴛʏ! &e%player% &7ʟᴏɢɢᴇᴅ ᴏᴜᴛ ᴅᴜʀɪɴɢ ᴄᴏᴍʙᴀᴛ ᴀɴᴅ ᴡᴀs &cᴇxᴇᴄᴜᴛᴇᴅ&7!"
-  command-blocked: "&c&l☠ &c&lᴄᴏᴍʙᴀᴛ! &7ʏᴏᴜ ᴄᴀɴɴᴏᴛ ᴜsᴇ ᴄᴏᴍᴍᴀɴᴅs ᴡʜɪʟᴇ ɪɴ ᴄᴏᴍʙᴀᴛ."
-
-# Bounty System
-bounty:
-  set: "&6&l🎯 [ʙᴏᴜɴᴛʏ] &f%sender% &7ᴘʟᴀᴄᴇᴅ ᴀ &6%amount% ꜱᴛʀ &7ʙᴏᴜɴᴛʏ ᴏɴ &e%target%&7!"
-  claim: "&6&l🎯 [ʙᴏᴜɴᴛʏ] &e%player% &7ᴄʟᴀɪᴍᴇᴅ &6%amount% ꜱᴛʀ &7ʙʏ ᴅᴇꜰᴇᴀᴛɪɴɢ &e%target%&7!"
-  claim-bonus-skip: "&8(( ʙᴏᴜɴᴛʏ ᴄʟᴀɪᴍᴇᴅ — ɴᴏʀᴍᴀʟ ᴋɪʟʟ ꜱᴛʀᴇɴɢᴛʜ ɢᴀɪɴ sᴜᴘᴘʀᴇssᴇᴅ ))"
-
-# Monarch System
-monarch:
-  new: "&e&l👑 [ᴍᴏɴᴀʀᴄʜ] &f%player% &7ʜᴀs ᴀsᴄᴇɴᴅᴇᴅ ᴛᴏ ʙᴇᴄᴏᴍᴇ ᴛʜᴇ &e&lꜱᴇʀᴠᴇʀ ᴍᴏɴᴀʀᴄʜ&7!"
-  dethroned: "&e&l👑 [ᴍᴏɴᴀʀᴄʜ] &f%player% &7ʜᴀs ʙᴇᴇɴ &cᴅᴇᴛʜʀᴏɴᴇᴅ &7ᴀs ᴍᴏɴᴀʀᴄʜ!"
-
-# Seasons & Contracts
-season:
-  day: "&b&l📅 [sᴇᴀsᴏɴ] &7ᴄᴜʀʀᴇɴᴛ ꜱᴇᴀꜱᴏɴ ᴅᴀʏ: &b%day%"
-contract:
-  complete: "&a&l✔ [ᴄᴏɴᴛʀᴀᴄᴛ] &7ʏᴏᴜ'ᴠᴇ ᴄᴏᴍᴘʟᴇᴛᴇᴅ ᴀ ᴅᴀɪʟʏ ᴄᴏɴᴛʀᴀᴄᴛ! &8(&a+%reward% ꜱᴛʀ&8)"
-
-# Discord Integration
-discord:
-  kill-log: ":crossed_swords: **%attacker%** defeated **%victim%** and gained **%amount%** strength! ⚔"
-  bounty-log: ":moneybag: **%attacker%** claimed **%victim%**'s bounty of **%amount%** strength!"
-
-# Totem Limit
-totem:
-
-# Strength & Reroll
-strength:
-  insufficient: "&c&l✖ &c&lɪɴꜱᴜꜰꜰɪᴄɪᴇɴᴛ ꜱᴛʀᴇɴɢᴛʜ! &7ʏᴏᴜ ɴᴇᴇᴅ ᴀᴛ ʟᴇᴀꜱᴛ &e1 ꜱᴛʀ &7ᴛᴏ ʀᴇʀᴏʟʟ ʏᴏᴜʀ ᴄʟᴀꜱꜱ."
-  free-reroll-reward: "&b&l🎁 [ʀᴇᴡᴀʀᴅ] &fʏᴏᴜ ʀᴇᴄᴇɪᴠᴇᴅ ᴀ &d&lꜰʀᴇᴇ ʀᴇʀᴏʟʟ ʙᴏᴏᴋ&f! &7ʀɪɢʜᴛ-ᴄʟɪᴄᴋ ᴛᴏ ᴜꜱᴇ."
-  cooldown: "&c&l⌛ [ᴄᴏᴏʟᴅᴏᴡɴ] &7ᴘʟᴇᴀꜱᴇ ᴡᴀɪᴛ &c%time%s &7ʙᴇꜰᴏʀᴇ ᴜꜱɪɴɢ ᴀɴᴏᴛʜᴇʀ ꜱᴛʀᴇɴɢᴛʜ ɪᴛᴇᴍ."
-  max-reached: "&d&l⚡ [ᴍᴀx ꜱᴛʀᴇɴɢᴛʜ] &7ʏᴏᴜ ᴀʀᴇ ᴀʟʀᴇᴀᴅʏ ᴀᴛ ᴛʜᴇ ᴍᴀxɪᴍᴜᴍ ꜱᴛʀᴇɴɢᴛʜ ʟɪᴍɪᴛ."
-  protection-granted: "&b&l🛡 [ᴘʀᴏᴛᴇᴄᴛᴇᴅ] &fʏᴏᴜ ɢᴀɪɴᴇᴅ &b4 ʜᴏᴜʀꜱ &ꜰᴏꜰ &b&lᴅᴇᴀᴛʜ ᴘʀᴏᴛᴇᴄᴛɪᴏɴ&f! &7(ɴᴏ ꜱᴛʀᴇɴɢᴛʜ ʟᴏꜱᴛ)"
-  protected: "&b&l🛡 [ᴘʀᴏᴛᴇᴄᴛᴇᴅ] &fʏᴏᴜ ᴀʀᴇ ᴜɴᴅᴇʀ &b&lᴘʀᴏᴛᴇᴄᴛɪᴏɴ&f! &7(ɴᴏ ꜱᴛʀᴇɴɢᴛʜ ʟᴏꜱᴛ)"
-  protection-blocked: "&7(( ʏᴏᴜʀ ᴛᴀʀɢᴇᴛ ɪs &bᴘʀᴏᴛᴇᴄᴛᴇᴅ &7ᴀɴᴅ ᴄᴀɴɴᴏᴛ ʟᴏsᴇ sᴛʀᴇɴɢᴛʜ ))"
-  anti-farm: "&8(( ᴋɪʟʟ ɪɢɴᴏʀᴇᴅ — ʏᴏᴜ ʜᴀᴠᴇ ʀᴇᴄᴇɴᴛʟʏ ᴋɪʟʟᴇᴅ ᴛʜɪs ᴘʟᴀʏᴇʀ ᴛᴏᴏ ᴍᴜᴄʜ ))"
-  newbie-protection-start: "&a&l☘ [ɴᴇᴡʙɪᴇ] &fᴡᴇʟᴄᴏᴍᴇ! &a8 ʜᴏᴜʀꜱ &ꜰᴏꜰ newbie protection granted."
-  newbie-you-protected: "&a&l☘ [ɴᴇᴡʙɪᴇ] &fʏᴏᴜ ᴀʀᴇ ᴜɴᴅᴇʀ &a&lɴᴇᴡʙɪᴇ ᴘʀᴏᴛᴇᴄᴛɪᴏɴ&f! &7(ɴᴏ ꜱᴛʀ ʟᴏꜱᴛ)"
-  newbie-protected: "&7(( ʏᴏᴜʀ ᴛᴀʀɢᴇᴛ ɪs ᴀ &aɴᴇᴡ ᴘʟᴀʏᴇʀ &7ᴀɴᴅ ɪs ᴘʀᴏᴛᴇᴄᴛᴇᴅ ))"
-  newbie-no-gain: "&8(( ʏᴏᴜ ᴄᴀɴɴᴏᴛ ɢᴀɪɴ ꜱᴛʀ ꜰʀᴏᴍ ᴋɪʟʟꜱ ᴡʜɪʟᴇ ᴜɴᴅᴇʀ ɴᴇᴡʙɪᴇ ᴘʀᴏᴛᴇᴄᴛɪᴏɴ ))"
-  protected-no-gain: "&8(( ʏᴏᴜ ᴄᴀɴɴᴏᴛ ɢᴀɪɴ ꜱᴛʀ ꜰʀᴏᴍ ᴋɪʟʟꜱ ᴡʜɪʟᴇ ᴜɴᴅᴇʀ ᴅᴇᴀᴛʜ ᴘʀᴏᴛᴇᴄᴛɪᴏɴ ))"
-  gain: "&a&l⚡ [ꜱᴛʀᴇɴɢᴛʜ ɢᴀɪɴᴇᴅ] &7ʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ɪɴᴄʀᴇᴀꜱᴇᴅ ᴛᴏ &e&l%strength% STR&7!"
-  loss: "&c&l⚡ [ꜱᴛʀᴇɴɢᴛʜ ʟᴏꜱᴛ] &7ʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ᴅᴇᴄʀᴇᴀꜱᴇᴅ ᴛᴏ &c&l%strength% STR&7!"
-  at-minimum: "&c&l✖ [ᴀᴛ ᴍɪɴɪᴍᴜᴍ] &7ʏᴏᴜ ᴀʀᴇ ᴀᴛ ᴛʜᴇ ᴍɪɴɪᴍᴜᴍ ꜱᴛʀᴇɴɢᴛʜ ʟɪᴍɪᴛ."
-  victim-at-minimum: "&c&l✖ [ᴀᴛ ᴍɪɴɪᴍᴜᴍ] &7ʏᴏᴜʀ ᴛᴀʀɢᴇᴛ ɪs ᴀʟʀᴇᴀᴅʏ ᴀᴛ ᴛʜᴇ ᴍɪɴɪᴍᴜᴍ ꜱᴛʀᴇɴɢᴛʜ."
+ur:
+  prefix: '&x&f&f&8&c&0&0&lS&x&f&f&9&7&0&a&lT&x&f&f&a&3&1&4&lR&x&f&f&a&e&1&e&lE&x&f&f&b&a&2&8&lN&x&f&f&c&5&3&2&lG&x&f&f&d&1&3&c&lT&x&f&f&d&c&4&6&lH &8» '
+  no-permission: '&c&l✖ &c&lاجازت نہیں ہے! &7آپ کے پاس اس کمانڈ کو استعمال کرنے کی اجازت نہیں ہے۔'
+  only-players: '&c&l✖ &c&lصرف کھلاڑی! &7یہ کمانڈ صرف گیم کے اندر چلائی جا سکتی ہے۔'
+  player-not-found: '&c&l✖ &c&lکھلاڑی نہیں ملا! &7مطلوبہ کھلاڑی آن لائن نہیں ہے۔'
+  invalid-amount: '&c&l✖ &c&lغلط مقدار! &7براہ کرم ایک درست مثبت تعداد درج کریں۔'
+  totem: '&6&l⚡ [ٹوٹم] &7طاقتور ٹوٹم فعال ہو گیا!'
+  combat:
+    tagged: '&c&l☠ &c&lلڑائی شروع! &7آپ جنگ میں ہیں! &8(&cلاگ آؤٹ نہ کریں&8)'
+    expired: '&a&l✔ &a&lلڑائی ختم! &7اب آپ محفوظ طریقے سے لاگ آؤٹ کر سکتے ہیں۔'
+    logged-out: '&c&l☠ &f%player% &7لڑائی کے دوران فرار ہو گیا اور ختم کر دیا گیا!'
+    penalty: '&c&l☠ &c&lلاگ آؤٹ کی سزا! &e%player% &7نے لڑائی کے دوران لاگ آؤٹ کیا اور اسے &cختم کر دیا گیا&7!'
+    command-blocked: '&c&l☠ &c&lلڑائی! &7آپ لڑائی کے دوران کمانڈز استعمال نہیں کر سکتے۔'
+    anti-clean: '&e&l⚔ &7اینٹی کلین تحفظ فعال ہے (%seconds% سیکنڈ باقی)'
+  bounty:
+    set: '&6&l🎯 [انعام] &f%sender% &7نے &e%target% &7پر &6%amount% STR &7کا انعام مقرر کیا!'
+    claim: '&6&l🎯 [انعام] &e%player% &7نے &e%target% &7کو ہرا کر &6%amount% STR &7کا انعام جیت لیا!'
+    claim-bonus-skip: '&8(( انعام حاصل کر لیا گیا — عام قتل پر ملنے والی طاقت کا اضافہ روک دیا گیا ))'
+    broadcast: '&6&l🎯 [موجودہ انعامات] &7انعام یافتہ کھلاڑیوں کی فہرست دیکھنے کے لیے &e/bounty list &7استعمال کریں۔'
+  monarch:
+    new: '&e&l👑 [بادشاہ] &f%player% &7نئے &e&lسرور کے بادشاہ &7بن گئے ہیں!'
+    dethroned: '&e&l👑 [بادشاہ] &f%player% &7کو بادشاہ کے عہدے سے &cہٹا دیا گیا ہے&7!'
+  season:
+    day: '&b&l📅 [سیزن] &7موجودہ سیزن کا دن: &b%day%'
+  contract:
+    complete: '&a&l✔ [معاہدہ] &7آپ نے اپنا روزانہ کا معاہدہ مکمل کر لیا! &8(&a+%reward% STR&8)'
+  discord:
+    linked: '&a&l✔ [ڈسکارڈ] &7آپ کا ڈسکارڈ اکاؤنٹ کامیابی سے منسلک ہو گیا!'
+    unlinked: '&c&l✖ [ڈسکارڈ] &7آپ کا ڈسکارڈ اکاؤنٹ منقطع کر دیا گیا ہے۔'
+    kill-log: ':crossed_swords: **%attacker%** نے **%victim%** کو شکست دی اور **%amount%** طاقت حاصل کی! ⚔'
+    bounty-log: ':moneybag: **%attacker%** نے **%victim%** کا **%amount%** طاقت کا انعام حاصل کیا!'
+  strength:
+    insufficient: '&c&l✖ &c&lناکافی طاقت! &7اپنی کلاس کو تبدیل کرنے کے لیے آپ کو کم از کم &e1 STR &7کی ضرورت ہے۔'
+    free-reroll-reward: '&b&l🎁 [انعام] &fآپ کو &d&lمفت ری رول کتاب&f ملی! &7استعمال کرنے کے لیے رائٹ کلک کریں۔'
+    cooldown: '&c&l⌛ [انتظار] &7دوسرا طاقت کا آئٹم استعمال کرنے سے پہلے براہ کرم &c%time%s &7انتظار کریں۔'
+    max-reached: '&d&l⚡ [زیادہ سے زیادہ طاقت] &7آپ پہلے ہی طاقت کی آخری حد تک پہنچ چکے ہیں۔'
+    protection-granted: '&b&l🛡 [محفوظ] &fآپ کو &b%hours% گھنٹے &fکا &b&lموت سے تحفظ&f دیا گیا ہے! &7(کوئی طاقت ضائع نہیں ہوگی)'
+    protected: '&b&l🛡 [محفوظ] &fآپ &b&lتحفظ&f میں ہیں! &7(کوئی طاقت ضائع نہیں ہوگی)'
+    protection-blocked: '&7(( آپ کا ہدف &bمحفوظ &7ہے اور اس کی طاقت کم نہیں ہو سکتی ))'
+    anti-farm: '&8(( قتل شمار نہیں ہوا — آپ نے حال ہی میں اس کھلاڑی کو بہت زیادہ مارا ہے ))'
+    newbie-protection-start: '&a&l☘ [نیا کھلاڑی] &fخوش آمدید! &a%hours% گھنٹے &fکا نئے کھلاڑی کا تحفظ فراہم کر دیا گیا۔'
+    newbie-you-protected: '&a&l☘ [نیا کھلاڑی] &fآپ &a&lنئے کھلاڑی کے تحفظ&f میں ہیں! &7(کوئی STR ضائع نہیں ہوگی)'
+    newbie-protected: '&7(( آپ کا ہدف ایک &aنیا کھلاڑی &7ہے اور وہ محفوظ ہے ))'
+    newbie-no-gain: '&8(( آپ نئے کھلاڑی کے تحفظ کے دوران قتل سے STR حاصل نہیں کر سکتے ))'
+    protected-no-gain: '&8(( آپ موت کے تحفظ کے دوران قتل سے STR حاصل نہیں کر سکتے ))'
+    gain: '&a&l⚡ [طاقت میں اضافہ] &7آپ کی طاقت بڑھ کر &e&l%strength% STR&7 ہو گئی!'
+    loss: '&c&l⚡ [طاقت میں کمی] &7آپ کی طاقت کم ہو کر &c&l%strength% STR&7 رہ گئی!'
+    at-minimum: '&c&l✖ [کم ترین حد] &7آپ طاقت کی کم ترین حد پر ہیں۔'
+    victim-at-minimum: '&c&l✖ [کم ترین حد] &7آپ کا ہدف پہلے ہی کم ترین طاقت پر ہے۔'
+  abilities:
+    supercharge: '&d&lسپر چارج &r&7— آپ کی کمان فوری کھنچاؤ کی رفتار رکھتی ہے!'
+    scorpion-miss: '&c⚡ بچھو کا کانٹا خطا ہو گیا!'
+    scorpion-hit-target: '&c⚡ آپ کو %player% کے اسکارپین ہک نے کھینچ کر سن کر دیا!'
+    scorpion-hit-player: '&a⚡ اسکارپین ہک لگا! %target% کو سیدھا آپ کی طرف کھینچ لایا!'
+    no-arrows: '&cآپ کے پاس تیر نہیں ہیں!'
+    trident-no-throw: '&c&lآپ ترشول نہیں پھینک سکتے! &7اسے قریبی ہتھیار کے طور پر استعمال کریں۔'
+    ability-cooldown: '&cصلاحیت کول ڈاؤن پر ہے! (%remaining%s)'
+    bleed: '&5&lخون کا بہاؤ &r&7— آپ کے بلیڈ نے حریف کو ویدر کر دیا!'
+    berserk-cooldown: '&cبرسرک کول ڈاؤن پر ہے! (%remaining%s)'
+    blink-cooldown: '&cبلنک کول ڈاؤن پر ہے! (%remaining%s)'
+    berserk-end: '&cبرسرک موڈ ختم ہو گیا۔'
+    berserk-start: '&e&lبرسرک &r&7— برسرک موڈ فعال! (+2 اٹیک ڈیمیج، 15 سیکنڈ کے لیے Speed III)'
+    blink-success: '&5&lبلنک &r&7— آپ آگے ٹیلی پورٹ ہو گئے!'
+    shield-active: '&6&lڈھال فعال &r&7— تمام نقصان کی واپسی اور 7 سیکنڈ کے لیے Resistance II!'
+    shield-ended: '&cڈیمیج ریفلیکٹ کا اثر ختم ہو گیا۔'
+    potion-disabled: '&c⚠ طاقت کے پوشنز غیر فعال ہیں۔'
+    no-weapons-available: '&cکوئی اور ہتھیار کی قسم دستیاب نہیں ہے!'
+    rapid-fire: '&b&lتیز فائرنگ &r&7— تیز رفتار تیروں کی بوچھاڑ شروع!'
+    axe-stunned: '&cآپ کلہاڑی کے وار سے سن ہو گئے ہیں!'
+    axe-shield-disabled: '&cآپ کی ڈھال کلہاڑی کے وار سے غیر فعال ہو گئی ہے!'
+  items:
+    swap-key-hint: '&d&l⚡ &7ڈھال کی صلاحیت استعمال کرنے کے لیے اپنا آئٹم تبدیل کرنے کا بٹن (F) دبائیں!'
+    actionbar-cooldown: '&e&l⚡ &7منسلک صلاحیت کول ڈاؤن پر ہے! &c(%remaining%s)'
+    bound-to-another: '&d&l⚡ &7یہ ہتھیار کسی دوسری روح کے ساتھ منسلک ہے!'
+    cannot-store-container: '&d&l⚡ &7آپ اپنا منسلک ہتھیار پیٹیوں یا کنٹینرز میں نہیں رکھ سکتے!'
+    cannot-place-item: '&d&l⚡ &7آپ اپنا منسلک ہتھیار اس پر نہیں رکھ سکتے!'
+    void-return: '&d&l⚡ &fآپ کا منسلک ہتھیار خلا (Void) سے واپس آ گیا۔ &d&l⚡'
+    actionbar-returned: '&d&l⚡ منسلک ہتھیار واپس آ گیا! ⚡'
+    return-knockback: '&d&l⚡ &7واپس آتے ہوئے منسلک ہتھیار نے آپ کو دھکیل دیا!'
+    sealed-destiny-name: '&d&lسیل شدہ تقدیر'
+    sealed-destiny-lore-1: '&7ایک قدیم نایاب نوادرات جو آپ کے'
+    sealed-destiny-lore-2: '&7اندرونی جنگجو کی طاقت کو ظاہر کرتا ہے۔'
+    sealed-destiny-lore-click: '&fاپنی طاقت کو &bبیدار &fکرنے کے لیے رائٹ کلک کریں!'
+    sealed-destiny-lore-tag: '&a&lمفت &7(پہلی بار جوائن کرنے کا انعام)'
+  gui:
+    bind-title: '&d&l⚡ ہتھیار کی بائنڈنگ ⚡'
+    shuffle-title: '&0&lتقدیر کی بیداری...'
+    invalid-class-slot: '&cسلاٹ 14 میں غلط کلاس کا ہتھیار ہے!'
+    already-bound: '&cیہ ہتھیار پہلے سے ہی منسلک ہے!'
+    need-more-strength: '&cہتھیار منسلک کرنے کے لیے آپ کو کم از کم %cost% طاقت چاہیے۔ آپ کے پاس %current% ہے۔'
+    bound-success: '&aاپنی کلاس کا ہتھیار منسلک کرنے کے لیے &e%cost% طاقت &aخرچ کی گئی!'
+    bound-free-success: '&aآپ کی روح کی قربانی کے فضل سے آپ کا ہتھیار &eمفت &aمیں منسلک ہو گیا ہے!'
+    bound-broadcast: '&d&l⚡ &f&lآپ کا ہتھیار آپ کے ساتھ کامیابی سے منسلک ہو گیا ہے! &d&l⚡'
+    unbound-success: '&aکامیابی سے آپ کے ہتھیار کا ربط ختم کر دیا گیا۔'
+    starter-book-not-owner: '&c&l✖ &cیہ مفت ری رول کتاب %owner% سے منسلک ہے اور آپ اسے استعمال نہیں کر سکتے!'
+    starter-book-no-drop: '&c&l✖ &cآپ اپنی ذاتی مفت ری رول کتاب نیچے نہیں پھینک سکتے!'
+    starter-book-no-container: '&c&l✖ &cآپ اپنی ذاتی مفت ری رول کتاب کنٹینر میں نہیں رکھ سکتے!'
+    bind-select-title: '&d&l⚡ ہتھیار کا ماڈل منتخب کریں ⚡'
+    bind-back-btn-title: '&c&l⬅ ہتھیار کے سلاٹ پر واپس جائیں'
+    bind-back-btn-lore: '&7ہتھیار رکھنے یا واپس لینے کے لیے واپس جائیں۔'
+    bind-confirm-btn-bind: '&a&l⚡ روح سے منسلک کرنے کی تصدیق کریں ⚡'
+    bind-confirm-btn-change: '&a&l⚡ ماڈل تبدیل کرنے کی تصدیق کریں ⚡'
+    bind-confirm-btn-not-enough: '&c&l❌ ناکافی طاقت'
+    bind-confirm-selected: '&7منتخب ماڈل: &b%model%'
+    bind-confirm-cost-free: 'مفت (روح کی قربانی)'
+    bind-confirm-cost-str: '%cost% طاقت'
+    bind-confirm-cost-line: '&7بائنڈنگ فیس: &e%cost%'
+    bind-confirm-strength-line: '&7آپ کی طاقت: &f%strength%'
+    bind-confirm-click-action: '&eاس ماڈل کے ساتھ اپنے ہتھیار کو منسلک کرنے کے لیے کلک کریں!'
+    bind-confirm-need-more: '&cمنسلک کرنے کے لیے آپ کو کم از کم %cost% طاقت کی ضرورت ہے!'
+    bind-model-selected: '&7حیثیت: &a&lمنتخب شدہ'
+    bind-model-selected-lore: '&eتصدیق کرنے پر یہ ماڈل لاگو کیا جائے گا۔'
+    bind-model-not-selected: '&7حیثیت: &cغیر منتخب'
+    bind-model-click-to-select: '&eیہ ماڈل منتخب کرنے کے لیے کلک کریں!'
+    bind-target-preview: '&e&lمنسلک کرنے کا ہدف: &f%item%'
+    bind-target-preview-lore: '&7نیچے دیئے گئے 3 خصوصی 3D ماڈلز میں سے 1 منتخب کریں۔'
+    bind-guide-title: '&d&l⚡ یہ کیسے کام کرتا ہے ⚡'
+    bind-guide-step1: '&71. اپنی کلاس کا ہتھیار &eسلاٹ 14&7 میں رکھیں۔'
+    bind-guide-step2: '&72. &e3 کسٹم ماڈلز&7 دیکھنے کے لیے &d&lBind Weapon &7پر کلک کریں۔'
+    bind-guide-step3: '&73. اپنا پسندیدہ ماڈل منتخب کریں اور &a&lConfirm &7پر کلک کریں!'
+    bind-status-title: '&b&lبائنڈنگ کی صورتحال اور فوائد'
+    bind-status-class: '&7آپ کی کلاس: %class%'
+    bind-status-bound: '&7منسلک ہتھیار: %status%'
+    bind-status-perks: '&eبائنڈنگ کے فوائد:'
+    bind-status-perk-death: '&d- موت پر حفاظت: &7منسلک ہتھیار موت پر کبھی نیچے نہیں گرتا'
+    bind-status-perk-loyalty: '&d- وفادار پرواز: &7دوبارہ زندہ ہونے پر دشمنوں کو دھکیلتے ہوئے واپس اڑ کر آتا ہے'
+    bind-status-perk-soulbound: '&d- روحانی ہالہ: &7ہاتھ میں پکڑنے پر کلاس کے جادوئی ذرات خارج کرتا ہے'
+    bind-btn-change-model: '&a&l✨ ماڈل تبدیل کریں (1 طاقت) ✨'
+    bind-btn-cannot-change: '&c&l✨ ماڈل تبدیل نہیں کر سکتے'
+    bind-btn-bind-weapon: '&d&l⚡ ہتھیار منسلک کریں ⚡'
+    bind-btn-cannot-bind: '&c&l⚡ ہتھیار منسلک نہیں کر سکتے'
+    bind-btn-desc: '&7اس ہتھیار کو اپنی روح سے منسلک کریں۔'
+    bind-btn-desc-change: '&7اپنے منسلک ہتھیار کا 3D ماڈل تبدیل کریں۔'
+    bind-btn-cost: '&7لاگت: &e%cost%'
+    bind-btn-status: '&7حیثیت: %status%'
+    bind-btn-click-choose: '&eاپنا 3D ہتھیار کا ماڈل منتخب کرنے کے لیے کلک کریں!'
+    bind-action-place-weapon: '&cبراہ کرم سلاٹ 14 میں ایک ہتھیار رکھیں۔'
+    bind-action-no-class: '&cآپ کے پاس کوئی ہتھیار کی کلاس نہیں ہے!'
+    bind-action-wrong-class: '&cہتھیار آپ کی کلاس (%class%) سے مطابقت نہیں رکھتا!'
+    bind-action-other-player: '&cکسی دوسرے کھلاڑی کے ساتھ منسلک ہے!'
+    bind-action-change-model: '&aنیا ماڈل منتخب کرنے کے لیے کلک کریں!'
+    bind-action-ready: '&aاپنا ماڈل منتخب کرنے کے لیے تیار ہیں!'
+    unbind-title: '&c&l⚡ ہتھیار کا ربط ختم کریں ⚡'
+    unbind-desc: '&7اپنے موجودہ ہتھیار کا ربط منقطع کریں۔'
+    unbind-status: '&7حیثیت: %status%'
+    unbind-action: '&eسلاٹ 14 میں موجود ہتھیار کا ربط ختم کرنے کے لیے کلک کریں۔'
+    unbind-cannot: '&cسلاٹ 14 میں ایک منسلک ہتھیار رکھیں۔'
+    bind-stats-kills: '&d&l⚔ ہتھیار کے شکار (Kills)'
+    bind-stats-kills-desc: '&7منسلک ہتھیار سے کیے گئے PvP شکار کا ریکارڈ۔'
+    bind-stats-damage: '&d&l💥 پہنچایا گیا نقصان'
+    bind-stats-damage-desc: '&7منسلک ہتھیار سے پہنچائے گئے کل نقصان کا ریکارڈ۔'
+    bind-stats-sacrifices: '&d&l🛡️ روح کی قربانیاں'
+    bind-stats-sacrifices-desc: '&7منسلک ہتھیار سے موت سے بچائے جانے کا ریکارڈ۔'
+    bind-stats-duration: '&d&l⌛ بائنڈنگ کا دورانیہ'
+    bind-stats-duration-desc: '&7ہتھیار منسلک رہنے کا کل وقت۔'
+    bind-stats-abilities: '&d&l✨ صلاحیتوں کا استعمال'
+    bind-stats-abilities-desc: '&7منسلک ہتھیار کی صلاحیتوں کے استعمال کی گنتی۔'
+    not-your-weapon: '&cیہ ہتھیار کسی دوسرے کھلاڑی سے منسلک ہے!'
+    place-weapon-first: '&cبراہ کرم پہلے سلاٹ 14 میں اپنی کلاس کا ہتھیار رکھیں!'
+    skin-changed-success: '&aہتھیار کا ماڈل تبدیل کرنے کے لیے &e1 طاقت &aخرچ کی گئی!'
+  ledger:
+    title: '  لیجنڈز کا کھاتہ'
+    header: '-------------------'
+    warrior: 'جنگجو: '
+    strength: 'طاقت: '
+    class: 'کلاس: '
+    bounty: 'انعام: '
+    kills: 'شکار: '
+    deaths: 'اموات: '
+    kd: 'K/D تناسب: '
+    footer: 'تقدیر خون سے لکھی جاتی ہے۔'
+  ranks:
+    unassigned: '&e[غیر تفویض شدہ]'
+    -10: '&8[مایوس کن]'
+    -9: '&8[بدحال]'
+    -8: '&7[کمزور]'
+    -7: '&7[ناتواں]'
+    -6: '&7[کسان]'
+    -5: '&f[ماتحت]'
+    -4: '&f[شہری]'
+    -3: '&a[اسکوائر]'
+    -2: '&a[شاگرد]'
+    -1: '&e[نوآموز]'
+    0: '&e[غیر جانبدار]'
+    1: '&d[مبتدی]'
+    2: '&b[سپاہی]'
+    3: '&5&l[شہسوار]'
+    4: '&6&l[تجربہ کار]'
+    5: '&c&l[فاتح]'
+    6: '&4&l[سالار]'
+    7: '&4&l[شہنشاہ جنگ]'
+    8: '&5&l[عظیم استاد]'
+    9: '&d&l[حکمران اعلیٰ]'
+    10: '&x&f&f&a&a&0&0&l[نیم دیوتا]'
+  weapons:
+    unassigned: 'غیر تفویض شدہ'
+    sword:
+      name: 'تلوار'
+      desc: 'ڈوئل ویلڈ اور آٹو کریٹیکل صلاحیت'
+    axe:
+      name: 'کلہاڑی'
+      desc: 'کریٹیکل وار سے سن کرنا اور کائنیٹک ڈیمیج ذخیرہ'
+    trident:
+      name: 'ترشول'
+      desc: 'آسمانی بجلی کی صلاحیت اور پانی کی لہروں کی رفتار'
+    shield:
+      name: 'ڈھال'
+      desc: 'سن ہونے پر Speed II اور 15 سیکنڈ کی لافانی طاقت'
+    bow:
+      name: 'کمان'
+      desc: 'لکیری آواز کی طاقتور شعاع الٹیمیٹ (AOE)'
+    crossbow:
+      name: 'کراسبو'
+      desc: 'چمکدار تیر اور دشمنوں کو جکڑنے والی الٹیمیٹ'
+  commands:
+    withdraw-success: '<#2ecc71><b>نکلوائی گئی</b></#2ecc71> <gray>آپ نے نکلوائی</gray> <#f1c40f>%amount% STR</#f1c40f><gray>۔ باقی ماندہ:</gray> <white>%remaining%</white>'
+    punish-message: '<#e74c3c><b>[سزا]</b></#e74c3c> <gray>آپ کو ایڈمن کی طرف سے سزا دی گئی ہے۔ اگلے</gray> <white>24 گھنٹوں</white><gray> کے لیے، ہر موت پر آپ</gray> <red><b>2 STR</b></red> <gray>کھو دیں گے۔</gray>'
+    no-newbie-message: '<#e74c3c><b>[ایڈمن]</b></#e74c3c> <gray>آپ کا نئے کھلاڑی کا تحفظ ختم کر دیا گیا ہے۔ اب آپ مکمل طور پر طاقت کے نظام میں شامل ہیں۔</gray>'
+    bounty-refund: '<#2ecc71><b>[!]</b></#2ecc71> <gray>%target% پر آپ کا</gray> <#f1c40f>%amount% STR</#f1c40f> <gray>کا انعام ایڈمن نے واپس کر دیا۔</gray>'
+    bounty-help-header: '<#f1c40f><b>[انعامی نظام]</b></#f1c40f>'
+    bounty-help-place: ' <#f39c12>•</#f39c12> <white>/bounty <کھلاڑی> <مقدار></white> <gray>اپنی طاقت استعمال کر کے انعام مقرر کریں</gray>'
+    bounty-help-list: ' <#f39c12>•</#f39c12> <white>/bounty list</white> <gray>تمام فعال انعامات دیکھیں</gray>'
+    language-changed: '<#2ecc71><b>[زبان]</b></#2ecc71> <gray>زبان تبدیل ہو کر</gray> <white>%lang%</white> <gray>ہو گئی!</gray>'
+    error-prefix: '[خرابی]'
+    success-prefix: '[کامیابی]'
+    admin:
+      help-header: '<#f1c40f><b>[StrengthSMP ایڈمن]</b></#f1c40f>'
+      help-maintenance: ' <#f39c12>•</#f39c12> <white>/strengthsmp maintenance <on|off></white> <gray>— مینٹیننس موڈ آن یا آف کریں</gray>'
+      help-toggle: ' <#f39c12>•</#f39c12> <white>/strengthsmp toggle</white> <gray>— فوری سسٹم کو ٹوگل کریں</gray>'
+      help-reload: ' <#f39c12>•</#f39c12> <white>/strengthsmp reload</white> <gray>— کنفگ فائل دوبارہ لوڈ کریں</gray>'
+      help-lang: ' <#f39c12>•</#f39c12> <white>/strengthsmp lang <en|ru|es|de|fr|pt|hi|ur></white> <gray>— پلگ ان کی زبان تبدیل کریں</gray>'
+      help-info: ' <#f39c12>•</#f39c12> <white>/strengthsmp info</white> <gray>— سسٹم کی معلومات اور صورتحال</gray>'
+      help-setupboard: ' <#f39c12>•</#f39c12> <white>/strengthsmp setupboard</white> <gray>— ڈسکارڈ بورڈ سیٹ اپ کریں</gray>'
+      help-resetplayer: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetplayer <کھلاڑی></white>'
+      help-reroll: ' <#f39c12>•</#f39c12> <white>/strengthsmp reroll <کھلاڑی></white>'
+      help-setstrength: ' <#f39c12>•</#f39c12> <white>/strengthsmp setstrength <کھلاڑی> <مقدار></white>'
+      help-setweapon: ' <#f39c12>•</#f39c12> <white>/strengthsmp setweapon <کھلاڑی> <ہتھیار></white>'
+      help-giveitem: ' <#f39c12>•</#f39c12> <white>/strengthsmp giveitem <کھلاڑی> <strength|reroll|death></white>'
+      help-resetmonarch: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetmonarch</white> <gray>— بادشاہ کا دوبارہ حساب لگائیں</gray>'
+      help-pack: ' <#f39c12>•</#f39c12> <white>/strengthsmp pack</white> <gray>— زبردستی ریسورس پیک بھیجیں</gray>'
+      state-on: '<#e74c3c><b>آن</b></#e74c3c>'
+      state-off: '<b>آف</b>'
+      state-enabled: '<b>فعال</b>'
+      state-disabled: '<#e74c3c><b>غیر فعال</b></#e74c3c>'
+      maintenance-on: '<#e74c3c><b>[مینٹیننس موڈ]</b> مینٹیننس اب <b>آن</b> ہے (سسٹم معطل اور KeepInventory فعال)۔</#e74c3c>'
+      maintenance-off: '<#2ecc71><b>[مینٹیننس موڈ]</b> مینٹیننس اب <b>آف</b> ہے (سسٹم فعال)۔</#2ecc71>'
+      maintenance-usage: 'استعمال: /strengthsmp maintenance <on|off>'
+      maintenance-toggled: '<#2ecc71>مینٹیننس موڈ اب %state% ہے</#2ecc71>'
+      system-toggled: '<#2ecc71>سسٹم اب %state% ہے</#2ecc71>'
+      reload-success: 'ترتیبات کامیابی سے دوبارہ لوڈ ہو گئیں۔'
+      lang-current: '<#f1c40f><b>[زبان]</b> موجودہ زبان ہے: <b>%lang%</b>۔ استعمال: /strengthsmp lang <en|ru|es|de|fr|pt|hi|ur></#f1c40f>'
+      pack-sending: '<#2ecc71>ریسورس پیک بھیجنے کی کوشش کی جا رہی ہے... کنسول میں معلومات دیکھیں۔</#2ecc71>'
+      info-header: '<#f1c40f><b>[سسٹم کی معلومات]</b></#f1c40f>'
+      info-status: ' <#95a5a6>حیثیت:</#95a5a6> %status%'
+      info-status-enabled: '<#2ecc71>فعال</#2ecc71>'
+      info-status-disabled: '<#e74c3c>غیر فعال</#e74c3c>'
+      info-monarch: ' <#95a5a6>بادشاہ:</#95a5a6> <#f1c40f>%monarch%</#f1c40f>'
+      info-monarch-none: 'کوئی نہیں'
+      info-online: ' <#95a5a6>آن لائن کھلاڑی:</#95a5a6> <white>%count%</white>'
+      reroll-usage: 'استعمال: /strengthsmp reroll <کھلاڑی>'
+      reroll-success: '%player% کا ری رول ہو گیا → %icon% %weapon%'
+      reroll-target: '<#2ecc71><b>[!]</b></#2ecc71> <gray>ایک ایڈمن نے آپ کا ہتھیار تبدیل کر کے</gray> <#f1c40f><b>%weapon%</b></#f1c40f> <gray>کر دیا۔</gray>'
+      setstrength-usage: 'استعمال: /strengthsmp setstrength <کھلاڑی> <مقدار>'
+      setstrength-success: '%player% کی طاقت <#f1c40f>%amount%</#f1c40f> مقرر کر دی گئی۔'
+      setweapon-usage: 'استعمال: /strengthsmp setweapon <کھلاڑی> <ہتھیار>'
+      setweapon-success: '%player% کا ہتھیار <#f1c40f>%weapon%</#f1c40f> مقرر کر دیا گیا۔'
+      setweapon-target: '<#2ecc71><b>[!]</b></#2ecc71> <gray>ایڈمن نے آپ کے ہتھیار کی کلاس</gray> <#f1c40f><b>%weapon%</b></#f1c40f> <gray>میں تبدیل کر دی۔</gray>'
+      setweapon-invalid: 'ہتھیار کی غلط قسم! استعمال کریں: SWORD, AXE, BOW, CROSSBOW, SHIELD, TRIDENT'
+      resetplayer-usage: 'استعمال: /strengthsmp resetplayer <کھلاڑی>'
+      resetplayer-success: '<#f1c40f>%player%</#f1c40f> کے اعداد و شمار ری سیٹ کر دیے گئے۔'
+      resetplayer-target: '<#e74c3c><b>[!]</b></#e74c3c> <gray>ایک ایڈمن نے آپ کے اعداد و شمار ری سیٹ کر دیے ہیں۔</gray>'
+      giveitem-usage: 'استعمال: /strengthsmp giveitem <کھلاڑی> <strength|reroll|death>'
+      giveitem-strength: '<#f1c40f>%player%</#f1c40f> کو طاقت کا آئٹم دیا گیا۔'
+      giveitem-reroll: '<#f1c40f>%player%</#f1c40f> کو ری رول کا آئٹم دیا گیا۔'
+      giveitem-death: '<#f1c40f>%player%</#f1c40f> کو موت کا سرٹیفکیٹ دیا گیا۔'
+      giveitem-unknown: 'نامعلوم آئٹم کی قسم! استعمال کریں: strength, reroll, یا death'
+      checkitem-usage: 'استعمال: /strengthsmp checkitem <کھلاڑی>'
+      checkitem-not-holding: '%player% نے کوئی چیز نہیں پکڑی ہوئی!'
+      checkitem-header: '<#2ecc71><b>[آئٹم کی جانچ]</b></#2ecc71>'
+      checkitem-player: ' <#95a5a6>کھلاڑی:</#95a5a6> <white>%player%</white>'
+      checkitem-material: ' <#95a5a6>مواد:</#95a5a6> <white>%material%</white>'
+      checkitem-cmd: ' <#95a5a6>کسٹم ماڈل ڈیٹا:</#95a5a6> <#f1c40f>%value%</#f1c40f>'
+      board-not-connected: 'ڈسکارڈ بوٹ منسلک نہیں ہے!'
+      board-success: 'ڈسکارڈ بورڈ اپ ڈیٹ ہو گیا۔'
+      resetmonarch-success: 'بادشاہ کی حیثیت کا دوبارہ حساب لگا لیا گیا ہے۔'
+      unknown-subcommand: 'نامعلوم ذیلی کمانڈ: <#f1c40f>%sub%</#f1c40f>۔ مدد کے لیے <white>/strengthsmp</white> استعمال کریں۔'
+he:
+  prefix: '&x&f&f&8&c&0&0&lS&x&f&f&9&7&0&a&lT&x&f&f&a&3&1&4&lR&x&f&f&a&e&1&e&lE&x&f&f&b&a&2&8&lN&x&f&f&c&5&3&2&lG&x&f&f&d&1&3&c&lT&x&f&f&d&c&4&6&lH &8» '
+  no-permission: '&c&l✖ &c&lאין גישה! &7אין לך הרשאה להשתמש בפקודה זו.'
+  only-players: '&c&l✖ &c&lרק שחקנים! &7ניתן להשתמש בפקודה זו רק מתוך המשחק.'
+  player-not-found: '&c&l✖ &c&lשחקן לא נמצא! &7השחקן המבוקש אינו מחובר.'
+  invalid-amount: '&c&l✖ &c&lכמות לא תקינה! &7אנא ציין מספר חיובי תקין.'
+  totem: '&6&l⚡ [טוטם] &7טוטם עוצמתי הופעל!'
+  combat:
+    tagged: '&c&l☠ &c&lבקרב! &7אתה נמצא במצב קרב! &8(&cאל תתנתק&8)'
+    expired: '&a&l✔ &a&lהקרב הסתיים! &7כעת אתה יכול להתנתק בבטחה.'
+    logged-out: '&c&l☠ &f%player% &7התנתק בזמן קרב והוצא להורג!'
+    penalty: '&c&l☠ &c&lעונש התנתקות! &e%player% &7התנתק בזמן קרב ו&cהוצא להורג&7!'
+    command-blocked: '&c&l☠ &c&lבקרב! &7לא ניתן להשתמש בפקודות בזמן קרב.'
+    anti-clean: '&e&l⚔ &7הגנת אנטי-קלין פעילה (%seconds% שניות נותרו)'
+  bounty:
+    set: '&6&l🎯 [פרס] &f%sender% &7שם פרס של &6%amount% STR &7על ראשו של &e%target%&7!'
+    claim: '&6&l🎯 [פרס] &e%player% &7זכה בפרס של &6%amount% STR &7לאחר שהביס את &e%target%&7!'
+    claim-bonus-skip: '&8(( הפרס נאסף — עליית כוח רגילה מהריגה בוטלה ))'
+    broadcast: '&6&l🎯 [פרסים פעילים] &7השתמש ב-&e/bounty list &7כדי לצפות בכל הפרסים.'
+  monarch:
+    new: '&e&l👑 [מונרך] &f%player% &7עלה לשלטון והפך ל&e&lשליט השרת&7!'
+    dethroned: '&e&l👑 [מונרך] &f%player% &7&cהודח &7מתפקיד שליט השרת!'
+  season:
+    day: '&b&l📅 [עונה] &7יום נוכחי בעונה: &b%day%'
+  contract:
+    complete: '&a&l✔ [חוזה] &7השלמת חוזה יומי! &8(&a+%reward% STR&8)'
+  discord:
+    linked: '&a&l✔ [דיסקורד] &7חשבון הדיסקורד שלך קושר בהצלחה!'
+    unlinked: '&c&l✖ [דיסקורד] &7חשבון הדיסקורד שלך נותק.'
+    kill-log: ':crossed_swords: **%attacker%** הביס את **%victim%** וקיבל **%amount%** כוח! ⚔'
+    bounty-log: ':moneybag: **%attacker%** לקח את הפרס של **%victim%** בסך **%amount%** כוח!'
+  strength:
+    insufficient: '&c&l✖ &c&lאין מספיק כוח! &7אתה צריך לפחות &e1 STR &7כדי להחליף את המקצוע שלך.'
+    free-reroll-reward: '&b&l🎁 [פרס] &fקיבלת &d&lספר הגרלה מחדש חינם&f! &7לחץ מקש ימני כדי להשתמש.'
+    cooldown: '&c&l⌛ [זמן המתנה] &7אנא המתן &c%time%s &7לפני שימוש בחפץ כוח נוסף.'
+    max-reached: '&d&l⚡ [מקסימום כוח] &7אתה כבר נמצא בגבול הכוח המרבי.'
+    protection-granted: '&b&l🛡 [מוגן] &fקיבלת &b%hours% שעות &fשל &b&lהגנה ממוות&f! &7(לא יאבד כוח)'
+    protected: '&b&l🛡 [מוגן] &fאתה נמצא תחת &b&lהגנה&f! &7(לא יאבד כוח)'
+    protection-blocked: '&7(( המטרה שלך &bמוגנת &7ולא יכולה לאבד כוח ))'
+    anti-farm: '&8(( הריגה לא נספרה — הרגת שחקן זה יותר מדי פעמים לאחרונה ))'
+    newbie-protection-start: '&a&l☘ [שחקן חדש] &fברוך הבא! &a%hours% שעות &fשל הגנת שחקן חדש הופעלו.'
+    newbie-you-protected: '&a&l☘ [שחקן חדש] &fאתה תחת &a&lהגנת שחקן חדש&f! &7(לא יאבד STR)'
+    newbie-protected: '&7(( המטרה שלך היא &aשחקן חדש &7ומוגנת מפגיעה ))'
+    newbie-no-gain: '&8(( אינך יכול לקבל STR מהריגות בזמן הגנת שחקן חדש ))'
+    protected-no-gain: '&8(( אינך יכול לקבל STR מהריגות בזמן הגנה ממוות ))'
+    gain: '&a&l⚡ [כוח התקבל] &7הכוח שלך עלה ל-&e&l%strength% STR&7!'
+    loss: '&c&l⚡ [כוח אבד] &7הכוח שלך ירד ל-&c&l%strength% STR&7!'
+    at-minimum: '&c&l✖ [מינימום כוח] &7אתה נמצא בגבול הכוח המינימלי.'
+    victim-at-minimum: '&c&l✖ [מינימום כוח] &7המטרה שלך כבר נמצאת בכוח המינימלי.'
+  abilities:
+    supercharge: '&d&lטעינת-על &r&7— לקשת שלך יש מהירות משיכה מיידית!'
+    scorpion-miss: '&c⚡ קרס העקרב החטיא!'
+    scorpion-hit-target: '&c⚡ נמשכת והוממת על ידי קרס העקרב של %player%!'
+    scorpion-hit-player: '&a⚡ פגיעה עם קרס העקרב! משכת את %target% ישירות אליך!'
+    no-arrows: '&cאין לך חצים!'
+    trident-no-throw: '&c&lלא ניתן לזרוק קלשונים! &7השתמש בו כנשק קפא''''פ.'
+    ability-cooldown: '&cהיכולת בזמן המתנה! (%remaining% שניות)'
+    bleed: '&5&lדימום &r&7— הלהב שלך גרם לקורבן לקמול!'
+    berserk-cooldown: '&cמצב ברסרק בהמתנה! (%remaining% שניות)'
+    blink-cooldown: '&cהבהוב בהמתנה! (%remaining% שניות)'
+    berserk-end: '&cמצב ברסרק הסתיים.'
+    berserk-start: '&e&lברסרק &r&7— מצב ברסרק הופעל! (+2 נזק התקפה, Speed III למשך 15 שניות)'
+    blink-success: '&5&lהבהוב &r&7— השתגרת קדימה!'
+    shield-active: '&6&lמגן פעיל &r&7— מחזיר את כל הנזק ו-Resistance II למשך 7 שניות!'
+    shield-ended: '&cהחזרת הנזק פגה.'
+    potion-disabled: '&c⚠ שיקויי כוח מושבתים.'
+    no-weapons-available: '&cאין סוגי נשק נוספים זמינים!'
+    rapid-fire: '&b&lירי מהיר &r&7— משגר מטח חצים מהיר!'
+    axe-stunned: '&cהוממת ממכת גרזן!'
+    axe-shield-disabled: '&cהמגן שלך הושבת על ידי מכת גרזן!'
+  items:
+    swap-key-hint: '&d&l⚡ &7השתמש במקש החלפת חפץ (F) כדי להשתמש ביכולת המגן!'
+    actionbar-cooldown: '&e&l⚡ &7יכולת נשק קשור בהמתנה! &c(%remaining% שניות)'
+    bound-to-another: '&d&l⚡ &7נשק זה קשור לנשמה אחרת!'
+    cannot-store-container: '&d&l⚡ &7אינך יכול לאחסן את הנשק הקשור שלך בתיבות או מיכלים!'
+    cannot-place-item: '&d&l⚡ &7אינך יכול להניח את הנשק הקשור שלך על זה!'
+    void-return: '&d&l⚡ &fהנשק הקשור שלך חזר מהריק (Void). &d&l⚡'
+    actionbar-returned: '&d&l⚡ הנשק הקשור חזר! ⚡'
+    return-knockback: '&d&l⚡ &7הועפת לאחור מנשק קשור שחזר!'
+    sealed-destiny-name: '&d&lגורל חתום'
+    sealed-destiny-lore-1: '&7חפץ עתיק המגלה את'
+    sealed-destiny-lore-2: '&7פוטנציאל הלוחם הפנימי שלך.'
+    sealed-destiny-lore-click: '&fלחץ מקש ימני כדי &bלעורר &fאת כוחך!'
+    sealed-destiny-lore-tag: '&a&lחינם &7(פרס כניסה ראשונה)'
+  gui:
+    bind-title: '&d&l⚡ קשירת נשק ⚡'
+    shuffle-title: '&0&lהתעוררות הגורל...'
+    invalid-class-slot: '&cנשק מקצוע לא חוקי בחריץ 14!'
+    already-bound: '&cנשק זה כבר קשור!'
+    need-more-strength: '&cאתה צריך לפחות %cost% כוח כדי לקשור את נשקך. יש לך %current%.'
+    bound-success: '&aהוצאת &e%cost% כוח &aכדי לקשור את נשק המקצוע שלך!'
+    bound-free-success: '&aנשקך נקשר ב&eחינם &aבחסדי הקרבת הנשמה שלך!'
+    bound-broadcast: '&d&l⚡ &f&lהנשק שלך נקשר אליך בהצלחה! &d&l⚡'
+    unbound-success: '&aהנשק שלך שוחרר מקשירה בהצלחה.'
+    starter-book-not-owner: '&c&l✖ &cספר הגרלה חינמי זה קשור ל-%owner% ואינך יכול להשתמש בו!'
+    starter-book-no-drop: '&c&l✖ &cאינך יכול להשליך את ספר ההגרלה האישי שלך!'
+    starter-book-no-container: '&c&l✖ &cאינך יכול להניח את ספר ההגרלה האישי שלך במיכלים!'
+    bind-select-title: '&d&l⚡ בחר מודל נשק ⚡'
+    bind-back-btn-title: '&c&l⬅ חזרה לחריץ הנשק'
+    bind-back-btn-lore: '&7חזור כדי להניח או לקחת חזרה את נשקך.'
+    bind-confirm-btn-bind: '&a&l⚡ אשר קשירת נשמה ⚡'
+    bind-confirm-btn-change: '&a&l⚡ אשר שינוי מודל ⚡'
+    bind-confirm-btn-not-enough: '&c&l❌ אין מספיק כוח'
+    bind-confirm-selected: '&7מודל נבחר: &b%model%'
+    bind-confirm-cost-free: 'חינם (הקרבת נשמה)'
+    bind-confirm-cost-str: '%cost% כוח'
+    bind-confirm-cost-line: '&7עלות קשירה: &e%cost%'
+    bind-confirm-strength-line: '&7הכוח שלך: &f%strength%'
+    bind-confirm-click-action: '&eלחץ כדי לקשור את נשקך עם מודל זה!'
+    bind-confirm-need-more: '&cאתה צריך לפחות %cost% כוח כדי לקשור!'
+    bind-model-selected: '&7סטטוס: &a&lנבחר'
+    bind-model-selected-lore: '&eמודל זה יוחל לאחר אישור.'
+    bind-model-not-selected: '&7סטטוס: &cלא נבחר'
+    bind-model-click-to-select: '&eלחץ לבחירת מודל זה!'
+    bind-target-preview: '&e&lמטרת קשירה: &f%item%'
+    bind-target-preview-lore: '&7בחר 1 מתוך 3 מודלים תלת-ממדיים ייחודיים למטה.'
+    bind-guide-title: '&d&l⚡ כיצד זה עובד ⚡'
+    bind-guide-step1: '&71. הנח את נשק המקצוע שלך ב&eחריץ 14&7.'
+    bind-guide-step2: '&72. לחץ &d&lקשור נשק &7כדי לראות &e3 מודלים מותאמים&7.'
+    bind-guide-step3: '&73. בחר את המודל המועדף עליך ולחץ &a&lאשר&7!'
+    bind-status-title: '&b&lסטטוס קשירה והטבות'
+    bind-status-class: '&7המקצוע שלך: %class%'
+    bind-status-bound: '&7נשק קשור: %status%'
+    bind-status-perks: '&eהטבות קשירה:'
+    bind-status-perk-death: '&d- נשמר במוות: &7נשק קשור לעולם אינו נופל בעת מוות'
+    bind-status-perk-loyalty: '&d- מעוף נאמנות: &7עף חזרה אליך בעת חזרה לחיים ומעיף אויבים לאחור'
+    bind-status-perk-soulbound: '&d- הילת נשמה: &7פולט חלקיקי קסם ייחודיים של המקצוע בעת החזקה'
+    bind-btn-change-model: '&a&l✨ שנה מודל (1 כוח) ✨'
+    bind-btn-cannot-change: '&c&l✨ לא ניתן לשנות מודל'
+    bind-btn-bind-weapon: '&d&l⚡ קשור נשק ⚡'
+    bind-btn-cannot-bind: '&c&l⚡ לא ניתן לקשור נשק'
+    bind-btn-desc: '&7קשור נשק זה לנשמתך.'
+    bind-btn-desc-change: '&7שנה את מודל התלת-ממד של נשקך הקשור.'
+    bind-btn-cost: '&7עלות: &e%cost%'
+    bind-btn-status: '&7סטטוס: %status%'
+    bind-btn-click-choose: '&eלחץ לבחירת מודל תלת-ממד לנשקך!'
+    bind-action-place-weapon: '&cאנא הנח נשק בחריץ 14.'
+    bind-action-no-class: '&cאין לך מקצוע נשק!'
+    bind-action-wrong-class: '&cהנשק אינו תואם למקצוע שלך (%class%)!'
+    bind-action-other-player: '&cקשור לשחקן אחר!'
+    bind-action-change-model: '&aלחץ לבחירת מודל חדש!'
+    bind-action-ready: '&aמוכן לבחירת המודל שלך!'
+    unbind-title: '&c&l⚡ שחרור נשק ⚡'
+    unbind-desc: '&7שחרר את הנשק הקשור הנוכחי שלך.'
+    unbind-status: '&7סטטוס: %status%'
+    unbind-action: '&eלחץ לשחרור הנשק בחריץ 14.'
+    unbind-cannot: '&cהנח נשק קשור בחריץ 14.'
+    bind-stats-kills: '&d&l⚔ הריגות עם הנשק'
+    bind-stats-kills-desc: '&7עוקב אחר הריגות PvP שהושגו עם הנשק הקשור שלך.'
+    bind-stats-damage: '&d&l💥 נזק שנגרם'
+    bind-stats-damage-desc: '&7עוקב אחר סך הנזק שנגרם עם הנשק הקשור שלך.'
+    bind-stats-sacrifices: '&d&l🛡️ הקרבות נשמה'
+    bind-stats-sacrifices-desc: '&7עוקב אחר הצלות ממוות שהופעלו על ידי הנשק הקשור שלך.'
+    bind-stats-duration: '&d&l⌛ משך קשירה'
+    bind-stats-duration-desc: '&7עוקב אחר משך הזמן שעבר מאז שקשרת את נשקך הנוכחי.'
+    bind-stats-abilities: '&d&l✨ הפעלות יכולת'
+    bind-stats-abilities-desc: '&7עוקב אחר שימושים ביכולת הנשק בזמן שהוא קשור.'
+    not-your-weapon: '&cנשק זה קשור לשחקן אחר!'
+    place-weapon-first: '&cאנא הנח תחילה את נשק המקצוע שלך בחריץ 14!'
+    skin-changed-success: '&aהוצאת &e1 כוח &aכדי לשנות את מודל הנשק שלך!'
+  ledger:
+    title: '  ספר האגדות'
+    header: '-------------------'
+    warrior: 'לוחם: '
+    strength: 'כוח: '
+    class: 'מקצוע: '
+    bounty: 'פרס: '
+    kills: 'הריגות: '
+    deaths: 'מיתות: '
+    kd: 'יחס הריגות/מיתות: '
+    footer: 'הגורל מחושל בדם.'
+  ranks:
+    unassigned: '&e[לא הוקצה]'
+    -10: '&8[חסר תקווה]'
+    -9: '&8[אומלל]'
+    -8: '&7[שברירי]'
+    -7: '&7[חלשלוש]'
+    -6: '&7[איכר]'
+    -5: '&f[ווסאל]'
+    -4: '&f[אזרח]'
+    -3: '&a[נושא כלים]'
+    -2: '&a[שוליה]'
+    -1: '&e[טירון]'
+    0: '&e[ניטרלי]'
+    1: '&d[מתחיל]'
+    2: '&b[חייל]'
+    3: '&5&l[אביר]'
+    4: '&6&l[ותיק קרבות]'
+    5: '&c&l[אלוף]'
+    6: '&4&l[מצביא]'
+    7: '&4&l[כובש]'
+    8: '&5&l[רב-אומן]'
+    9: '&d&l[שליט עליון]'
+    10: '&x&f&f&a&a&0&0&l[חצי אל]'
+  weapons:
+    unassigned: 'לא הוקצה'
+    sword:
+      name: 'חרב'
+      desc: 'אחיזה כפולה ופגיעה קריטית אוטומטית פסיבית'
+    axe:
+      name: 'גרזן'
+      desc: 'פגיעות קריטיות מהממות + אגירת נזק קינטי'
+    trident:
+      name: 'קלשון'
+      desc: 'ברק פסיבי + ניידות גלי מים'
+    shield:
+      name: 'מגן'
+      desc: 'מהירות II בהממה + 15 שניות אלמוות'
+    bow:
+      name: 'קשת'
+      desc: 'קרן קול קווית אולטימטיבית (נזק אזורי)'
+    crossbow:
+      name: 'רובה קשת'
+      desc: 'חצים זוהרים + רצועת אחיזה אולטימטיבית'
+  commands:
+    withdraw-success: '<#2ecc71><b>משיכה</b></#2ecc71> <gray>משכת</gray> <#f1c40f>%amount% STR</#f1c40f><gray>. נותר:</gray> <white>%remaining%</white>'
+    punish-message: '<#e74c3c><b>[עונש]</b></#e74c3c> <gray>נענשת על ידי אדמין. במשך</gray> <white>24 השעות</white> <gray>הקרובות, תאבד</gray> <red><b>2 STR</b></red> <gray>בכל מוות.</gray>'
+    no-newbie-message: '<#e74c3c><b>[אדמין]</b></#e74c3c> <gray>הגנת השחקן החדש שלך הוסרה. כעת אתה משתתף מלא בכלכלת הכוח.</gray>'
+    bounty-refund: '<#2ecc71><b>[!]</b></#2ecc71> <gray>הפרס שלך בסך</gray> <#f1c40f>%amount% STR</#f1c40f> <gray>על %target% הוחזר על ידי אדמין.</gray>'
+    bounty-help-header: '<#f1c40f><b>[מערכת פרסים]</b></#f1c40f>'
+    bounty-help-place: ' <#f39c12>•</#f39c12> <white>/bounty <שחקן> <כמות></white> <gray>הצב פרס באמצעות ה-STR שלך</gray>'
+    bounty-help-list: ' <#f39c12>•</#f39c12> <white>/bounty list</white> <gray>צפה בכל הפרסים הפעילים</gray>'
+    language-changed: '<#2ecc71><b>[שפה]</b></#2ecc71> <gray>השפה שונתה ל-</gray><white>%lang%</white><gray>!</gray>'
+    error-prefix: '[שגיאה]'
+    success-prefix: '[הצלחה]'
+    admin:
+      help-header: '<#f1c40f><b>[StrengthSMP ניהול]</b></#f1c40f>'
+      help-maintenance: ' <#f39c12>•</#f39c12> <white>/strengthsmp maintenance <on|off></white> <gray>— מצב תחזוקה</gray>'
+      help-toggle: ' <#f39c12>•</#f39c12> <white>/strengthsmp toggle</white> <gray>— החלפת מצב מערכת</gray>'
+      help-reload: ' <#f39c12>•</#f39c12> <white>/strengthsmp reload</white> <gray>— טעינה מחדש של ההגדרות</gray>'
+      help-lang: ' <#f39c12>•</#f39c12> <white>/strengthsmp lang <en|ru|es|de|fr|pt|hi|ur|he></white> <gray>— החלפת שפת התוסף</gray>'
+      help-info: ' <#f39c12>•</#f39c12> <white>/strengthsmp info</white> <gray>— מצב המערכת</gray>'
+      help-setupboard: ' <#f39c12>•</#f39c12> <white>/strengthsmp setupboard</white> <gray>— הגדרת לוח דיסקורד</gray>'
+      help-resetplayer: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetplayer <שחקן></white>'
+      help-reroll: ' <#f39c12>•</#f39c12> <white>/strengthsmp reroll <שחקן></white>'
+      help-setstrength: ' <#f39c12>•</#f39c12> <white>/strengthsmp setstrength <שחקן> <כמות></white>'
+      help-setweapon: ' <#f39c12>•</#f39c12> <white>/strengthsmp setweapon <שחקן> <נשק></white>'
+      help-giveitem: ' <#f39c12>•</#f39c12> <white>/strengthsmp giveitem <שחקן> <strength|reroll|death></white>'
+      help-resetmonarch: ' <#f39c12>•</#f39c12> <white>/strengthsmp resetmonarch</white> <gray>— חישוב מחדש של המונרך</gray>'
+      help-pack: ' <#f39c12>•</#f39c12> <white>/strengthsmp pack</white> <gray>— כפיית שליחת חבילת משאבים</gray>'
+      state-on: '<#e74c3c><b>פעיל</b></#e74c3c>'
+      state-off: '<b>כבוי</b>'
+      state-enabled: '<b>מופעל</b>'
+      state-disabled: '<#e74c3c><b>מושבת</b></#e74c3c>'
+      maintenance-on: '<#e74c3c><b>[מצב תחזוקה]</b> מצב תחזוקה כעת <b>פעיל</b> (המערכת מושבתת ו-KeepInventory פעיל).</#e74c3c>'
+      maintenance-off: '<#2ecc71><b>[מצב תחזוקה]</b> מצב תחזוקה כעת <b>כבוי</b> (המערכת מופעלת).</#2ecc71>'
+      maintenance-usage: 'שימוש: /strengthsmp maintenance <on|off>'
+      maintenance-toggled: '<#2ecc71>מצב תחזוקה כעת %state%</#2ecc71>'
+      system-toggled: '<#2ecc71>המערכת כעת %state%</#2ecc71>'
+      reload-success: 'ההגדרות נטענו מחדש בהצלחה.'
+      lang-current: '<#f1c40f><b>[שפה]</b> השפה הנוכחית היא: <b>%lang%</b>. שימוש: /strengthsmp lang <en|ru|es|de|fr|pt|hi|ur|he></#f1c40f>'
+      pack-sending: '<#2ecc71>מנסה לשלוח חבילת משאבים... בדוק בקונסולה למידע נוסף.</#2ecc71>'
+      info-header: '<#f1c40f><b>[מידע מערכת]</b></#f1c40f>'
+      info-status: ' <#95a5a6>סטטוס:</#95a5a6> %status%'
+      info-status-enabled: '<#2ecc71>מופעל</#2ecc71>'
+      info-status-disabled: '<#e74c3c>מושבת</#e74c3c>'
+      info-monarch: ' <#95a5a6>מונרך:</#95a5a6> <#f1c40f>%monarch%</#f1c40f>'
+      info-monarch-none: 'אין'
+      info-online: ' <#95a5a6>שחקנים מחוברים:</#95a5a6> <white>%count%</white>'
+      reroll-usage: 'שימוש: /strengthsmp reroll <שחקן>'
+      reroll-success: 'הוגרל מחדש עבור %player% ← %icon% %weapon%'
+      reroll-target: '<#2ecc71><b>[!]</b></#2ecc71> <gray>אדמין הגריל מחדש את נשקך ל-</gray><#f1c40f><b>%weapon%</b></#f1c40f>'
+      setstrength-usage: 'שימוש: /strengthsmp setstrength <שחקן> <כמות>'
+      setstrength-success: 'הכוח של %player% הוגדר ל-<#f1c40f>%amount%</#f1c40f>'
+      setweapon-usage: 'שימוש: /strengthsmp setweapon <שחקן> <נשק>'
+      setweapon-success: 'הנשק של %player% הוגדר ל-<#f1c40f>%weapon%</#f1c40f>'
+      setweapon-target: '<#2ecc71><b>[!]</b></#2ecc71> <gray>מקצוע הנשק שלך שונה ל-</gray><#f1c40f><b>%weapon%</b></#f1c40f> <gray>על ידי אדמין.</gray>'
+      setweapon-invalid: 'סוג נשק לא חוקי! השתמש ב: SWORD, AXE, BOW, CROSSBOW, SHIELD, TRIDENT'
+      resetplayer-usage: 'שימוש: /strengthsmp resetplayer <שחקן>'
+      resetplayer-success: 'הנתונים של <#f1c40f>%player%</#f1c40f> אופסו בהצלחה'
+      resetplayer-target: '<#e74c3c><b>[!]</b></#e74c3c> <gray>הנתונים שלך אופסו על ידי אדמין.</gray>'
+      giveitem-usage: 'שימוש: /strengthsmp giveitem <שחקן> <strength|reroll|death>'
+      giveitem-strength: 'הוענק חפץ כוח לשחקן <#f1c40f>%player%</#f1c40f>'
+      giveitem-reroll: 'הוענק חפץ הגרלה מחדש לשחקן <#f1c40f>%player%</#f1c40f>'
+      giveitem-death: 'הוענקה תעודת מוות לשחקן <#f1c40f>%player%</#f1c40f>'
+      giveitem-unknown: 'סוג חפץ לא ידוע. השתמש ב: strength, reroll, או death'
+      checkitem-usage: 'שימוש: /strengthsmp checkitem <שחקן>'
+      checkitem-not-holding: 'השחקן %player% אינו מחזיק חפץ ביד!'
+      checkitem-header: '<#2ecc71><b>[בדיקת חפץ]</b></#2ecc71>'
+      checkitem-player: ' <#95a5a6>שחקן:</#95a5a6> <white>%player%</white>'
+      checkitem-material: ' <#95a5a6>סוג חומר:</#95a5a6> <white>%material%</white>'
+      checkitem-cmd: ' <#95a5a6>CustomModelData:</#95a5a6> <#f1c40f>%value%</#f1c40f>'
+      board-not-connected: 'בוט הדיסקורד אינו מחובר!'
+      board-success: 'לוח הדיסקורד עודכן.'
+      resetmonarch-success: 'מעמד המונרך חושב מחדש.'
+      unknown-subcommand: 'פקודת משנה לא מוכרת: <#f1c40f>%sub%</#f1c40f>. השתמש ב-<white>/strengthsmp</white> לעזרה.'

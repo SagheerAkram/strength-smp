@@ -12,6 +12,7 @@ package com.floki.strengthsmp.commands;
 
 import com.floki.strengthsmp.StrengthSMP;
 import com.floki.strengthsmp.commands.BaseCommand;
+import com.floki.strengthsmp.util.MessageUtil;
 import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -55,7 +56,7 @@ extends BaseCommand {
                 Player setter = Bukkit.getPlayer((UUID)setterUuid);
                 if (setter == null || !setter.isOnline()) continue;
                 this.plugin.updateDisplay(setter);
-                this.sendMessage((CommandSender)setter, "<#2ecc71><b>[!]</b></#2ecc71> <gray>Your bounty of</gray> <#f1c40f>" + amount + " STR</#f1c40f> <gray>on " + target.getName() + " was refunded by an admin.</gray>");
+                MessageUtil.sendWithDefault(setter, "commands.bounty-refund", "<#2ecc71><b>[!]</b></#2ecc71> <gray>Your bounty of</gray> <#f1c40f>%amount% STR</#f1c40f> <gray>on %target% was refunded by an admin.</gray>", "amount", String.valueOf(amount), "target", target.getName());
             }
             this.plugin.getMonarchService().calculateNewMonarch();
         }

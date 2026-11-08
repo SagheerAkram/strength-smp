@@ -53,7 +53,15 @@ public class MonarchService {
     }
 
     private void checkDailyCrown() {
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Karachi"));
+        ZoneId zone;
+        try {
+            String tz = this.plugin.getConfigManager().getC().getString("monarch.daily-reset-timezone", "");
+            zone = tz == null || tz.isEmpty() ? ZoneId.systemDefault() : ZoneId.of(tz);
+        }
+        catch (Exception e) {
+            zone = ZoneId.systemDefault();
+        }
+        ZonedDateTime now = ZonedDateTime.now(zone);
         long today = Long.parseLong(now.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
         long lastUpdate = this.dataManager.getLastMonarchUpdate();
         if (now.getHour() >= 5 && lastUpdate < today) {
@@ -88,6 +96,25 @@ public class MonarchService {
             if (this.plugin.getDiscordManager() != null) {
                 this.plugin.getDiscordManager().updateDashboard();
             }
+        }
+    }
+
+    public void setMonarchDirectly(UUID newMonarch) {
+        if (newMonarch == null) return;
+        UUID oldMonarch = this.currentMonarchUUID;
+        if (oldMonarch != null) {
+            this.clearMonarch();
+        }
+        this.dataManager.setMonarch(newMonarch);
+        this.currentMonarchUUID = newMonarch;
+        this.announceNewMonarch(newMonarch);
+        Player newPlayer = Bukkit.getPlayer(newMonarch);
+        if (newPlayer != null) {
+            this.applyMonarchEffects(newPlayer);
+            this.plugin.updateDisplay(newPlayer);
+        }
+        if (this.plugin.getDiscordManager() != null) {
+            this.plugin.getDiscordManager().updateDashboard();
         }
     }
 

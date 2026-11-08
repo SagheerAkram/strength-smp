@@ -36,6 +36,8 @@ public class ItemFactory {
     private static final String REROLL_ITEM_KEY = "smp_reroll_token";
     private static final String DEATH_CERT_KEY = "smp_death_certificate";
 
+    private static final String STARTER_BOOK_OWNER_KEY = "smp_starter_book_owner";
+
     private static String color(String msg) {
         return ChatColor.translateAlternateColorCodes((char)'&', (String)msg);
     }
@@ -81,14 +83,47 @@ public class ItemFactory {
     }
 
     public static ItemStack createSealedDestiny(Plugin plugin) {
+        return createSealedDestiny(plugin, null);
+    }
+
+    public static ItemStack createSealedDestiny(Plugin plugin, Player owner) {
         ItemStack item = ItemFactory.createRerollItem(plugin, 1);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ItemFactory.color("&d&lSEALED DESTINY"));
-            meta.setLore(Arrays.asList(ItemFactory.color("&7An ancient artifact that reveals"), ItemFactory.color("&7your inner warrior potential."), "", ItemFactory.color("&fRight-click to &bAWAKEN &fyour power!"), "", ItemFactory.color("&a&lFREE &7(First Join Reward)")));
+            meta.setDisplayName(ItemFactory.color(MessageUtil.get("items.sealed-destiny-name", "&d&lSEALED DESTINY")));
+            String tag = MessageUtil.get("items.sealed-destiny-lore-tag", "&a&lFREE &7(First Join Reward)");
+            meta.setLore(Arrays.asList(
+                ItemFactory.color(MessageUtil.get("items.sealed-destiny-lore-1", "&7An ancient artifact that reveals")),
+                ItemFactory.color(MessageUtil.get("items.sealed-destiny-lore-2", "&7your inner warrior potential.")),
+                "",
+                ItemFactory.color(MessageUtil.get("items.sealed-destiny-lore-click", "&fRight-click to &bAWAKEN &fyour power!")),
+                "",
+                ItemFactory.color(tag + (owner != null ? " &8[&e" + owner.getName() + "&8]" : ""))
+            ));
+            if (owner != null) {
+                meta.getPersistentDataContainer().set(new NamespacedKey(plugin, STARTER_BOOK_OWNER_KEY), PersistentDataType.STRING, owner.getUniqueId().toString());
+            }
             item.setItemMeta(meta);
         }
         return item;
+    }
+
+    public static boolean isStarterRerollBook(ItemStack item) {
+        if (item == null || !item.hasItemMeta()) return false;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return false;
+        StrengthSMP plugin = StrengthSMP.getInstance();
+        NamespacedKey key = new NamespacedKey((Plugin)plugin, STARTER_BOOK_OWNER_KEY);
+        return meta.getPersistentDataContainer().has(key, PersistentDataType.STRING);
+    }
+
+    public static String getStarterRerollBookOwner(ItemStack item) {
+        if (item == null || !item.hasItemMeta()) return null;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return null;
+        StrengthSMP plugin = StrengthSMP.getInstance();
+        NamespacedKey key = new NamespacedKey((Plugin)plugin, STARTER_BOOK_OWNER_KEY);
+        return meta.getPersistentDataContainer().get(key, PersistentDataType.STRING);
     }
 
     public static ItemStack createDeathCertificate(Plugin plugin, String victimName, String killerName) {
@@ -260,49 +295,98 @@ public class ItemFactory {
         }
     }
 
-    public static void unbindAllPlayerItems(Player player) {
+    public static void unbindItem(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR || !item.hasItemMeta()) {
+            return;
+        }
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) {
+            return;
+        }
         StrengthSMP plugin = StrengthSMP.getInstance();
         NamespacedKey boundKey = new NamespacedKey((Plugin)plugin, "bound_player_uuid");
         NamespacedKey itemIdKey = new NamespacedKey((Plugin)plugin, "bound_item_id");
+        NamespacedKey origCmdKey = new NamespacedKey((Plugin)plugin, "smp_original_cmd");
+        NamespacedKey origNameKey = new NamespacedKey((Plugin)plugin, "smp_original_name");
+        NamespacedKey origLoreKey = new NamespacedKey((Plugin)plugin, "smp_original_lore");
+
+        meta.getPersistentDataContainer().remove(boundKey);
+        meta.getPersistentDataContainer().remove(itemIdKey);
+
+        // 1. Texture (CustomModelData)
+        if (meta.getPersistentDataContainer().has(origCmdKey, PersistentDataType.INTEGER)) {
+            int origCmd = (Integer)meta.getPersistentDataContainer().get(origCmdKey, PersistentDataType.INTEGER);
+            if (origCmd >= 12000 && origCmd <= 14000) {
+                meta.setCustomModelData(null);
+            } else {
+                meta.setCustomModelData(Integer.valueOf(origCmd));
+            }
+            meta.getPersistentDataContainer().remove(origCmdKey);
+        } else {
+            meta.setCustomModelData(null);
+        }
+
+        // 2. Display Name
+        if (meta.getPersistentDataContainer().has(origNameKey, PersistentDataType.STRING)) {
+            String origName = (String)meta.getPersistentDataContainer().get(origNameKey, PersistentDataType.STRING);
+            if (origName != null && (origName.contains("⚡") || origName.contains("\u26a1"))) {
+                meta.setDisplayName(null);
+            } else {
+                meta.setDisplayName(origName);
+            }
+            meta.getPersistentDataContainer().remove(origNameKey);
+        } else {
+            meta.setDisplayName(null);
+        }
+
+        // 3. Lore
+        if (meta.getPersistentDataContainer().has(origLoreKey, PersistentDataType.STRING)) {
+            String origLoreRaw = (String)meta.getPersistentDataContainer().get(origLoreKey, PersistentDataType.STRING);
+            if (origLoreRaw != null && !origLoreRaw.isEmpty()) {
+                if (origLoreRaw.contains("BOUND WEAPON") || origLoreRaw.contains("Soulbound to:")) {
+                    meta.setLore(null);
+                } else {
+                    meta.setLore(Arrays.asList(origLoreRaw.split("\\|\\|\\|")));
+                }
+            } else {
+                meta.setLore(null);
+            }
+            meta.getPersistentDataContainer().remove(origLoreKey);
+        } else {
+            meta.setLore(null);
+        }
+
+        item.setItemMeta(meta);
+    }
+
+    public static void unbindAllPlayerItems(Player player) {
+        if (player == null) {
+            return;
+        }
+        StrengthSMP plugin = StrengthSMP.getInstance();
+        NamespacedKey boundKey = new NamespacedKey((Plugin)plugin, "bound_player_uuid");
         ItemStack[] contents = player.getInventory().getContents();
         boolean changed = false;
         for (int i = 0; i < contents.length; ++i) {
-            ItemMeta meta;
             ItemStack item = contents[i];
-            if (item == null || item.getType() == Material.AIR || !item.hasItemMeta() || (meta = item.getItemMeta()) == null || !meta.getPersistentDataContainer().has(boundKey, PersistentDataType.STRING)) continue;
+            if (item == null || item.getType() == Material.AIR || !item.hasItemMeta()) continue;
+            ItemMeta meta = item.getItemMeta();
+            if (meta == null || !meta.getPersistentDataContainer().has(boundKey, PersistentDataType.STRING)) continue;
             String ownerUuidStr = (String)meta.getPersistentDataContainer().get(boundKey, PersistentDataType.STRING);
             if (!player.getUniqueId().toString().equals(ownerUuidStr)) continue;
-            meta.getPersistentDataContainer().remove(boundKey);
-            meta.getPersistentDataContainer().remove(itemIdKey);
-            NamespacedKey origCmdKey = new NamespacedKey((Plugin)plugin, "smp_original_cmd");
-            NamespacedKey origNameKey = new NamespacedKey((Plugin)plugin, "smp_original_name");
-            if (meta.getPersistentDataContainer().has(origCmdKey, PersistentDataType.INTEGER)) {
-                int origCmd = (Integer)meta.getPersistentDataContainer().get(origCmdKey, PersistentDataType.INTEGER);
-                meta.setCustomModelData(Integer.valueOf(origCmd));
-                meta.getPersistentDataContainer().remove(origCmdKey);
-            } else {
-                meta.setCustomModelData(null);
-            }
-            List lore = meta.getLore();
-            if (lore != null) {
-                String prefix = MessageUtil.color(StrengthSMP.getInstance().getConfigManager().getBindLorePrefix());
-                lore.remove(prefix);
-                String parsedPrefix = MessageUtil.parse(StrengthSMP.getInstance().getConfigManager().getBindLorePrefix());
-                lore.remove(parsedPrefix);
-                lore.remove(ChatColor.stripColor((String)parsedPrefix));
-                meta.setLore(lore);
-            }
-            if (meta.getPersistentDataContainer().has(origNameKey, PersistentDataType.STRING)) {
-                String origName = (String)meta.getPersistentDataContainer().get(origNameKey, PersistentDataType.STRING);
-                meta.setDisplayName(origName);
-                meta.getPersistentDataContainer().remove(origNameKey);
-            } else if (meta.hasDisplayName()) {
-                String strippedName = ChatColor.stripColor((String)meta.getDisplayName());
-                strippedName = strippedName.replace("\u26a1", "").trim();
-                meta.setDisplayName(ItemFactory.color("&f" + strippedName));
-            }
-            item.setItemMeta(meta);
+            unbindItem(item);
             changed = true;
+        }
+        ItemStack cursor = player.getItemOnCursor();
+        if (cursor != null && cursor.getType() != Material.AIR && cursor.hasItemMeta()) {
+            ItemMeta meta = cursor.getItemMeta();
+            if (meta != null && meta.getPersistentDataContainer().has(boundKey, PersistentDataType.STRING)) {
+                String ownerUuidStr = (String)meta.getPersistentDataContainer().get(boundKey, PersistentDataType.STRING);
+                if (player.getUniqueId().toString().equals(ownerUuidStr)) {
+                    unbindItem(cursor);
+                    changed = true;
+                }
+            }
         }
         if (changed) {
             player.updateInventory();

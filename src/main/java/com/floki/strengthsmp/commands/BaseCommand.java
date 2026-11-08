@@ -1,6 +1,6 @@
 /*
  * Decompiled with CFR 0.152.
- * 
+ *
  * Could not load the following classes:
  *  org.bukkit.command.CommandExecutor
  *  org.bukkit.command.CommandSender
@@ -27,19 +27,20 @@ implements CommandExecutor {
     }
 
     protected void sendError(CommandSender sender, String message) {
-        sender.sendMessage(MessageUtil.parse("<#e74c3c><b>[ERROR]</b> " + message));
+        String label = MessageUtil.get("commands.error-prefix", "[ERROR]");
+        sender.sendMessage(MessageUtil.parse("<#e74c3c><b>" + label + "</b> " + message));
     }
 
     protected void sendSuccess(CommandSender sender, String message) {
-        sender.sendMessage(MessageUtil.parse("<#2ecc71><b>[SUCCESS]</b> " + message));
+        String label = MessageUtil.get("commands.success-prefix", "[SUCCESS]");
+        sender.sendMessage(MessageUtil.parse("<#2ecc71><b>" + label + "</b> " + message));
     }
 
     protected boolean isPlayer(CommandSender sender) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(MessageUtil.parse("<#e74c3c>This command is only available for players!"));
+            MessageUtil.sendWithDefault(sender, "only-players", "&c&l✖ &c&lPLAYERS ONLY! &7This command can only be run in-game.");
             return false;
         }
         return true;
     }
 }
-

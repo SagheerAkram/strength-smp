@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -48,17 +49,20 @@ public class ConfigManager {
         this.discord = this.loadFile("discord.yml");
         this.migrateDiscordConfig();
         this.migrateResourcePack();
+        this.migrateRecipes();
     }
 
     private FileConfiguration loadFile(String fileName) {
         File file = new File(this.plugin.getDataFolder(), fileName);
         if (!file.exists()) {
-            this.plugin.saveResource(fileName, false);
+            try {
+                this.plugin.saveResource(fileName, false);
+            } catch (Exception ignored) {}
         }
         YamlConfiguration configuration = YamlConfiguration.loadConfiguration((File)file);
         InputStream defConfigStream = this.plugin.getResource(fileName);
         if (defConfigStream != null) {
-            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration((Reader)new InputStreamReader(defConfigStream));
+            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration((Reader)new InputStreamReader(defConfigStream, StandardCharsets.UTF_8));
             configuration.setDefaults((Configuration)defConfig);
         }
         return configuration;
@@ -128,19 +132,42 @@ public class ConfigManager {
         }
     }
 
-    private void migrateResourcePack() {
-        String currentMode = this.config.getString("resource-pack.hosting.mode", "INTERNAL");
-        String currentUrl = this.config.getString("resource-pack.url", "");
-        String correctUrl = "https://download.mc-packs.net/pack/373f6b038da9d35301d65f930be4d1e09701f8e2.zip";
-        String correctHash = "373f6b038da9d35301d65f930be4d1e09701f8e2";
-        if (currentMode.equalsIgnoreCase("INTERNAL") || currentUrl.contains("github") || currentUrl.contains("127.0.0.1") || currentUrl.contains("localhost") || currentUrl.isEmpty()) {
-            this.plugin.getLogger().warning("\u26a0\ufe0f Resource pack config is outdated. Auto-migrating to EXTERNAL CDN hosting...");
-            this.config.set("resource-pack.hosting.mode", (Object)"EXTERNAL");
-            this.config.set("resource-pack.hosting.public-ip", (Object)"AUTO");
-            this.config.set("resource-pack.url", (Object)correctUrl);
-            this.config.set("resource-pack.hash", (Object)correctHash);
+    /**
+     * The recipes: section in config.yml used to be decorative — the recipes were
+     * hardcoded in Java and never matched it. Now that the section is authoritative, any
+     * config still carrying those stale, never-used defaults would silently change the
+     * recipe on update, so rewrite it to the recipe that was actually in force.
+     * Configs that were genuinely customised hold different values and are left untouched.
+     */
+    private void migrateRecipes() {
+        boolean changed = false;
+        if ("DIAMOND_PICKAXE".equalsIgnoreCase(this.config.getString("recipes.strength-item.ingredients.P", "")) && "NETHERITE_INGOT".equalsIgnoreCase(this.config.getString("recipes.strength-item.ingredients.S", ""))) {
+            this.config.set("recipes.strength-item.ingredients.P", (Object)"NETHERITE_PICKAXE");
+            this.config.set("recipes.strength-item.ingredients.S", (Object)"NETHERITE_SCRAP");
+            changed = true;
+        }
+        if ("PRISMARINE_CRYSTALS".equalsIgnoreCase(this.config.getString("recipes.reroll-weapon.ingredients.S", ""))) {
+            this.config.set("recipes.reroll-weapon.ingredients.S", (Object)"PRISMARINE_SHARD");
+            changed = true;
+        }
+        if (changed) {
             this.saveConfig();
-            this.plugin.getLogger().info("\u2705 Resource pack config migrated to EXTERNAL CDN (mc-packs.net)!");
+            this.plugin.getLogger().info("✅ Recipe config aligned with the recipes that were already in force (crafting is unchanged).");
+        }
+    }
+
+    private void migrateResourcePack() {
+        String currentUrl = this.config.getString("resource-pack.url", "");
+        String currentHash = this.config.getString("resource-pack.hash", "");
+        String oldBrokenHash = "373f6b038da9d35301d65f930be4d1e09701f8e2";
+        if (currentUrl.contains(oldBrokenHash) || currentHash.equalsIgnoreCase(oldBrokenHash)) {
+            this.plugin.getLogger().warning("⚠️ Detected outdated resource pack link. Switching to INTERNAL hosting mode...");
+            this.config.set("resource-pack.hosting.mode", (Object)"INTERNAL");
+            this.config.set("resource-pack.hosting.public-ip", (Object)"AUTO");
+            this.config.set("resource-pack.url", (Object)"");
+            this.config.set("resource-pack.hash", (Object)"");
+            this.saveConfig();
+            this.plugin.getLogger().info("✅ Resource pack hosting configured to INTERNAL mode!");
         }
     }
 

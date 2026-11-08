@@ -28,6 +28,18 @@ public class Config {
         return this.configManager.getConfig();
     }
 
+    public FileConfiguration getConfig() {
+        return this.getC();
+    }
+
+    public void saveConfig() {
+        this.configManager.saveConfig();
+    }
+
+    public void reloadAll() {
+        this.reload();
+    }
+
     public FileConfiguration getW() {
         return this.configManager.getWeapons();
     }
@@ -451,6 +463,11 @@ public class Config {
     }
 
     public String getRankNameForStrength(int strength) {
+        String msgKey = "ranks." + strength;
+        String localized = com.floki.strengthsmp.util.MessageUtil.get(msgKey, "");
+        if (localized != null && !localized.isEmpty() && !localized.equals(msgKey)) {
+            return localized;
+        }
         String key = "strength-ranks." + strength;
         if (this.getC().contains(key)) {
             return this.getC().getString(key);
